@@ -1,0 +1,25 @@
+<Test>
+  <Name>tcp-bytes-in-flight-test</Name>
+  <Result>PASS</Result>
+  <Time real="0.840" user="0.350" system="0.020"/>
+  <Test>
+    <Name>BytesInFlight value, no drop</Name>
+    <Result>PASS</Result>
+    <Time real="0.250" user="0.100" system="0.000"/>
+  </Test>
+  <Test>
+    <Name>BytesInFlight value, one drop</Name>
+    <Result>PASS</Result>
+    <Time real="0.200" user="0.080" system="0.010"/>
+  </Test>
+  <Test>
+    <Name>BytesInFlight value, two drop of same segment</Name>
+    <Result>PASS</Result>
+    <Time real="0.240" user="0.080" system="0.010"/>
+  </Test>
+  <Test>
+    <Name>BytesInFlight value, two drop of consecutive segments</Name>
+    <Result>PASS</Result>
+    <Time real="0.150" user="0.080" system="0.000"/>
+  </Test>
+</Test>

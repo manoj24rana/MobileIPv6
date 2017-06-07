@@ -1,0 +1,1042 @@
+
+#ifndef MIPV6_HEADER_H
+#define MIPV6_HEADER_H
+
+#include <list>
+
+#include "ns3/header.h"
+#include "ns3/ipv6-address.h"
+#include "ns3/packet.h"
+
+//#include "ipv6-mobility-option-header.h"
+
+namespace ns3
+{
+
+class Identifier;
+
+class Ipv6MobilityHeader : public Header
+{
+public:
+   enum MhType_e
+  {
+        HOME_TEST_INIT=1,
+        CARE_OF_TEST_INIT=2,
+        HOME_TEST=3,
+        CARE_OF_TEST=4,	
+        IPV6_MOBILITY_BINDING_UPDATE=5,
+	IPV6_MOBILITY_BINDING_ACKNOWLEDGEMENT=6,
+        IPV6_DESTINATION_OPTION=7,
+        IPV6_MOBILITY_RCOA_REQ=8,
+        IPV6_MOBILITY_RCOA_REP=9
+ };
+  enum BAStatus_e {
+        BA_STATUS_BINDING_UPDATE_ACCEPTED = 0,
+	BA_STATUS_REASON_UNSPECIFIED = 128,
+	BA_STATUS_ADMINISTRATIVELY_PROHIBITED,
+	BA_STATUS_INSUFFICIENT_RESOURCES = 130,
+	
+    /* PMIPv6 extended BA status */
+	
+        BA_STATUS_PROXY_REG_NOT_ENABLED = 152,
+	BA_STATUS_NOT_LMA_FOR_THIS_MOBILE_NODE,
+	BA_STATUS_NOT_AUTHORIZED_FOR_PROXY_REG,
+	BA_STATUS_MAG_NOT_AUTHORIZED_FOR_HOME_NETWORK_PREFIX = 155,
+	BA_STATUS_TIMESTAMP_MISMATCH,
+	BA_STATUS_TIMESTAMP_LOWER_THAN_PREV_ACCEPTED,
+	BA_STATUS_MISSING_HOME_NETWORK_PREFIX_OPTION,
+	BA_STATUS_BCE_PBU_PREFIX_SET_DO_NOT_MATCH,
+	BA_STATUS_MISSING_MN_IDENTIFIER_OPTION = 160,
+	BA_STATUS_MISSING_HANDOFF_INDICATOR_OPTION,
+	BA_STATUS_MISSING_ACCESS_TECH_TYPE_OPTION
+  };
+  static TypeId GetTypeId ();
+
+  /**
+   * \brief Get the instance type ID.
+   * \return instance type ID
+   */
+  virtual TypeId GetInstanceTypeId () const;
+
+  /**
+   * \brief Constructor.
+   */
+  Ipv6MobilityHeader ();
+
+  /**
+   * \brief Destructor.
+   */
+  virtual ~Ipv6MobilityHeader ();
+  
+  /**
+   * \brief Get the payload proto field.
+   * \return payload proto (MUST BE 59)
+   */
+  uint8_t GetPayloadProto () const;
+
+  /**
+   * \brief Set the payload_proto.
+   * \param payload_proto payload protocol
+   */
+  void SetPayloadProto (uint8_t payload_proto);
+
+  /**
+   * \brief Get the header len field.
+   * \return the unit of 8 octets
+   */
+  uint8_t GetHeaderLen () const;
+
+  /**
+   * \brief Set the header_len.
+   * \param header_len 8octets of header length
+   */
+  void SetHeaderLen (uint8_t header_len);
+
+  /**
+   * \brief Get the mh type field.
+   * \return the mh type
+   */
+  uint8_t GetMhType () const;
+
+  /**
+   * \brief Set the mh type.
+   * \param mh_type the mh type
+   */
+  void SetMhType (uint8_t mh_type);
+
+  /**
+   * \brief Get the reserved.
+   * \return reserved
+   */
+  uint8_t GetReserved () const;
+
+  /**
+   * \brief Set the reserved.
+   * \param reserved to set
+   */
+  void SetReserved (uint8_t reserved);
+
+  /**
+   * \brief Get the checksum.
+   * \return checksum
+   */
+  uint16_t GetChecksum () const;
+
+  /**
+   * \brief Set the checksum.
+   * \param checksum to set
+   */
+  void SetChecksum (uint16_t checksum);
+
+    /**
+   * \brief Print informations.
+   * \param os output stream
+   */
+  virtual void Print (std::ostream& os) const;
+
+  /**
+   * \brief Get the serialized size.
+   * \return serialized size
+   */
+  virtual uint32_t GetSerializedSize () const;
+
+  /**
+   * \brief Serialize the packet.
+   * \param start start offset
+   */
+  virtual void Serialize (Buffer::Iterator start) const;
+
+  /**
+   * \brief Deserialize the packet.
+   * \param start start offset
+   * \return length of packet
+   */
+  virtual uint32_t Deserialize (Buffer::Iterator start);
+
+private:
+  /**
+   * \brief The next header.
+   */
+  uint8_t m_payload_proto;
+
+  /**
+   * \brief The header length.
+   */
+  uint8_t m_header_len;
+  
+   /**
+   * \brief The MH type.
+   */
+  uint8_t m_mh_type;
+  
+  /**
+   * \brief Reserved.
+   */
+  uint8_t m_reserved;
+
+   /**
+   * \brief The checksum.
+   */
+  uint16_t m_checksum;
+
+};
+
+class Ipv6MobilityBindingUpdateHeader : public Ipv6MobilityHeader
+{
+public:
+  /**
+   * \brief Get the UID of this class.
+   * \return UID
+   */
+  static TypeId GetTypeId ();
+
+  /**
+   * \brief Get the instance type ID.
+   * \return instance type ID
+   */
+  virtual TypeId GetInstanceTypeId () const;
+
+  /**
+   * \brief Constructor.
+   */
+  Ipv6MobilityBindingUpdateHeader ();
+
+  /**
+   * \brief Destructor.
+   */
+  virtual ~Ipv6MobilityBindingUpdateHeader ();
+
+  /**
+   * \brief Get the Sequence field.
+   * \return sequence value
+   */
+  uint16_t GetSequence () const;
+
+  /**
+   * \brief Set the sequence field.
+   * \param sequence the sequence value
+   */
+  void SetSequence (uint16_t sequence);
+
+  /**
+   * \brief Get the A flag.
+   * \return A flag
+   */
+  bool GetFlagA() const;
+  
+  /**
+   * \brief Set the A flag.
+   * \param a value
+   */
+  void SetFlagA(bool a);
+
+  /**
+   * \brief Get the H flag.
+   * \return H flag
+   */
+  bool GetFlagH() const;
+  
+  /**
+   * \brief Set the H flag.
+   * \param h value
+   */
+  void SetFlagH(bool h);
+
+  /**
+   * \brief Get the L flag.
+   * \return L flag
+   */
+  bool GetFlagL() const;
+  
+  /**
+   * \brief Set the L flag.
+   * \param l value
+   */
+  void SetFlagL(bool l);
+
+  /**
+   * \brief Get the K flag.
+   * \return K flag
+   */
+  bool GetFlagK() const;
+  
+  /**
+   * \brief Set the K flag.
+   * \param k value
+   */
+  void SetFlagK(bool k);
+  
+  
+
+   //brief Get the P flag.
+   //return P flag
+  
+  bool GetFlagP() const;
+  
+  /**
+   * \brief Set the P flag.
+   * \param p value
+   */
+  void SetFlagP(bool p);
+
+  /**
+   * \brief Get the Reserved value.
+   * \return Reserved value
+   */
+//HMIPv6 Flag
+  bool GetFlagM() const;
+  void SetFlagM(bool m);
+
+  uint16_t GetReserved2() const;
+  
+  /**
+   * \brief Set the Reserved.
+   * \param reserved reserved value
+   */
+  void SetReserved2(uint16_t reserved2);
+
+  /**
+   * \brief Get the Lifetime value.
+   * \return Lifetime
+   */
+  uint16_t GetLifetime() const;
+  
+  /**
+   * \brief Set the Lifetime.
+   * \param lifetime lifetime value
+   */
+  void SetLifetime(uint16_t lifetime);
+
+  /**
+   * \brief Print informations.
+   * \param os output stream
+   */
+  virtual void Print (std::ostream& os) const;
+
+  /**
+   * \brief Get the serialized size.
+   * \return serialized size
+   */
+  virtual uint32_t GetSerializedSize () const;
+
+  /**
+   * \brief Serialize the packet.
+   * \param start start offset
+   */
+  virtual void Serialize (Buffer::Iterator start) const;
+
+  /**
+   * \brief Deserialize the packet.
+   * \param start start offset
+   * \return length of packet
+   */
+  virtual uint32_t Deserialize (Buffer::Iterator start);
+
+private:
+
+  /**
+   * \brief The Sequence field
+   */
+  uint16_t m_sequence;
+
+  /**
+   * \brief The A flag.
+   */
+  bool m_flagA;
+
+  /**
+   * \brief The H flag.
+   */
+  bool m_flagH;
+
+  /**
+   * \brief The L flag.
+   */
+  bool m_flagL;
+
+  /**
+   * \brief The K flag.
+   */
+  bool m_flagK;
+
+  /**
+   * \brief The P flag.
+   */
+  bool m_flagP;
+  bool m_flagM;
+  /**
+   * \brief The reserved value.
+   */
+  uint16_t m_reserved2;
+
+  /**
+   * \brief The Lifetime.
+   */
+  uint16_t m_lifetime;
+};
+
+/**
+ * \class Ipv6MobilityBindingAckHeader
+ * \brief Ipv6 Mobility Binding Acknowledgement header.
+ */
+class Ipv6MobilityBindingAckHeader : public Ipv6MobilityHeader
+{
+public:
+  /**
+   * \brief Get the UID of this class.
+   * \return UID
+   */
+  static TypeId GetTypeId ();
+
+  /**
+   * \brief Get the instance type ID.
+   * \return instance type ID
+   */
+  virtual TypeId GetInstanceTypeId () const;
+
+  /**
+   * \brief Constructor.
+   */
+  Ipv6MobilityBindingAckHeader ();
+
+  /**
+   * \brief Destructor.
+   */
+  virtual ~Ipv6MobilityBindingAckHeader ();
+
+  /**
+   * \brief Get the Status field.
+   * \return status value
+   */
+  uint8_t GetStatus () const;
+
+  /**
+   * \brief Set the status field.
+   * \param status the status value
+   */
+  void SetStatus (uint8_t status);
+  
+  /**
+   * \brief Get the K flag.
+   * \return K flag
+   */
+  bool GetFlagK() const;
+  
+  /**
+   * \brief Set the K flag.
+   * \param k value
+   */
+  void SetFlagK(bool k);
+
+  /**
+   * \brief Get the P flag.
+   * \return P flag
+   */
+  bool GetFlagP() const;
+  
+  /**
+   * \brief Set the P flag.
+   * \param p value
+   */
+  void SetFlagP(bool p);
+
+  /**
+   * \brief Get the Reserved2 field.
+   * \return reserved2 value
+   */
+   bool GetFlagM() const;
+   void SetFlagM(bool m);
+
+  uint8_t GetReserved2 () const;
+
+  /**
+   * \brief Set the reserved2 field.
+   * \param reserved2 the reserved2 value
+   */
+  void SetReserved2 (uint8_t reserved2);
+  
+  /**
+   * \brief Get the Sequence field.
+   * \return sequence value
+   */
+  uint16_t GetSequence () const;
+
+  /**
+   * \brief Set the sequence field.
+   * \param sequence the sequence value
+   */
+  void SetSequence (uint16_t sequence);
+
+  /**
+   * \brief Get the Lifetime value.
+   * \return Lifetime
+   */
+  uint16_t GetLifetime() const;
+  
+  /**
+   * \brief Set the Lifetime.
+   * \param lifetime lifetime value
+   */
+  void SetLifetime(uint16_t lifetime);
+
+  /**
+   * \brief Print informations.
+   * \param os output stream
+   */
+  virtual void Print (std::ostream& os) const;
+
+  /**
+   * \brief Get the serialized size.
+   * \return serialized size
+   */
+  virtual uint32_t GetSerializedSize () const;
+
+  /**
+   * \brief Serialize the packet.
+   * \param start start offset
+   */
+  virtual void Serialize (Buffer::Iterator start) const;
+
+  /**
+   * \brief Deserialize the packet.
+   * \param start start offset
+   * \return length of packet
+   */
+  virtual uint32_t Deserialize (Buffer::Iterator start);
+
+private:
+
+  /**
+   * \brief The status value.
+   */
+  uint8_t m_status;
+
+  /**
+   * \brief The K flag.
+   */
+  bool m_flagK;
+
+  /**
+   * \brief The R flag.
+   */
+  //bool m_flagR;
+
+  /**
+   * \brief The P flag.
+   */
+  bool m_flagP;
+  bool m_flagM;
+  /**
+   * \brief The reserved value.
+   */
+  uint8_t m_reserved2;
+
+  /**
+   * \brief The Sequence field
+   */
+  uint16_t m_sequence;
+
+  /**
+   * \brief The Lifetime.
+   */
+  uint16_t m_lifetime;
+};
+
+class DestinationOptionHeader : public Ipv6MobilityHeader 
+{
+public:
+  static TypeId GetTypeId ();
+
+  virtual TypeId GetInstanceTypeId () const;
+
+  DestinationOptionHeader ();
+
+  virtual ~DestinationOptionHeader ();
+  
+        Ipv6Address GetHoA () const;
+
+  void SetHoA (Ipv6Address hoa2);
+      
+
+  virtual void Print (std::ostream& os) const;
+
+  virtual uint32_t GetSerializedSize () const;
+
+  /**
+   * \brief Serialize the packet.
+
+   * \param start start offset
+
+   */
+  virtual void Serialize (Buffer::Iterator start) const;
+
+  /**
+
+   * \brief Deserialize the packet.
+
+   * \param start start offset
+
+   * \return length of packet
+
+   */
+  virtual uint32_t Deserialize (Buffer::Iterator start);
+
+private:
+
+  Ipv6Address hoa;
+
+};
+
+class Ipv6HoTIHeader : public Ipv6MobilityHeader
+{
+public:
+  /**
+   * \brief Get the UID of this class.
+   * \return UID
+
+   */
+  static TypeId GetTypeId ();
+
+  /**
+   * \brief Get the instance type ID.
+   * \return instance type ID
+   */
+  virtual TypeId GetInstanceTypeId () const;
+
+  /**
+   * \brief Constructor.
+   */
+  Ipv6HoTIHeader ();
+
+  /**
+   * \brief Destructor.
+   */
+  virtual ~Ipv6HoTIHeader ();
+
+  uint16_t GetReserved2() const;
+  
+  /**
+   * \brief Set the Reserved.
+   * \param reserved reserved value
+   */
+  void SetReserved2(uint16_t reserved2);
+
+  
+  virtual void Print (std::ostream& os) const;
+
+  /**
+   * \brief Get the serialized size.
+   * \return serialized size
+   */
+  virtual uint32_t GetSerializedSize () const;
+
+  /**
+   * \brief Serialize the packet.
+
+   * \param start start offset
+   */
+  virtual void Serialize (Buffer::Iterator start) const;
+
+  /**
+   * \brief Deserialize the packet.
+   * \param start start offset
+   * \return length of packet
+   */
+  virtual uint32_t Deserialize (Buffer::Iterator start);
+
+private:
+
+  
+  /**
+   * \brief The reserved value.
+   */
+  uint16_t m_reserved2;
+
+};
+
+class Ipv6CoTIHeader : public Ipv6MobilityHeader
+{
+public:
+  /**
+   * \brief Get the UID of this class.
+   * \return UID
+   */
+  static TypeId GetTypeId ();
+
+  /**
+   * \brief Get the instance type ID.
+   * \return instance type ID
+   */
+  virtual TypeId GetInstanceTypeId () const;
+
+  /**
+   * \brief Constructor.
+   */
+  Ipv6CoTIHeader ();
+
+  /**
+   * \brief Destructor.
+   */
+  virtual ~Ipv6CoTIHeader ();
+
+  uint16_t GetReserved2() const;
+  
+  /**
+   * \brief Set the Reserved.
+   * \param reserved reserved value
+   */
+  void SetReserved2(uint16_t reserved2);
+
+  
+  virtual void Print (std::ostream& os) const;
+
+  /**
+   * \brief Get the serialized size.
+   * \return serialized size
+   */
+  virtual uint32_t GetSerializedSize () const;
+
+  /**
+   * \brief Serialize the packet.
+   * \param start start offset
+   */
+  virtual void Serialize (Buffer::Iterator start) const;
+
+  /**
+   * \brief Deserialize the packet.
+   * \param start start offset
+   * \return length of packet
+   */
+  virtual uint32_t Deserialize (Buffer::Iterator start);
+
+private:
+
+  
+  /**
+   * \brief The reserved value.
+   */
+  uint16_t m_reserved2;
+
+};
+
+class Ipv6HoTHeader : public Ipv6MobilityHeader
+{
+public:
+  /**
+   * \brief Get the UID of this class.
+   * \return UID
+   */
+  static TypeId GetTypeId ();
+
+  /**
+   * \brief Get the instance type ID.
+   * \return instance type ID
+   */
+  virtual TypeId GetInstanceTypeId () const;
+
+  /**
+   * \brief Constructor.
+   */
+  Ipv6HoTHeader ();
+
+  /**
+   * \brief Destructor.
+   */
+  virtual ~Ipv6HoTHeader ();
+
+  uint16_t GetReserved2() const;
+  
+  /**
+   * \brief Set the Reserved.
+   * \param reserved reserved value
+   */
+  void SetReserved2(uint16_t reserved2);
+
+  
+  virtual void Print (std::ostream& os) const;
+
+  /**
+   * \brief Get the serialized size.
+   * \return serialized size
+   */
+  virtual uint32_t GetSerializedSize () const;
+
+  /**
+   * \brief Serialize the packet.
+   * \param start start offset
+   */
+  virtual void Serialize (Buffer::Iterator start) const;
+
+  /**
+   * \brief Deserialize the packet.
+   * \param start start offset
+   * \return length of packet
+   */
+  virtual uint32_t Deserialize (Buffer::Iterator start);
+
+private:
+
+  
+  /**
+   * \brief The reserved value.
+   */
+  uint16_t m_reserved2;
+
+};
+
+class Ipv6CoTHeader : public Ipv6MobilityHeader
+{
+public:
+  /**
+   * \brief Get the UID of this class.
+   * \return UID
+   */
+  static TypeId GetTypeId ();
+
+  /**
+   * \brief Get the instance type ID.
+   * \return instance type ID
+   */
+  virtual TypeId GetInstanceTypeId () const;
+
+  /**
+   * \brief Constructor.
+   */
+  Ipv6CoTHeader ();
+
+  /**
+   * \brief Destructor.
+   */
+  virtual ~Ipv6CoTHeader ();
+
+  uint16_t GetReserved2() const;
+  
+  /**
+   * \brief Set the Reserved.
+   * \param reserved reserved value
+   */
+  void SetReserved2(uint16_t reserved2);
+
+  
+  virtual void Print (std::ostream& os) const;
+
+  /**
+   * \brief Get the serialized size.
+   * \return serialized size
+   */
+  virtual uint32_t GetSerializedSize () const;
+
+  /**
+   * \brief Serialize the packet.
+   * \param start start offset
+   */
+  virtual void Serialize (Buffer::Iterator start) const;
+
+  /**
+   * \brief Deserialize the packet.
+   * \param start start offset
+   * \return length of packet
+   */
+  virtual uint32_t Deserialize (Buffer::Iterator start);
+
+private:
+
+  
+  /**
+   * \brief The reserved value.
+   */
+  uint16_t m_reserved2;
+
+};
+
+
+class Ipv6MobilityRCoAReqHeader : public Ipv6MobilityHeader
+{
+public:
+  /**
+
+   * \brief Get the UID of this class.
+
+   * \return UID
+
+   */
+  static TypeId GetTypeId ();
+
+  /**
+
+   * \brief Get the instance type ID.
+
+   * \return instance type ID
+
+   */
+  virtual TypeId GetInstanceTypeId () const;
+
+  /**
+
+   * \brief Constructor.
+
+   */
+  Ipv6MobilityRCoAReqHeader ();
+
+  /**
+
+   * \brief Destructor.
+
+   */
+  virtual ~Ipv6MobilityRCoAReqHeader ();
+
+  /**
+
+   * \brief Get the Status field.
+
+   * \return status value
+
+   */
+  uint32_t GetLifetime () const;
+
+  /**
+
+   * \brief Set the status field.
+
+   * \param status the status value
+
+   */
+  void SetLifetime (uint32_t lifetime);
+  
+  Ipv6Address GetMAPIP () const;
+
+  void SetMAPIP (Ipv6Address mapip);
+  virtual void Print (std::ostream& os) const;
+
+  /**
+
+   * \brief Get the serialized size.
+
+   * \return serialized size
+
+   */
+  virtual uint32_t GetSerializedSize () const;
+
+  /**
+
+   * \brief Serialize the packet.
+
+   * \param start start offset
+
+   */
+  virtual void Serialize (Buffer::Iterator start) const;
+
+  /**
+
+   * \brief Deserialize the packet.
+
+   * \param start start offset
+
+   * \return length of packet
+
+   */
+  virtual uint32_t Deserialize (Buffer::Iterator start);
+
+private:
+
+
+  uint32_t m_lifetime;
+  Ipv6Address m_mapip;
+};
+
+class Ipv6MobilityRCoARepHeader : public Ipv6MobilityHeader
+{
+public:
+  /**
+
+   * \brief Get the UID of this class.
+
+   * \return UID
+
+   */
+  static TypeId GetTypeId ();
+
+  /**
+
+   * \brief Get the instance type ID.
+
+   * \return instance type ID
+
+   */
+  virtual TypeId GetInstanceTypeId () const;
+
+  /**
+
+   * \brief Constructor.
+
+   */
+  Ipv6MobilityRCoARepHeader ();
+
+  /**
+
+   * \brief Destructor.
+
+   */
+  virtual ~Ipv6MobilityRCoARepHeader ();
+
+  /**
+
+   * \brief Get the Status field.
+
+   * \return status value
+
+   */
+  uint32_t GetLifetime () const;
+
+  /**
+   * \brief Set the status field.
+   * \param status the status value
+   */
+  void SetLifetime (uint32_t lifetime);
+  
+  Ipv6Address GetMAPIP () const;
+
+  void SetMAPIP (Ipv6Address mapip);
+  virtual void Print (std::ostream& os) const;
+
+  /**
+
+   * \brief Get the serialized size.
+
+   * \return serialized size
+
+   */
+  virtual uint32_t GetSerializedSize () const;
+
+  /**
+
+   * \brief Serialize the packet.
+
+   * \param start start offset
+
+   */
+  virtual void Serialize (Buffer::Iterator start) const;
+
+  /**
+
+   * \brief Deserialize the packet.
+
+   * \param start start offset
+
+   * \return length of packet
+
+   */
+  virtual uint32_t Deserialize (Buffer::Iterator start);
+
+private:
+
+
+  uint32_t m_lifetime;
+  Ipv6Address m_mapip;
+};
+
+
+
+} /* namespace ns3 */
+
+#endif /* IPV6_MOBILITY_HEADER_H */

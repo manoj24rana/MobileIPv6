@@ -1,0 +1,466 @@
+/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/*
+ *
+ * Mobile IPv6 (RFC3775) Implementation in NS3 
+ *
+ * Jadavpur Univerity (JU)
+ * School of Mobile Computing and Communucation (SMCC)
+ *
+ * Author: M. K. Rana <manoj24.rana@gmail.com>
+ *
+ */
+
+#include "ns3/core-module.h"
+#include "ns3/network-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/applications-module.h"
+#include "ns3/mobility-module.h"
+#include "ns3/wifi-module.h"
+#include "ns3/csma-module.h"
+#include "ns3/point-to-point-module.h"
+#include "ns3/bridge-module.h"
+#include "ns3/ipv6-static-routing.h"
+#include "ns3/ipv6-routing-table-entry.h"
+#include "ns3/mipv6-module.h"
+#include "ns3/internet-trace-helper.h"
+#include "ns3/trace-helper.h"
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <vector>
+#include <string>
+
+
+NS_LOG_COMPONENT_DEFINE ("mip6Wifi");
+
+using namespace ns3;
+
+void
+ReceivePacket(Ptr<const Packet> p, const Address & addr)
+{
+	std::cout << Simulator::Now ().GetSeconds () << "\t" << p->GetSize() <<"\n";
+}
+
+
+
+
+int main (int argc, char *argv[])
+{
+
+  NodeContainer sta;
+  NodeContainer ha;
+  NodeContainer mid;
+  NodeContainer cn;
+  NodeContainer outernet;
+  NodeContainer ars;
+  NodeContainer backbone1;
+  NodeContainer backbone2;
+  //NodeContainer corres;
+  
+  NetDeviceContainer haDevs;
+  NetDeviceContainer midDevs;
+  NetDeviceContainer ar1Devs;
+  NetDeviceContainer ar2Devs;
+  NetDeviceContainer outerDevs;
+  NetDeviceContainer staDevs;
+  NetDeviceContainer backbone1Devs;
+  NetDeviceContainer backbone2Devs;
+  //NetDeviceContainer corresDevs;
+  //NetDeviceContainer backbone2Devs;
+  //NetDeviceContainer ar1BrDev;
+  //NetDeviceContainer ar2BrDev;
+  
+  
+  Ipv6InterfaceContainer haIfs;
+  Ipv6InterfaceContainer midIfs;
+  Ipv6InterfaceContainer outerIfs;
+  Ipv6InterfaceContainer ar1Ifs;
+  Ipv6InterfaceContainer ar2Ifs;
+  Ipv6InterfaceContainer staIfs;
+  Ipv6InterfaceContainer backbone1Ifs;
+  Ipv6InterfaceContainer backbone2Ifs;
+  //Ipv6InterfaceContainer corresIfs;
+  
+  CommandLine cmd;
+  cmd.Parse (argc, argv);
+  
+  SeedManager::SetSeed (123456);
+
+  ars.Create(2);
+  ha.Create(1);
+  sta.Create(1);
+  mid.Create(1);
+  //cn.Create(1);
+
+  InternetStackHelper internet;
+  
+
+
+  internet.Install (ars);
+  internet.Install (sta);
+  internet.Install (mid);
+  internet.Install (ha);
+  //internet.Install (cn);
+  
+  //corres.Add(ha.Get(0));
+  //corres.Add(cn.Get(0));
+
+  
+  outernet.Add(mid.Get(0));
+  outernet.Add(ha.Get(0));
+
+
+  backbone1.Add(ars.Get(0));
+  backbone1.Add(mid.Get(0));
+  backbone2.Add(ars.Get(1));
+  backbone2.Add(mid.Get(0));
+  
+  PointToPointHelper point;
+  
+  CsmaHelper csma;
+
+  Ipv6AddressHelper ipv6;
+  
+  Ipv6InterfaceContainer iifc;
+  
+
+
+  //BridgeHelper bridge;
+  
+  //Link between HA and MID is 50Mbps and 100ms delay
+  csma.SetChannelAttribute ("DataRate", DataRateValue (DataRate(2000000)));
+  csma.SetChannelAttribute ("Delay", TimeValue (MilliSeconds(1)));
+  csma.SetDeviceAttribute ("Mtu", UintegerValue (1400));
+  backbone1Devs = csma.Install(backbone1);
+  backbone2Devs = csma.Install(backbone2);
+    
+
+  ipv6.SetBase (Ipv6Address ("2001:db80::"), Ipv6Prefix (64));
+  iifc = ipv6.Assign (backbone1Devs);
+  backbone1Ifs.Add(iifc);
+  ipv6.SetBase (Ipv6Address ("5001:db80::"), Ipv6Prefix (64));
+  iifc = ipv6.Assign (backbone2Devs);
+  backbone2Ifs.Add(iifc);
+  //backbone1Ifs.SetRouter(0,true);
+  //backbone1Ifs.SetRouter(1,true);
+  //backbone2Ifs.SetRouter(0,true);
+  //backbone2Ifs.SetRouter(1,true);
+  
+  backbone1Ifs.SetForwarding(0,true);
+  backbone1Ifs.SetForwarding(1,true);
+  backbone2Ifs.SetForwarding(0,true);
+  backbone2Ifs.SetForwarding(1,true);
+  backbone1Ifs.SetDefaultRouteInAllNodes (0);
+  backbone1Ifs.SetDefaultRouteInAllNodes (1);
+  backbone2Ifs.SetDefaultRouteInAllNodes (0);
+  backbone2Ifs.SetDefaultRouteInAllNodes (1);  
+  
+  //All Link of outernet is 5Mbps and 2ms delay
+   
+  point.SetDeviceAttribute ("DataRate", StringValue("2Mbps"));
+  point.SetChannelAttribute ("Delay", StringValue("1ms"));
+  outerDevs = point.Install(outernet);
+  //corresDevs = point.Install(corres);
+
+
+  ipv6.SetBase (Ipv6Address ("3001:db80::"), Ipv6Prefix (64));
+  iifc = ipv6.Assign (outerDevs);
+  outerIfs.Add(iifc);
+  //outerIfs.SetRouter(0,true);
+  //outerIfs.SetRouter(1,true);
+  outerIfs.SetForwarding (0, true);
+  outerIfs.SetDefaultRouteInAllNodes (0);
+  outerIfs.SetForwarding (1, true);
+  outerIfs.SetDefaultRouteInAllNodes (1);
+  //outerIfs.SetForwarding (1, true);
+  //outerIfs.SetDefaultRouteInAllNodes (1);
+/*
+  ipv6.SetBase (Ipv6Address ("4001:db80::"), Ipv6Prefix (64));
+  iifc = ipv6.Assign (corresDevs);
+  corresIfs.Add(iifc);
+  //outerIfs.SetRouter(0,true);
+  //outerIfs.SetRouter(1,true);
+  corresIfs.SetForwarding (0, true);
+  corresIfs.SetDefaultRouteInAllNodes (0);
+  */
+  
+  MobilityHelper mobility;
+  Ptr<ListPositionAllocator> positionAlloc;
+  
+  positionAlloc = CreateObject<ListPositionAllocator> ();
+  
+  
+  positionAlloc->Add (Vector (-50.0, 20.0, 0.0)); //AR1
+  positionAlloc->Add (Vector (50.0, 20.0, 0.0));  //AR2
+  //positionAlloc->Add (Vector (0.0, -20.0, 0.0));  //MID
+  mobility.SetPositionAllocator (positionAlloc);
+  mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
+  mobility.Install (ars);
+
+  positionAlloc = CreateObject<ListPositionAllocator> ();
+  positionAlloc->Add (Vector (0.0, -20.0, 0.0));  //MID
+  mobility.SetPositionAllocator (positionAlloc);
+  mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
+  mobility.Install (mid);
+
+  positionAlloc = CreateObject<ListPositionAllocator> ();
+  
+  positionAlloc->Add (Vector (25.0, -20.0, 0.0));   //HA
+  
+  mobility.SetPositionAllocator (positionAlloc);
+  mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
+  
+  mobility.Install (ha);
+  /*
+positionAlloc = CreateObject<ListPositionAllocator> ();
+  
+  positionAlloc->Add (Vector (50.0, -40.0, 0.0));   //CN
+  
+  mobility.SetPositionAllocator (positionAlloc);
+  mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
+  
+  mobility.Install (cn);
+  
+*/
+
+
+
+  //Setting AR1 and AR2
+  
+  
+  
+
+  Ssid ssid = Ssid("ns-3-ssid");
+  YansWifiPhyHelper wifiPhy = YansWifiPhyHelper::Default ();
+  wifiPhy.SetPcapDataLinkType (YansWifiPhyHelper::DLT_IEEE802_11_RADIO);
+
+  WifiHelper wifi = WifiHelper::Default ();
+  NqosWifiMacHelper wifiMac = NqosWifiMacHelper::Default ();
+  YansWifiChannelHelper wifiChannel = YansWifiChannelHelper::Default ();
+  wifiPhy.SetChannel (wifiChannel.Create ());
+   
+  wifiMac.SetType ("ns3::ApWifiMac",
+		           "Ssid", SsidValue (ssid),
+		           "BeaconGeneration", BooleanValue (true),
+		           "BeaconInterval", TimeValue (MilliSeconds(100)));
+
+  ar1Devs = wifi.Install (wifiPhy, wifiMac, ars.Get(0));
+  ar2Devs = wifi.Install (wifiPhy, wifiMac, ars.Get(1));
+  Ipv6AddressHelper ipv62;
+  //ipv6.NewNetwork (Ipv6Address ("7777:db80::0"), 64);
+  ipv62.SetBase (Ipv6Address ("8888:56ac::"), Ipv6Prefix (64));
+  iifc = ipv62.Assign (ar1Devs);
+  ar1Ifs.Add(iifc);
+  //ar1Ifs.SetRouter(0,true);
+  //iifc.SetForwarding(0,true);
+  ar1Ifs.SetForwarding (0, true);
+  ar1Ifs.SetDefaultRouteInAllNodes (0);
+  
+  //ipv6.NewNetwork (Ipv6Address ("9999:db80::0"), 64);
+  Ipv6AddressHelper ipv63;
+  ipv63.SetBase (Ipv6Address ("9999:db80::"), Ipv6Prefix (64));
+  iifc = ipv63.Assign (ar2Devs);
+  ar2Ifs.Add(iifc);
+  //ar2Ifs.SetRouter(0,true);
+  ar2Ifs.SetForwarding (0, true);
+  ar2Ifs.SetDefaultRouteInAllNodes (0);
+
+  //ar1BrDev = bridge.Install (ars.Get(0), NetDeviceContainer(backboneDevs.Get(0), ar1Devs.Get(0)));
+  //ar2BrDev = bridge.Install (ars.Get(1), NetDeviceContainer(backboneDevs.Get(1), ar2Devs.Get(0))); 
+
+  //setting STA
+
+  positionAlloc = CreateObject<ListPositionAllocator> ();
+  
+  positionAlloc->Add (Vector (-50.0, 50.0, 0.0)); //STA
+  
+  mobility.SetPositionAllocator (positionAlloc);
+  mobility.SetMobilityModel ("ns3::ConstantVelocityMobilityModel");  
+  mobility.Install(sta);
+  
+  Ptr<ConstantVelocityMobilityModel> cvm = sta.Get(0)->GetObject<ConstantVelocityMobilityModel>();
+  cvm->SetVelocity(Vector (7.5, 0, 0)); //move to left to right 10.0m/s
+
+ /*
+ //MobilityHelper mobility;
+
+  mobility.SetPositionAllocator ("ns3::GridPositionAllocator",
+                                 "MinX", DoubleValue (0.0),
+                                 "MinY", DoubleValue (60.0),
+                                 "DeltaX", DoubleValue (50.0),
+                                 "DeltaY", DoubleValue (50.0),
+                                 "GridWidth", UintegerValue (1000),
+                                 "LayoutType", StringValue ("RowFirst"));
+
+  mobility.SetMobilityModel ("ns3::RandomWalk2dMobilityModel",
+                             "Bounds", RectangleValue (Rectangle (-50, 50, -50, 50)));
+  mobility.Install (sta.Get(0));
+*/
+  //WLAN interface of STA
+  wifiMac.SetType ("ns3::StaWifiMac",
+	               "Ssid", SsidValue (ssid),
+	               "ActiveProbing", BooleanValue (false));
+  staDevs.Add( wifi.Install (wifiPhy, wifiMac, sta));
+
+  iifc = ipv6.AssignWithoutAddress (staDevs);
+   
+  staIfs.Add(iifc);
+  //iifc = ipv63.AssignWithoutAddress (staDevs);
+  //staIfs.Add(iifc);
+  //staIfs.SetRouter(0,true);
+  //staIfs.SetForwarding(0,false);
+  //staIfs.SetDefaultRouteInAllNodes (0);
+
+/*radvd configuration for AR1 
+
+Ipv6Address prefix ("8888:56ac::");  create the prefix 
+
+uint32_t indexRouter = ar1Ifs.GetInterfaceIndex (0);  AR interface (n-AR1) 
+
+Ptr<Radvd> radvd=CreateObject<Radvd> ();
+Ptr<RadvdInterface> routerInterface= Create<RadvdInterface> (indexRouter, 1500, 50);
+Ptr<RadvdPrefix> routerPrefix = Create<RadvdPrefix> (prefix, 64, 1.5, 2.0);
+
+routerInterface->AddPrefix(routerPrefix);
+
+radvd->AddConfiguration(routerInterface);
+
+ars.Get(0)->AddApplication(radvd);
+radvd->SetStartTime(Seconds (1.0));
+radvd->SetStopTime(Seconds (100.0));
+
+radvd configuration for AR2 
+
+Ipv6Address prefix2 ("9999:db80::");  create the prefix 
+
+
+uint32_t indexRouter2 = ar2Ifs.GetInterfaceIndex (0);  R interface (R-n1) 
+Ptr<Radvd> radvd2=CreateObject<Radvd> ();
+
+Ptr<RadvdInterface> routerInterface2 = Create<RadvdInterface> (indexRouter2, 1500, 50);
+Ptr<RadvdPrefix> routerPrefix2 = Create<RadvdPrefix> (prefix2, 64, 1.5, 2.0);
+
+routerInterface2->AddPrefix(routerPrefix2);
+
+radvd2->AddConfiguration(routerInterface2);
+
+ars.Get(1)->AddApplication(radvd2);
+radvd2->SetStartTime(Seconds (4.1));
+radvd2->SetStopTime(Seconds (100.0));
+
+*/
+/*
+mipv6HAHelper hahelper;
+mipv6MNHelper mnhelper;
+mipv6CNHelper cnhelper;
+hahelper.Install(outernet.Get(1));  
+mnhelper.Install(sta.Get(0));
+cnhelper.Install(mid.Get(0));
+*/
+ Ipv6StaticRoutingHelper routingHelper;
+ Ptr<Ipv6> ipv692 = mid.Get(0)->GetObject<Ipv6> ();
+ Ptr<Ipv6StaticRouting> rttop = routingHelper.GetStaticRouting(ipv692);
+ rttop->AddNetworkRouteTo(Ipv6Address("8888:56ac::"),Ipv6Prefix(64),Ipv6Address("fe80::200:ff:fe00:1"),1,0);
+ rttop->AddNetworkRouteTo(Ipv6Address("9999:db80::"),Ipv6Prefix(64),Ipv6Address("fe80::200:ff:fe00:3"),2,0);
+  Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
+  //routingHelper.PrintRoutingTableAt (Seconds (1.0), mid.Get(0), routingStream);
+  //routingHelper.PrintRoutingTableAt (Seconds (3.0), mid.Get(0), routingStream);
+
+/*
+ Ptr<Ipv6> ipv693 = mid.Get(0)->GetObject<Ipv6> ();
+ Ptr<Ipv6StaticRouting> rttop2 = routingHelper.GetStaticRouting(ipv693);
+ rttop2->AddNetworkRouteTo(Ipv6Address("1001:db80::"),Ipv6Prefix(64),Ipv6Address("fe80::200:ff:fe00:6"),3,0);
+*/
+
+//  Ipv6StaticRoutingHelper routingHelper;
+//  Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
+ // routingHelper.PrintRoutingTableAt (Seconds (5.0), ha.Get(0), routingStream);
+ // routingHelper.PrintRoutingTableAt (Seconds (15.0), ha.Get(0), routingStream);
+
+//  Ptr<Ipv6> ipv693 = sta.Get(0)->GetObject<Ipv6> ();
+//  Ptr<Ipv6StaticRouting> rttop2 = routingHelper.GetStaticRouting(ipv693);
+//  rttop2->AddNetworkRouteTo(Ipv6Address("ff02::1"),Ipv6Prefix(64),Ipv6Address("::"),1,0);
+  
+  
+ // AsciiTraceHelper ascii;
+  //wifi.EnableAsciiAll (ascii.CreateFileStream ("mipv6-wifi.tr"));
+  //csma.EnablePcapAll (std::string ("mip6-wifi"), false);
+  //point.EnablePcapAll ("manoj");
+  //wifi.EnablePcap ("mipv6-wifi", ar1Devs.Get(0));
+//Config::ConnectWithoutContext("/NodeList/*/ApplicationList/*/$ns3::PacketSink/Rx", MakeCallback (&ReceivePacket)); 
+ //wifiPhy.EnablePcap ("Mipv6-final-MN", staDevs.Get(0));
+internet.EnablePcapIpv6 ("prefix1", sta.Get(0));
+internet.EnablePcapIpv6 ("prefix2", ha.Get(0));
+internet.EnablePcapIpv6 ("prefix3", mid.Get(0));
+//pyu.EnablePcapIpv6("bal",sta.Get(0);
+
+
+  //wifiPhy.EnablePcap ("mipv6-wifi", staDevs.Get(0));
+  
+  /* Create a Ping6 application to send ICMPv6 echo request from node STA to HA   */
+
+  UdpEchoServerHelper echoServer (9);
+
+  ApplicationContainer serverApps = echoServer.Install (sta.Get (0));
+  serverApps.Start (Seconds (1.0));
+  serverApps.Stop (Seconds (100.0));
+
+  UdpEchoClientHelper echoClient (Ipv6Address("1001:db80::200:ff:fe00:b"), 9);
+  echoClient.SetAttribute ("MaxPackets", UintegerValue (100000));
+  echoClient.SetAttribute ("Interval", TimeValue (Seconds (0.01)));
+  echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
+
+  ApplicationContainer clientApps = echoClient.Install (mid.Get (0));
+  clientApps.Start (Seconds (4.1));
+  clientApps.Stop (Seconds (100.0));  
+ // LogComponentEnable("UdpEchoClientApplication", LOG_LEVEL_ALL);
+  //LogComponentEnable("UdpEchoServerApplication", LOG_LEVEL_ALL);  
+
+
+//  LogComponentEnable("mipv6HA", LOG_LEVEL_ALL);
+//  LogComponentEnable("mipv6Agent", LOG_LEVEL_ALL);
+//  LogComponentEnable("mipv6MN", LOG_LEVEL_ALL);
+//  LogComponentEnable("mipv6CN", LOG_LEVEL_ALL);
+//  LogComponentEnable("StaWifiMac", LOG_LEVEL_ALL);
+  //LogComponentEnable("Ipv6TunnelL4Protocol", LOG_LEVEL_ALL);  
+  LogComponentEnable("Ipv6MobilityL4Protocol", LOG_LEVEL_ALL);  
+  //LogComponentEnable("TunnelNetDevice", LOG_LEVEL_ALL);
+  //LogComponentEnable("UdpL4Protocol", LOG_LEVEL_ALL);
+  
+
+  //point.EnablePcapAll ("mipv6");
+  //point.EnablePcap ("mipv6", outerDevs.Get (1), true);
+// UDP connfection from N0 to N2
+/*
+  uint16_t sinkPort = 6;
+  Address sinkAddress (Ipv6Address("1001:db80::200:ff:fe00:b"), 9)); // interface of MN
+  PacketSinkHelper packetSinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (Ipv6Address("1001:db80::200:ff:fe00:b"), 9));
+  ApplicationContainer sinkApps = packetSinkHelper.Install (sta.Get (0)); //MN as sink
+  sinkApps.Start (Seconds (6.));
+  sinkApps.Stop (Seconds (100.));
+
+  Ptr<Socket> ns3UdpSocket = Socket::CreateSocket (ha.Get (0), UdpSocketFactory::GetTypeId ()); //source at n0
+
+  // Create UDP application at n0
+  Ptr<MyApp> app = CreateObject<MyApp> ();
+  app->Setup (ns3UdpSocket, sinkAddress, 1040, 100000, DataRate ("250Kbps"));
+  ha.Get (0)->AddApplication (app);
+  app->SetStartTime (Seconds (1.));
+  app->SetStopTime (Seconds (100.));  
+  
+ wifiPhy.EnablePcap ("manoj", staDevs); 
+ */
+ 
+ // myfile << "Writing this to a file.\n";
+ // myfile.close();
+ // ascii.close();
+ //LogComponentEnable("DropTailQueue",LOG_LEVEL_ALL);
+// Config::SetDefault("ns3::DropTailQueue::MaxPackets", UintegerValue(0)); 
+
+  Simulator::Stop (Seconds (14.5));
+  Simulator::Run ();
+  Simulator::Destroy ();
+
+  return 0;
+}
+

@@ -1,0 +1,55 @@
+<Test>
+  <Name>tcp-rtt-estimation-test</Name>
+  <Result>PASS</Result>
+  <Time real="3.250" user="1.530" system="0.050"/>
+  <Test>
+    <Name>RTT estimation, ts, no data</Name>
+    <Result>PASS</Result>
+    <Time real="0.080" user="0.040" system="0.000"/>
+  </Test>
+  <Test>
+    <Name>RTT estimation, no ts, no data</Name>
+    <Result>PASS</Result>
+    <Time real="0.010" user="0.010" system="0.000"/>
+  </Test>
+  <Test>
+    <Name>RTT estimation, ts, some data</Name>
+    <Result>PASS</Result>
+    <Time real="0.040" user="0.040" system="0.000"/>
+  </Test>
+  <Test>
+    <Name>RTT estimation, no ts, some data</Name>
+    <Result>PASS</Result>
+    <Time real="0.020" user="0.030" system="0.000"/>
+  </Test>
+  <Test>
+    <Name>RTT estimation, no ts, some data, with retr</Name>
+    <Result>PASS</Result>
+    <Time real="0.170" user="0.040" system="0.000"/>
+  </Test>
+  <Test>
+    <Name>RTT estimation, ts, some data, with retr</Name>
+    <Result>PASS</Result>
+    <Time real="0.140" user="0.050" system="0.010"/>
+  </Test>
+  <Test>
+    <Name>RTT estimation, no ts, some data, with retr</Name>
+    <Result>PASS</Result>
+    <Time real="0.180" user="0.050" system="0.000"/>
+  </Test>
+  <Test>
+    <Name>RTT estimation, ts, some data, with retr</Name>
+    <Result>PASS</Result>
+    <Time real="0.110" user="0.050" system="0.010"/>
+  </Test>
+  <Test>
+    <Name>RTT estimation, no ts, a lot of data, with retr</Name>
+    <Result>PASS</Result>
+    <Time real="1.320" user="0.570" system="0.020"/>
+  </Test>
+  <Test>
+    <Name>RTT estimation, ts, a lot of data, with retr</Name>
+    <Result>PASS</Result>
+    <Time real="1.140" user="0.620" system="0.010"/>
+  </Test>
+</Test>

@@ -1,0 +1,25 @@
+<Test>
+  <Name>pfifo-fast-queue-disc</Name>
+  <Result>PASS</Result>
+  <Time real="0.050" user="0.010" system="0.000"/>
+  <Test>
+    <Name>Test TOS-based prioritization</Name>
+    <Result>PASS</Result>
+    <Time real="0.020" user="0.010" system="0.000"/>
+  </Test>
+  <Test>
+    <Name>Test DSCP-based prioritization</Name>
+    <Result>PASS</Result>
+    <Time real="0.020" user="0.000" system="0.000"/>
+  </Test>
+  <Test>
+    <Name>Test queue overflow</Name>
+    <Result>PASS</Result>
+    <Time real="0.000" user="0.000" system="0.000"/>
+  </Test>
+  <Test>
+    <Name>Test queue with non IP header</Name>
+    <Result>PASS</Result>
+    <Time real="0.010" user="0.000" system="0.000"/>
+  </Test>
+</Test>

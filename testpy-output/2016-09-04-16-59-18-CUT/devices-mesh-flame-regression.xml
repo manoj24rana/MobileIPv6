@@ -1,0 +1,10 @@
+<Test>
+  <Name>devices-mesh-flame-regression</Name>
+  <Result>PASS</Result>
+  <Time real="0.270" user="0.160" system="0.010"/>
+  <Test>
+    <Name>FLAME regression test</Name>
+    <Result>PASS</Result>
+    <Time real="0.270" user="0.160" system="0.010"/>
+  </Test>
+</Test>

@@ -1,0 +1,30 @@
+<Test>
+  <Name>ipv6-ripng</Name>
+  <Result>PASS</Result>
+  <Time real="0.750" user="0.290" system="0.010"/>
+  <Test>
+    <Name>RIPng</Name>
+    <Result>PASS</Result>
+    <Time real="0.360" user="0.120" system="0.000"/>
+  </Test>
+  <Test>
+    <Name>RIPng counting to infinity</Name>
+    <Result>PASS</Result>
+    <Time real="0.060" user="0.050" system="0.000"/>
+  </Test>
+  <Test>
+    <Name>RIPng Split Horizon strategy</Name>
+    <Result>PASS</Result>
+    <Time real="0.030" user="0.030" system="0.000"/>
+  </Test>
+  <Test>
+    <Name>RIPng Split Horizon strategy</Name>
+    <Result>PASS</Result>
+    <Time real="0.140" user="0.030" system="0.010"/>
+  </Test>
+  <Test>
+    <Name>RIPng Split Horizon strategy</Name>
+    <Result>PASS</Result>
+    <Time real="0.160" user="0.060" system="0.000"/>
+  </Test>
+</Test>

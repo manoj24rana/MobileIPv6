@@ -1,0 +1,15 @@
+<Test>
+  <Name>tcp-fast-retr-test</Name>
+  <Result>PASS</Result>
+  <Time real="0.690" user="0.410" system="0.010"/>
+  <Test>
+    <Name>Fast Retransmit testing</Name>
+    <Result>PASS</Result>
+    <Time real="0.270" user="0.190" system="0.010"/>
+  </Test>
+  <Test>
+    <Name>Fast Retransmit testing</Name>
+    <Result>PASS</Result>
+    <Time real="0.410" user="0.210" system="0.000"/>
+  </Test>
+</Test>

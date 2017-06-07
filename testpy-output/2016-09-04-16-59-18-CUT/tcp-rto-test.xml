@@ -1,0 +1,25 @@
+<Test>
+  <Name>tcp-rto-test</Name>
+  <Result>PASS</Result>
+  <Time real="0.660" user="0.370" system="0.010"/>
+  <Test>
+    <Name>RTO retransmit testing</Name>
+    <Result>PASS</Result>
+    <Time real="0.240" user="0.160" system="0.010"/>
+  </Test>
+  <Test>
+    <Name>RTO timing testing</Name>
+    <Result>PASS</Result>
+    <Time real="0.020" user="0.020" system="0.000"/>
+  </Test>
+  <Test>
+    <Name>RTO retransmit testing</Name>
+    <Result>PASS</Result>
+    <Time real="0.310" user="0.170" system="0.000"/>
+  </Test>
+  <Test>
+    <Name>RTO timing testing</Name>
+    <Result>PASS</Result>
+    <Time real="0.080" user="0.020" system="0.000"/>
+  </Test>
+</Test>

@@ -1,0 +1,15 @@
+<Test>
+  <Name>type-id</Name>
+  <Result>PASS</Result>
+  <Time real="0.050" user="0.010" system="0.010"/>
+  <Test>
+    <Name>Check uniqueness of all TypeIds</Name>
+    <Result>PASS</Result>
+    <Time real="0.050" user="0.010" system="0.010"/>
+  </Test>
+  <Test>
+    <Name>Check behavour when type names collide</Name>
+    <Result>PASS</Result>
+    <Time real="0.000" user="0.000" system="0.000"/>
+  </Test>
+</Test>

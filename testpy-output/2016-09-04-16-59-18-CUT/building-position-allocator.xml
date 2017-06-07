@@ -1,0 +1,15 @@
+<Test>
+  <Name>building-position-allocator</Name>
+  <Result>PASS</Result>
+  <Time real="0.230" user="0.080" system="0.000"/>
+  <Test>
+    <Name>RandomRoom, 12 rooms, 24 nodes</Name>
+    <Result>PASS</Result>
+    <Time real="0.030" user="0.020" system="0.000"/>
+  </Test>
+  <Test>
+    <Name>SameRoom 48 nodes</Name>
+    <Result>PASS</Result>
+    <Time real="0.200" user="0.060" system="0.000"/>
+  </Test>
+</Test>
