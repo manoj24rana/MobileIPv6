@@ -216,6 +216,7 @@ UdpL4Protocol::DeAllocate (Ipv4EndPoint *endPoint)
 Ipv6EndPoint *
 UdpL4Protocol::Allocate6 (void)
 {
+<<<<<<< HEAD
 //MIPv6 Extension Starts
   if (!m_mipv6callback.IsNull())
    {
@@ -228,11 +229,16 @@ UdpL4Protocol::Allocate6 (void)
      NS_LOG_FUNCTION_NOARGS ();
      return m_endPoints6->Allocate ();
    }
+=======
+  NS_LOG_FUNCTION_NOARGS ();
+  return m_endPoints6->Allocate ();
+>>>>>>> 4953ae400d53a10c123b892dd0e75346326fa30c
 }
 
 Ipv6EndPoint *
 UdpL4Protocol::Allocate6 (Ipv6Address address)
 {
+<<<<<<< HEAD
 //MIPv6 Extension Starts
   if (!m_mipv6callback.IsNull())
    {
@@ -245,11 +251,16 @@ UdpL4Protocol::Allocate6 (Ipv6Address address)
      NS_LOG_FUNCTION (this << address);
      return m_endPoints6->Allocate (address);
    }
+=======
+  NS_LOG_FUNCTION (this << address);
+  return m_endPoints6->Allocate (address);
+>>>>>>> 4953ae400d53a10c123b892dd0e75346326fa30c
 }
 
 Ipv6EndPoint *
 UdpL4Protocol::Allocate6 (uint16_t port)
 {
+<<<<<<< HEAD
 //MIPv6 Extension Starts
   if (!m_mipv6callback.IsNull())
    {
@@ -262,11 +273,16 @@ UdpL4Protocol::Allocate6 (uint16_t port)
      NS_LOG_FUNCTION (this << port);
      return m_endPoints6->Allocate (port);
    }
+=======
+  NS_LOG_FUNCTION (this << port);
+  return m_endPoints6->Allocate (port);
+>>>>>>> 4953ae400d53a10c123b892dd0e75346326fa30c
 }
 
 Ipv6EndPoint *
 UdpL4Protocol::Allocate6 (Ipv6Address address, uint16_t port)
 {
+<<<<<<< HEAD
 //MIPv6 Extension Starts
   if (!m_mipv6callback.IsNull())
    {
@@ -279,11 +295,16 @@ UdpL4Protocol::Allocate6 (Ipv6Address address, uint16_t port)
      NS_LOG_FUNCTION (this << address << port);
      return m_endPoints6->Allocate (address, port);
    }
+=======
+  NS_LOG_FUNCTION (this << address << port);
+  return m_endPoints6->Allocate (address, port);
+>>>>>>> 4953ae400d53a10c123b892dd0e75346326fa30c
 }
 Ipv6EndPoint *
 UdpL4Protocol::Allocate6 (Ipv6Address localAddress, uint16_t localPort,
                          Ipv6Address peerAddress, uint16_t peerPort)
 {
+<<<<<<< HEAD
 //MIPv6 Extension Starts
   if (!m_mipv6callback.IsNull())
    {
@@ -298,6 +319,11 @@ UdpL4Protocol::Allocate6 (Ipv6Address localAddress, uint16_t localPort,
      return m_endPoints6->Allocate (localAddress, localPort,
                                 peerAddress, peerPort);
    }
+=======
+  NS_LOG_FUNCTION (this << localAddress << localPort << peerAddress << peerPort);
+  return m_endPoints6->Allocate (localAddress, localPort,
+                                peerAddress, peerPort);
+>>>>>>> 4953ae400d53a10c123b892dd0e75346326fa30c
 }
 
 void 

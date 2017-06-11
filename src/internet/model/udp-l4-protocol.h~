@@ -224,6 +224,7 @@ public:
   virtual IpL4Protocol::DownTargetCallback GetDownTarget (void) const;
   virtual IpL4Protocol::DownTargetCallback6 GetDownTarget6 (void) const;
 
+<<<<<<< HEAD
 //MIPv6 Extension Starts
 
   Callback<Ipv6Address> m_mipv6callback;
@@ -231,6 +232,8 @@ public:
 
 //MIPv6 Extension Ends
 
+=======
+>>>>>>> 4953ae400d53a10c123b892dd0e75346326fa30c
 protected:
   virtual void DoDispose (void);
   /*
