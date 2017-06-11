@@ -33,6 +33,11 @@
 #include "mipv6-l4-protocol.h"
 #include "mipv6-mn.h"
 #include "mipv6-tun-l4-protocol.h"
+<<<<<<< HEAD
+#include "ns3/udp-l4-protocol.h"
+#include "ns3/tcp-l4-protocol.h"
+=======
+>>>>>>> 4953ae400d53a10c123b892dd0e75346326fa30c
 
 
 using namespace std;
@@ -116,6 +121,13 @@ Ptr<Ipv6TunnelL4Protocol> tunnel4prot = node->GetObject<Ipv6TunnelL4Protocol> ()
   Ptr<Ipv6L3Protocol> ipv6l3 = node->GetObject<Ipv6L3Protocol> ();
   ipv6l3->SetPrefixCallback(MakeCallback(&mipv6MN::SetDefaultRouterAddress, this));
 
+  Ptr<UdpL4Protocol> udpl4 = node->GetObject<UdpL4Protocol> ();
+  udpl4->SetMipv6Callback(MakeCallback(&BList::GetHoa, m_buinf));
+
+  Ptr<TcpL4Protocol> tcpl4 = node->GetObject<TcpL4Protocol> ();
+  tcpl4->SetMipv6Callback(MakeCallback(&BList::GetHoa, m_buinf));
+
+
   }
   else
   {
@@ -166,6 +178,12 @@ Ptr<Ipv6TunnelL4Protocol> tunnel4prot = node->GetObject<Ipv6TunnelL4Protocol> ()
 
   Ptr<Ipv6L3Protocol> ipv6l3 = node->GetObject<Ipv6L3Protocol> ();
   ipv6l3->SetPrefixCallback(MakeCallback(&mipv6MN::SetDefaultRouterAddress, this));
+  
+  Ptr<UdpL4Protocol> udpl4 = node->GetObject<UdpL4Protocol> ();
+  udpl4->SetMipv6Callback(MakeCallback(&BList::GetHoa, m_buinf));
+
+  Ptr<TcpL4Protocol> tcpl4 = node->GetObject<TcpL4Protocol> ();
+  tcpl4->SetMipv6Callback(MakeCallback(&BList::GetHoa, m_buinf));
 
   }
              
