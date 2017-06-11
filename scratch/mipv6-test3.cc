@@ -305,16 +305,17 @@ mnhelper1.Install(sta.Get(0));
 //mnhelper1.Install(sta.Get(1));
 
 //LogComponentEnable("BList", LOG_LEVEL_ALL);
-LogComponentEnable("mipv6MN", LOG_LEVEL_ALL);
-LogComponentEnable("mipv6HA", LOG_LEVEL_ALL);
-//LogComponentEnable("Ipv6L3Protocol", LOG_LEVEL_ALL);
+//LogComponentEnable("mipv6MN", LOG_LEVEL_ALL);
+//LogComponentEnable("mipv6HA", LOG_LEVEL_ALL);
+//LogComponentEnable("UdpSocketImpl", LOG_LEVEL_ALL);
 //LogComponentEnable("Ipv6TunnelL4Protocol", LOG_LEVEL_ALL);
 
 
 UdpEchoServerHelper echoServer (9);
 
   ApplicationContainer serverApps = echoServer.Install (cn.Get (0));
-  serverApps.Start (Seconds (4.0));
+
+  serverApps.Start (Seconds (1.0));
   serverApps.Stop (Seconds (700.0));
 
   UdpEchoClientHelper echoClient (Ipv6Address("5001:db80::200:ff:fe00:4"), 9);
@@ -323,7 +324,8 @@ UdpEchoServerHelper echoServer (9);
   echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
 
   ApplicationContainer clientApps = echoClient.Install (sta.Get (0));
-  clientApps.Start (Seconds (4.1));
+
+  clientApps.Start (Seconds (1.1));
   clientApps.Stop (Seconds (700.0));  
 
   LogComponentEnable("UdpEchoClientApplication", LOG_LEVEL_ALL);
