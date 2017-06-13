@@ -1,27 +1,16 @@
-#include <stdio.h>
-#include <sstream>
 #include "ns3/log.h"
 #include "ns3/assert.h"
 #include "ns3/packet.h"
 #include "ns3/node.h"
-#include "ns3/boolean.h"
 #include "ns3/ipv6-routing-protocol.h"
-#include "ns3/ipv6-route.h"
 #include "ns3/ipv6-l3-protocol.h"
 #include "ns3/ipv6-interface.h"
 #include "ns3/icmpv6-l4-protocol.h"
 #include "ns3/ipv6-extension.h"
 #include "ns3/ipv6-extension-header.h"
 #include "ns3/callback.h"
-
-#include "ns3/wifi-net-device.h"
-#include "ns3/wifi-mac.h"
-#include "ns3/regular-wifi-mac.h"
-#include "ns3/wimax-net-device.h"
-
 #include "ns3/ipv6-static-routing-helper.h"
 #include "ns3/ipv6-static-routing.h"
-
 #include "mipv6-header.h"
 #include "mipv6-mobility.h"
 #include "mipv6-demux.h"
@@ -60,7 +49,7 @@ void mipv6HA::NotifyNewAggregate ()
       Ptr<Icmpv6L4Protocol> icmpv6l4 = node->GetObject<Icmpv6L4Protocol> ();
       Ptr<Ipv6L3Protocol> ipv6 = node->GetObject<Ipv6L3Protocol> ();
       icmpv6l4->SetDADCallback(MakeCallback(&mipv6HA::DADFailureIndication, this));
-      //icmpv6l4->SetNSCallback(MakeCallback(&mipv6HA::IsAddress, this));
+      icmpv6l4->SetNSCallback(MakeCallback(&mipv6HA::IsAddress, this));
       ipv6->SetNSCallback2(MakeCallback(&mipv6HA::IsAddress2, this));
     }
     

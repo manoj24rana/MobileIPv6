@@ -1,6 +1,4 @@
 #include "ns3/log.h"
-#include "ns3/queue.h"
-#include "ns3/simulator.h"
 #include "ns3/mac48-address.h"
 #include "ns3/error-model.h"
 #include "ns3/channel.h"
@@ -11,8 +9,6 @@
 #include "ns3/ipv6-routing-protocol.h"
 #include "ns3/ipv6-route.h"
 #include "ns3/ipv6-header.h"
-#include "ns3/ethernet-header.h"
-#include "ns3/ethernet-trailer.h"
 #include "tunnel-net-device.h"
 
 NS_LOG_COMPONENT_DEFINE ("TunnelNetDevice");
@@ -321,16 +317,16 @@ if (a.IsLinkLocal() ||
   uint8_t ttl = 64;
   NS_LOG_FUNCTION("ECHO SENDING............................................................................");
   m_macTxTrace (packet);
-  //NS_LOG_FUNCTION ("Line1...........");
+  NS_LOG_FUNCTION ("Line1...........");
   if ( m_localAddress.IsAny() )
     {
-  //NS_LOG_FUNCTION ("Line2...........");
+  NS_LOG_FUNCTION ("Line2...........");
 	  Ipv6Header header;
           
 	  Socket::SocketErrno err;
       Ptr<Ipv6Route> route;
 	  Ptr<NetDevice> oif (0); //specify non-zero if bound to a source address
-  //NS_LOG_FUNCTION ("Line3...........");
+  NS_LOG_FUNCTION ("Line3...........");
 	  header.SetDestinationAddress (dst);
 	  route = ipv6->GetRoutingProtocol ()->RouteOutput (packet, header, oif, err);
 

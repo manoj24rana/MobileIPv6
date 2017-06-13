@@ -2,12 +2,9 @@
 #ifndef IPV6_MOBILITY_H
 #define IPV6_MOBILITY_H
 
-#include <list>
-
 #include "ns3/object.h"
 #include "ns3/node.h"
 #include "ns3/ptr.h"
-#include "ns3/header.h"
 #include "ns3/ipv6-address.h"
 #include "ns3/ipv6-interface.h"
 
@@ -60,7 +57,7 @@ public:
    */
   virtual uint8_t Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface) = 0;
   
-  virtual uint8_t ProcessOptions (Ptr<Packet> packet, uint8_t offset, uint8_t length, Ipv6MobilityOptionBundle &bundle);
+  virtual uint8_t ProcessOptions (Ptr<Packet> packet, uint8_t offset, uint8_t length, MIPv6OptionBundle &bundle);
   
 private:
   /**

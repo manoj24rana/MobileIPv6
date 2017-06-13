@@ -1,19 +1,15 @@
 #ifndef B_CACHE_H
 #define B_CACHE_H
 
-#include <stdint.h>
+
 
 #include <list>
-
-#include "ns3/packet.h"
 #include "ns3/nstime.h"
 #include "ns3/node.h"
 #include "ns3/ipv6-address.h"
 #include "ns3/ptr.h"
 #include "ns3/timer.h"
-#include "ns3/net-device.h"
 #include "ns3/sgi-hashmap.h"
-#include "ns3/ptr.h"
 
 namespace ns3
 {
@@ -72,7 +68,7 @@ public:
     Ipv6Address GetCoa() const;
     void SetCoa(Ipv6Address mnhoa);
 
-    
+    Ipv6Address GetHA() const;
     void SetHA(Ipv6Address haa);
     
     Ipv6Address GetSolicitedHoA() const;

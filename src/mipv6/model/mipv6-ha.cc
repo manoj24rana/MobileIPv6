@@ -1,27 +1,36 @@
-#include <stdio.h>
-#include <sstream>
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/*
+ * Copyright (c) 2017 Jadavpur University, India
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation;
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * Author: Manoj Kumar Rana <manoj24.rana@gmail.com>
+ */
+
 #include "ns3/log.h"
 #include "ns3/assert.h"
 #include "ns3/packet.h"
 #include "ns3/node.h"
-#include "ns3/boolean.h"
 #include "ns3/ipv6-routing-protocol.h"
-#include "ns3/ipv6-route.h"
 #include "ns3/ipv6-l3-protocol.h"
 #include "ns3/ipv6-interface.h"
 #include "ns3/icmpv6-l4-protocol.h"
 #include "ns3/ipv6-extension.h"
 #include "ns3/ipv6-extension-header.h"
 #include "ns3/callback.h"
-
-#include "ns3/wifi-net-device.h"
-#include "ns3/wifi-mac.h"
-#include "ns3/regular-wifi-mac.h"
-#include "ns3/wimax-net-device.h"
-
 #include "ns3/ipv6-static-routing-helper.h"
 #include "ns3/ipv6-static-routing.h"
-
 #include "mipv6-header.h"
 #include "mipv6-mobility.h"
 #include "mipv6-demux.h"

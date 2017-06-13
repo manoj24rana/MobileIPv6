@@ -1,21 +1,15 @@
-
 #ifndef MIPV6_HEADER_H
 #define MIPV6_HEADER_H
 
-#include <list>
-
 #include "ns3/header.h"
-
 #include "ns3/ipv6-address.h"
-#include "ns3/packet.h"
-#include "identifier.h"
 #include "mipv6-option-header.h"
 
 
 namespace ns3
 {
 
-class Identifier;
+//class Identifier;
 
 class MIPv6Header : public Header
 {

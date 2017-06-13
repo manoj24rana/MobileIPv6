@@ -2,8 +2,6 @@
 #define MIPV6_DEMUX_H
 
 #include <list>
-
-#include "ns3/header.h"
 #include "ns3/object.h"
 #include "ns3/ptr.h"
 

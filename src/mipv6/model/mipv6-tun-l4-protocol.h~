@@ -4,8 +4,7 @@
 #include "ns3/ipv6-address.h"
 #include "ns3/ip-l4-protocol.h"
 #include "ns3/tunnel-net-device.h"
-#include <iostream>
-#include <fstream>
+
 namespace ns3
 {
 
@@ -103,7 +102,7 @@ public:
   
   // myfile.open ("example.txt");
   //myfile.close();
-  void filewriter(uint64_t u, Time t);
+  //void filewriter(uint64_t u, Time t);
   void SetHomeAddress(Ipv6Address hoa);
   Ipv6Address GetHomeAddress();
   
@@ -125,7 +124,7 @@ private:
   Ptr<Node> m_node;
   uint64_t counter;
   Time sctime;
-  std::ofstream myfile;
+  //std::ofstream myfile;
   TunnelMap m_tunnelMap;
   Ipv6Address m_hoa;
 };

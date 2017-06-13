@@ -1,8 +1,5 @@
 #include "ns3/assert.h"
-#include "ns3/address-utils.h"
 #include "ns3/log.h"
-
-#include "identifier.h"
 #include "mipv6-header.h"
 
 namespace ns3

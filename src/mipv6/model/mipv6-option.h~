@@ -10,7 +10,7 @@
 #include "ns3/header.h"
 #include "ns3/ipv6-address.h"
 #include "ns3/nstime.h"
-#include "ns3/identifier.h"
+//#include "ns3/identifier.h"
 
 namespace ns3
 {

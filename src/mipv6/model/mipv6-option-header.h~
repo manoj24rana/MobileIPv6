@@ -1,14 +1,9 @@
-
 #ifndef MIPV6_OPTION_HEADER_H
 #define MIPV6_OPTION_HEADER_H
-
-#include <list>
 
 #include "ns3/header.h"
 #include "ns3/ipv6-address.h"
 #include "ns3/packet.h"
-#include "ns3/nstime.h"
-#include "ns3/identifier.h"
 
 namespace ns3
 {

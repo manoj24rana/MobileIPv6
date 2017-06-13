@@ -51,6 +51,7 @@ private:
   Ipv6Address m_defaultrouteraddress;
   Ipv6Address m_OldPrefixToUse;
   uint32_t m_OldinterfaceIndex;
+  uint32_t m_IfIndex;
 
     
 };

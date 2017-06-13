@@ -1,28 +1,9 @@
-#include <stdio.h>
-#include <sstream>
-
 #include "ns3/log.h"
 #include "ns3/assert.h"
 #include "ns3/packet.h"
 #include "ns3/node.h"
-#include "ns3/boolean.h"
-#include "ns3/ipv6-routing-protocol.h"
-#include "ns3/ipv6-route.h"
-#include "ns3/wifi-net-device.h"
-#include "ns3/wifi-mac.h"
-#include "ns3/identifier.h"
-#include "ns3/virtual-net-device.h"
-#include "ns3/ipv6-l3-protocol.h"
-#include "ns3/ipv6-interface.h"
 #include "ns3/internet-module.h"
-
-#include "ns3/ipv6-static-routing-helper.h"
-#include "ns3/ipv6-static-routing.h"
-#include "ns3/seq-ts-header.h"
 #include "mipv6-tun-l4-protocol.h"
-#include "ns3/simulator.h"
-#include "ns3/timer.h"
-#include <iostream>
 
 
 using namespace std;
@@ -200,7 +181,7 @@ if (destination.IsEqual(GetHomeAddress()))
 {
   uint8_t nextHeader = innerHeader.GetNextHeader ();
   Ptr<IpL4Protocol> protocol = 0;
-  protocol = GetProtocol (nextHeader);
+  protocol = ipv6->GetProtocol (nextHeader);
   if (protocol)
     return protocol->Receive (packet,innerHeader,incomingInterface);
 //  Ptr<UdpL4Protocol> udpv6 = GetNode()->GetObject<UdpL4Protocol>();

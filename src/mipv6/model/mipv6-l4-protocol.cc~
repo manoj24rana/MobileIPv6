@@ -1,24 +1,14 @@
-#include <stdio.h>
-#include <sstream>
-#include <string.h>
-
 #include "ns3/log.h"
 #include "ns3/assert.h"
 #include "ns3/packet.h"
 #include "ns3/node.h"
-#include "ns3/boolean.h"
-#include "ns3/ipv6-routing-protocol.h"
 #include "ns3/ipv6-route.h"
-#include "ns3/wifi-net-device.h"
-#include "ns3/wifi-mac.h"
 #include "ns3/ipv6-l3-protocol.h"
 #include "ns3/ipv6-interface.h"
 #include "ns3/object-base.h"
 #include "ns3/header.h"
 #include "ns3/chunk.h"
 #include "ns3/type-id.h"
-
-#include "identifier.h"
 #include "mipv6-mobility.h"
 #include "mipv6-option.h"
 #include "mipv6-header.h"
@@ -45,6 +35,10 @@ const double MIPv6L4Protocol::INITIAL_BINDING_ACK_TIMEOUT_FIRSTREG = 1.5;
 const double MIPv6L4Protocol::INITIAL_BINDING_ACK_TIMEOUT_REREG = 1.0;
 
 const uint8_t MIPv6L4Protocol::MAX_BINDING_UPDATE_RETRY_COUNT = 3;
+
+const uint8_t MIPv6L4Protocol::MAX_HOTI_RETRY_COUNT = 3;
+
+const uint8_t MIPv6L4Protocol::MAX_COTI_RETRY_COUNT = 3;
 
 const uint32_t MIPv6L4Protocol::MIN_DELAY_BEFORE_BCE_DELETE = 10000;
 

@@ -65,7 +65,7 @@ public:
   static const uint32_t TIMESTAMP_VALIDITY_WINDOW;
 
   /**
-   * \brief Get PMIPv6 protocol number.
+   * \brief Get MIPv6 protocol number.
    * \return protocol number
    */
   static uint16_t GetStaticProtocolNumber ();

@@ -3,13 +3,6 @@
 #include "ns3/node.h"
 #include "ns3/ipv6-address.h"
 #include "bcache.h"
-#include "mipv6-ha.h"
-#include "mipv6-l4-protocol.h"
-#include "mipv6-header.h"
-#include "mipv6-mobility.h"
-#include "mipv6-option-header.h"
-#include "mipv6-option.h"
-#include "ns3/net-device.h"
 #include "ns3/ptr.h"
 
 
@@ -65,6 +58,7 @@ for (BCacheI i = m_bCache.begin () ; i != m_bCache.end () ; i++)
           return true;
         }
     }
+return false;
 }
 
 void BCache::Add(BCache::Entry *bce)

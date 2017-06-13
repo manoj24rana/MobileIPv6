@@ -1,14 +1,7 @@
 #include "ns3/log.h"
-#include "ns3/uinteger.h"
 #include "ns3/node.h"
-
 #include "blist.h"
-
 #include "mipv6-l4-protocol.h"
-
-#include "mipv6-header.h"
-#include "mipv6-mobility.h"
-
 #include "mipv6-mn.h"
 
 namespace ns3

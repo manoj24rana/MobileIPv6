@@ -1,10 +1,5 @@
-
 #include "ns3/assert.h"
-#include "ns3/address-utils.h"
 #include "ns3/log.h"
-#include "ns3/identifier.h"
-#include "ns3/simulator.h"
-
 #include "mipv6-header.h"
 #include "mipv6-option-header.h"
 

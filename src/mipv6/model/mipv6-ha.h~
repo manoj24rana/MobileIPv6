@@ -20,6 +20,7 @@ public:
 
    void DADFailureIndication(Ipv6Address addr);
    bool IsAddress(Ipv6Address addr);
+   bool IsAddress2(Ipv6Address addr);
 
 protected:
   virtual void NotifyNewAggregate ();
