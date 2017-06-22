@@ -47,6 +47,7 @@ public:
   bool IsRouteOptimizationRequired();
   bool IsHomeMatch(Ipv6Address addr);
   void SetDefaultRouterAddress(Ipv6Address addr, uint32_t index);
+  bool CheckAddresses(Ipv6Address ha, Ipv6Address hoa);
   
 
 
@@ -59,6 +60,8 @@ protected:
   virtual uint8_t HandleBA(Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface);
   virtual uint8_t HandleHoT(Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface);
   virtual uint8_t HandleCoT(Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface);
+//  virtual std::list<Ipv6Address> GetAddressCache();
+//  virtual void SetAddressCache(std::list<Ipv6Address> acac);
   
 private:
   

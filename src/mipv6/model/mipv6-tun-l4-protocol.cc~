@@ -1,7 +1,28 @@
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/*
+ * Copyright (c) 2017 Jadavpur University, India
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation;
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * Author: Manoj Kumar Rana <manoj24.rana@gmail.com>
+ */
+
 #include "ns3/log.h"
 #include "ns3/assert.h"
 #include "ns3/packet.h"
 #include "ns3/node.h"
+#include "mipv6-agent.h"
 #include "ns3/internet-module.h"
 #include "mipv6-tun-l4-protocol.h"
 
@@ -125,7 +146,31 @@ enum IpL4Protocol::RxStatus Ipv6TunnelL4Protocol::Receive(Ptr<Packet> p, Ipv6Hea
   /**
    * Check whether the packet belongs to one of tunnels
    */
-  Ptr<TunnelNetDevice> tdev = GetTunnelDevice (src);   
+  Ptr<TunnelNetDevice> tdev = GetTunnelDevice (src);
+/*
+  if (tdev == 0 && GetCacheAddressList().size())
+  {
+    std::list<Ipv6Address>::iterator iter = std::find (GetCacheAddressList().begin(), GetCacheAddressList().end(), src);
+    if ( GetCacheAddressList().end() != iter )
+      tdev = GetTunnelDevice (GetHA());
+  }
+*/
+
+  if(tdev == 0)
+   {
+     Ptr<mipv6Agent> agent = GetNode()->GetObject<mipv6Agent>();
+     std::list<Ipv6Address> lista;
+     lista = agent->GetAddressCache();
+     if(lista.size() && agent->IsHomeMatch(src))
+      {
+        for(std::list<Ipv6Address>::iterator iter=lista.begin(); iter!=lista.end(); iter++)
+         {
+          tdev = GetTunnelDevice (iter.first());
+          if (tdev)
+           break;
+         }    
+      }
+   }
   if (tdev == 0 && src!="::")
     {
       NS_LOG_DEBUG ("The packet does not associate any tunnel device");
@@ -327,6 +372,26 @@ Ipv6Address Ipv6TunnelL4Protocol::GetHomeAddress()
 {
 return m_hoa;
 }
-  
+
+void Ipv6TunnelL4Protocol::SetCacheAddressList(std::list<Ipv6Address> list)
+{
+m_Cachelist= list;
+}
+
+std::list<Ipv6Address> Ipv6TunnelL4Protocol::GetCacheAddressList()
+{
+return m_Cachelist;
+}
+
+void Ipv6TunnelL4Protocol::SetHA(Ipv6Address ha)
+{
+m_ha=ha;
+}
+
+Ipv6Address Ipv6TunnelL4Protocol::GetHA()
+{
+return m_ha;
+}
+
 } /* namespace ns3 */
 

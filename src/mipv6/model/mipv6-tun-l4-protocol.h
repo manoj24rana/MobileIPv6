@@ -125,7 +125,12 @@ public:
   //void filewriter(uint64_t u, Time t);
   void SetHomeAddress(Ipv6Address hoa);
   Ipv6Address GetHomeAddress();
-  
+
+  void SetCacheAddressList(std::list<Ipv6Address> list);
+  std::list<Ipv6Address> GetCacheAddressList();
+
+  void SetHA(Ipv6Address ha);
+  Ipv6Address GetHA();
   
 protected:
  
@@ -147,6 +152,8 @@ private:
   //std::ofstream myfile;
   TunnelMap m_tunnelMap;
   Ipv6Address m_hoa;
+  std::list<Ipv6Address> m_Cachelist;
+  Ipv6Address m_ha;
 };
 
 } /* namespace ns3 */

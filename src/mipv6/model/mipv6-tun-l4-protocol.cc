@@ -22,6 +22,7 @@
 #include "ns3/assert.h"
 #include "ns3/packet.h"
 #include "ns3/node.h"
+#include "mipv6-agent.h"
 #include "ns3/internet-module.h"
 #include "mipv6-tun-l4-protocol.h"
 
@@ -145,7 +146,31 @@ enum IpL4Protocol::RxStatus Ipv6TunnelL4Protocol::Receive(Ptr<Packet> p, Ipv6Hea
   /**
    * Check whether the packet belongs to one of tunnels
    */
-  Ptr<TunnelNetDevice> tdev = GetTunnelDevice (src);   
+  Ptr<TunnelNetDevice> tdev = GetTunnelDevice (src);
+
+  if (tdev == 0 && GetCacheAddressList().size())
+  {
+    std::list<Ipv6Address>::iterator iter = std::find (GetCacheAddressList().begin(), GetCacheAddressList().end(), src);
+    if ( GetCacheAddressList().end() != iter )
+      tdev = GetTunnelDevice (GetHA());
+  }
+
+
+/*  if(tdev == 0)
+   {
+     Ptr<mipv6Agent> agent = GetNode()->GetObject<mipv6Agent>();
+     std::list<Ipv6Address> lista;
+     lista = agent->GetAddressCache();
+     if(lista.size() && agent->IsHomeMatch(src))
+      {
+        for(std::list<Ipv6Address>::iterator iter=lista.begin(); iter!=lista.end(); iter++)
+         {
+          tdev = GetTunnelDevice (iter.first());
+          if (tdev)
+           break;
+         }    
+      }
+   }  */
   if (tdev == 0 && src!="::")
     {
       NS_LOG_DEBUG ("The packet does not associate any tunnel device");
@@ -347,6 +372,26 @@ Ipv6Address Ipv6TunnelL4Protocol::GetHomeAddress()
 {
 return m_hoa;
 }
-  
+
+void Ipv6TunnelL4Protocol::SetCacheAddressList(std::list<Ipv6Address> list)
+{
+m_Cachelist= list;
+}
+
+std::list<Ipv6Address> Ipv6TunnelL4Protocol::GetCacheAddressList()
+{
+return m_Cachelist;
+}
+
+void Ipv6TunnelL4Protocol::SetHA(Ipv6Address ha)
+{
+m_ha=ha;
+}
+
+Ipv6Address Ipv6TunnelL4Protocol::GetHA()
+{
+return m_ha;
+}
+
 } /* namespace ns3 */
 

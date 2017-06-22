@@ -1,3 +1,23 @@
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/*
+ * Copyright (c) 2017 Jadavpur University, India
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation;
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * Author: Manoj Kumar Rana <manoj24.rana@gmail.com>
+ */
+
 #include "ns3/log.h"
 #include "ns3/assert.h"
 #include "ns3/packet.h"
@@ -55,36 +75,32 @@ void mipv6MN::NotifyNewAggregate ()
   if (GetNode () == 0)
     {
       Ptr<Node> node = this->GetObject<Node> ();
-
       SetNode (node);
+      m_buinf = CreateObject<BList> (m_Haalist);
+      m_buinf->SetNode (node);
+    
 
-        m_buinf = CreateObject<BList> (m_Haalist);
-        m_buinf->SetNode (node);
+  //Fetch any link-local address of the node
+  Ptr<Ipv6> ip = GetNode ()->GetObject<Ipv6> ();
+  Ipv6InterfaceAddress ads = ip->GetAddress(1,0);                
 
-//assuming interface 1 as the active interface
-   
-                Ptr<Ipv6> ip = node->GetObject<Ipv6> ();
-                Ipv6InterfaceAddress ads = ip->GetAddress(1,0);                
-                m_buinf->SetCoa(ads.GetAddress());
-  
-  std::cout<<"IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII"<<ads.GetAddress();
-  //m_buinf->SetHomeAgentList(m_Haalist);
+
+//Set HAA and Forming HoA from HAA Prefix
+
   if (m_Haalist.size())
-  {
-   m_buinf->SetHA(m_Haalist.front());
-   (m_buinf->GetHA()).GetBytes(buf1);
-   (m_buinf->GetCoa()).GetBytes(buf2);
-   for (i=0;i<8;i++)
-    buf[i]=buf1[i];
-   for (i=0;i<8;i++)
-    buf[i+8]=buf2[i+8];    
-   Ipv6Address addr(buf);
-   m_buinf->SetHoa(addr);
-Ptr<Ipv6TunnelL4Protocol> tunnel4prot = node->GetObject<Ipv6TunnelL4Protocol> ();  
-  tunnel4prot->SetHomeAddress(addr);
-  }
-
- 
+    {
+     m_buinf->SetHA(Ipv6Address("9999:db80::200:ff:fe00:8"));//m_Haalist.front());  // The first address
+     (m_buinf->GetHA()).GetBytes(buf1); //Fetching Prefix
+     (ads.GetAddress()).GetBytes(buf2); //Fetching interface identifier
+     for (i=0;i<8;i++)
+       buf[i]=buf1[i];
+     for (i=0;i<8;i++)
+       buf[i+8]=buf2[i+8];    
+     Ipv6Address addr(buf);
+     m_buinf->SetHoa(addr);
+     Ptr<Ipv6TunnelL4Protocol> tunnel4prot = GetNode ()->GetObject<Ipv6TunnelL4Protocol> ();  
+     tunnel4prot->SetHomeAddress(addr);
+    }
           
               
   m_buinf->SetHomeInitCookie(0xFFFFFFFFFFFFFFFF);
@@ -95,84 +111,25 @@ Ptr<Ipv6TunnelL4Protocol> tunnel4prot = node->GetObject<Ipv6TunnelL4Protocol> ()
   m_buinf->SetCareOfNonceIndex(0x0);
   m_buinf->SetCN("0::0");
   m_OldinterfaceIndex=-1;
-  //m_OldPrefixToUse(::);
-  //m_defaultrouteraddress(0);
 
-  Ptr<Icmpv6L4Protocol> icmpv6l4 = node->GetObject<Icmpv6L4Protocol> ();
+
+  Ptr<Icmpv6L4Protocol> icmpv6l4 = GetNode ()->GetObject<Icmpv6L4Protocol> ();
   icmpv6l4->SetNewIPCallback(MakeCallback(&mipv6MN::HandleNewAttachment, this));
+  icmpv6l4->SetCheckAddressCallback(MakeCallback(&mipv6MN::CheckAddresses, this));
 
-  Ptr<Ipv6L3Protocol> ipv6l3 = node->GetObject<Ipv6L3Protocol> ();
+  Ptr<Ipv6L3Protocol> ipv6l3 = GetNode ()->GetObject<Ipv6L3Protocol> ();
   ipv6l3->SetPrefixCallback(MakeCallback(&mipv6MN::SetDefaultRouterAddress, this));
 
-  Ptr<UdpL4Protocol> udpl4 = node->GetObject<UdpL4Protocol> ();
+  Ptr<UdpL4Protocol> udpl4 = GetNode ()->GetObject<UdpL4Protocol> ();
   udpl4->SetMipv6Callback(MakeCallback(&BList::GetHoa, m_buinf));
 
-  Ptr<TcpL4Protocol> tcpl4 = node->GetObject<TcpL4Protocol> ();
+  Ptr<TcpL4Protocol> tcpl4 = GetNode ()->GetObject<TcpL4Protocol> ();
   tcpl4->SetMipv6Callback(MakeCallback(&BList::GetHoa, m_buinf));
-
-
-  }
-  else
-  {
-        m_buinf = CreateObject<BList> (m_Haalist);
-        m_buinf->SetNode (GetNode ());
-  Ipv6Address coa;             
-  Ptr<Node> node = this->GetObject<Node> ();
-  Ptr<Ipv6> ip = node->GetObject<Ipv6> ();
-  Ipv6InterfaceAddress ads = ip->GetAddress(1,0);                
-  coa=ads.GetAddress();
-  std::cout<<"RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"<<coa;               
-                
-  if (coa!=m_buinf->GetCoa())
-  {                
-  m_buinf->SetCoa(coa);
-  //m_buinf->SetHomeAgentList(m_Haalist);
-  if (m_Haalist.size())
-  {
-   m_buinf->SetHA(m_Haalist.front());
-   (m_buinf->GetHA()).GetBytes(buf1);
-   (m_buinf->GetCoa()).GetBytes(buf2);
-   for (i=0;i<8;i++)
-    buf[i]=buf1[i];
-   for (i=0;i<8;i++)
-    buf[i+8]=buf2[i+8];    
-   Ipv6Address addr(buf);
-   m_buinf->SetHoa(addr);
-  Ptr<Ipv6TunnelL4Protocol> tunnel4prot = node->GetObject<Ipv6TunnelL4Protocol> ();  
-  tunnel4prot->SetHomeAddress(addr);      
-  }
-
-  
-
-
-  m_buinf->SetHomeInitCookie(0xFFFFFFFFFFFFFFFF);
-  m_buinf->SetCareOfInitCookie(0xFFFFFFFFFFFFFFFF);
-  m_buinf->SetHomeKeygenToken(0x0);
-  m_buinf->SetCareOfKeygenToken(0x0);
-  m_buinf->SetHomeNonceIndex(0x0);
-  m_buinf->SetCareOfNonceIndex(0x0);
-  m_buinf->SetCN("0::0");
-  m_OldinterfaceIndex=-1;
-  //m_OldPrefixToUse(::);
-
-
-  Ptr<Icmpv6L4Protocol> icmpv6l5 = node->GetObject<Icmpv6L4Protocol> ();
-  icmpv6l5->SetNewIPCallback(MakeCallback(&mipv6MN::HandleNewAttachment, this));
-
-  Ptr<Ipv6L3Protocol> ipv6l3 = node->GetObject<Ipv6L3Protocol> ();
-  ipv6l3->SetPrefixCallback(MakeCallback(&mipv6MN::SetDefaultRouterAddress, this));
-  
-  Ptr<UdpL4Protocol> udpl4 = node->GetObject<UdpL4Protocol> ();
-  udpl4->SetMipv6Callback(MakeCallback(&BList::GetHoa, m_buinf));
-
-  Ptr<TcpL4Protocol> tcpl4 = node->GetObject<TcpL4Protocol> ();
-  tcpl4->SetMipv6Callback(MakeCallback(&BList::GetHoa, m_buinf));
-
-  }
-             
-  }
-
-    
+ 
+  Ptr<Ipv6TunnelL4Protocol> tunnell4 = GetNode ()->GetObject<Ipv6TunnelL4Protocol> ();
+  tunnell4->SetCacheAddressList(m_Haalist);
+  tunnell4->SetHA(m_buinf->GetHA());
+ }
   mipv6Agent::NotifyNewAggregate ();
 }
 
@@ -316,16 +273,12 @@ Ptr<Packet> mipv6MN::BuildCoTI ()
 
 void mipv6MN::HandleNewAttachment (Ipv6Address ipr)
 {
-
-    
-  
-  
-  if (!ipr.IsLinkLocal() && !ipr.IsEqual(m_buinf->GetHoa()))
+  if (!ipr.IsLinkLocal() )// && !ipr.IsEqual(m_buinf->GetHoa()))
   {
   Ipv6Address coa=ipr;
   m_buinf->SetCoa(coa);
   
-
+  ClearTunnelAndRouting ();
   Ptr<Ipv6> ipv6 = GetNode ()->GetObject<Ipv6> ();
   NS_ASSERT (ipv6);
 
@@ -344,9 +297,8 @@ void mipv6MN::HandleNewAttachment (Ipv6Address ipr)
 
 
   //send BU
-NS_LOG_FUNCTION ("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"<<m_buinf->GetHA ());
   NS_LOG_FUNCTION (this << p->GetSize());
-  ClearTunnelAndRouting ();
+
   SendMessage (p->Copy (), m_buinf->GetHA (), 64);
   
 
@@ -413,6 +365,7 @@ uint8_t mipv6MN::HandleBA (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
           //if (m_buinf->IsHomeUpdating ())
             //{
               //create tunnel & setup routing
+              if(!(m_buinf->GetHoa()).IsEqual(m_buinf->GetCoa()))
               SetupTunnelAndRouting ();
             //}
 
@@ -423,7 +376,7 @@ uint8_t mipv6MN::HandleBA (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
           m_buinf->StartHomeRefreshTimer ();
           m_buinf->StopHomeReachableTimer ();
           m_buinf->StartHomeReachableTimer ();
-	  if (IsRouteOptimizationRequired() && !m_buinf->GetCN().IsEqual("0::0"))
+	  if (IsRouteOptimizationRequired() && !m_buinf->GetCN().IsEqual("0::0") && !(m_buinf->GetHoa()).IsEqual(m_buinf->GetCoa()))
 	  {
 	  Ptr<Packet> p = BuildHoTI ();
 	  m_buinf->SetHoTIPacket(p);
@@ -722,6 +675,14 @@ void mipv6MN::SetDefaultRouterAddress(Ipv6Address addr,  uint32_t index)
 {
 m_defaultrouteraddress=addr;
 m_IfIndex=index;
+}
+
+bool mipv6MN::CheckAddresses(Ipv6Address ha, Ipv6Address hoa)
+{
+std::cout<<"uuuuuuuuuuuuuuuuuuuuuttttttttttttttttttttttttttttteeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+if(ha.IsEqual(m_buinf->GetHA()) && hoa.IsEqual(m_buinf->GetHoa()))
+ return true;
+return false;
 }
 
 } /* namespace ns3 */
