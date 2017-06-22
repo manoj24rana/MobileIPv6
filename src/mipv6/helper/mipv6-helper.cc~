@@ -1,42 +1,44 @@
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/*
+ * Copyright (c) 2017 Jadavpur University, India
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation;
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * Author: Manoj Kumar Rana <manoj24.rana@gmail.com>
+ */
+
 #include "ns3/assert.h"
 #include "ns3/log.h"
 #include "ns3/object.h"
-#include "ns3/names.h"
-#include "ns3/ipv4.h"
-#include "ns3/ipv6.h"
-#include "ns3/packet-socket-factory.h"
-#include "ns3/config.h"
-#include "ns3/simulator.h"
-#include "ns3/string.h"
-#include "ns3/net-device.h"
-#include "ns3/callback.h"
 #include "ns3/node.h"
-#include "ns3/core-config.h"
-#include "ns3/arp-l3-protocol.h"
 #include "ns3/mipv6-l4-protocol.h"
 #include "ns3/mipv6-header.h"
 #include "ns3/mipv6-mobility.h"
 #include "ns3/mipv6-mn.h"
 #include "ns3/mipv6-ha.h"
 #include "ns3/mipv6-cn.h"
-#include "ns3/identifier.h"
 #include "ns3/mipv6-tun-l4-protocol.h"
-//#include "ns3/ipv6-static-source-routing.h"
-
-#include "ns3/ipv6-list-routing.h"
-
 #include "mipv6-helper.h"
-#include <limits>
-#include <map>
 
 NS_LOG_COMPONENT_DEFINE ("MIPv6Helper");
 
 namespace ns3 {
 
+//HA Helper
+
 mipv6HAHelper::mipv6HAHelper()
-  
 {
-//NS_ASSERT_MSG("MIPv6Helper HA constructor");
 }
 
 mipv6HAHelper::~mipv6HAHelper()
@@ -46,7 +48,6 @@ mipv6HAHelper::~mipv6HAHelper()
 void
 mipv6HAHelper::Install (Ptr<Node> node) 
 {
-
   m_node=node;
   Ptr<MIPv6L4Protocol> mipv6 = node->GetObject<MIPv6L4Protocol>();
 
@@ -56,11 +57,12 @@ mipv6HAHelper::Install (Ptr<Node> node)
   
       node->AggregateObject(mipv6);
   
-	  mipv6 = node->GetObject<MIPv6L4Protocol>();
+      mipv6 = node->GetObject<MIPv6L4Protocol>();
   
       mipv6->RegisterMobility();
-      
-	}
+
+      mipv6->RegisterMobilityOptions();
+    }
 	
   Ptr<Ipv6TunnelL4Protocol> ip6tunnel = node->GetObject<Ipv6TunnelL4Protocol>();
   
@@ -69,9 +71,12 @@ mipv6HAHelper::Install (Ptr<Node> node)
 	  ip6tunnel = CreateObject<Ipv6TunnelL4Protocol>();
 	  
 	  node->AggregateObject (ip6tunnel);
-	}
+    }
 
-  
+  Ptr<mipv6MN> mn = node->GetObject<mipv6MN>();
+  if (mn)
+    NS_ASSERT_MSG( !mn, "MN stack is installed on HA, not allowed");
+    
   Ptr<mipv6HA> ha = CreateObject<mipv6HA>();
  	
   node->AggregateObject(ha);
@@ -79,15 +84,18 @@ mipv6HAHelper::Install (Ptr<Node> node)
 
 std::list<Ipv6Address> mipv6HAHelper::GetHomeAgentAddressList()
 {
-Ptr<mipv6HA> ha = m_node->GetObject<mipv6HA>();
-return ha->HomeAgentAddressList();
+  Ptr<mipv6HA> ha = m_node->GetObject<mipv6HA>();
+  NS_ASSERT (ha != 0);  // must install mipv6ha before
+  return ha->HomeAgentAddressList();
 }
 
-mipv6MNHelper::mipv6MNHelper(std::list<Ipv6Address> haalist, bool rotopt)
-:m_Haalist(haalist),
-m_rotopt(rotopt)
-{
+//MN Helper
 
+mipv6MNHelper::mipv6MNHelper(std::list<Ipv6Address> haalist, bool rotopt, unsigned index)
+:m_Haalist(haalist),  //home agent list
+m_Index(index),
+m_rotopt(rotopt)     //must be false in this implementation (set as false by default)
+{
 }
 
 mipv6MNHelper::~mipv6MNHelper()
@@ -105,54 +113,38 @@ mipv6MNHelper::Install (Ptr<Node> node) const
   
       node->AggregateObject(mipv6);
 	  
-	  mipv6 = node->GetObject<MIPv6L4Protocol>();
+      mipv6 = node->GetObject<MIPv6L4Protocol>();
   
       mipv6->RegisterMobility();
-      
-	}
 
-Ptr<Ipv6TunnelL4Protocol> ip6tunnel = node->GetObject<Ipv6TunnelL4Protocol>();
+      mipv6->RegisterMobilityOptions();
+    }
+
+  Ptr<Ipv6TunnelL4Protocol> ip6tunnel = node->GetObject<Ipv6TunnelL4Protocol>();
   
   if ( ip6tunnel == 0 )
     {
-	  ip6tunnel = CreateObject<Ipv6TunnelL4Protocol>();
+      ip6tunnel = CreateObject<Ipv6TunnelL4Protocol>();
 	  
-	  node->AggregateObject (ip6tunnel);
-	}
+      node->AggregateObject (ip6tunnel);
+    }
+
+  Ptr<mipv6HA> ha = node->GetObject<mipv6HA>();
+  if (ha)
+    NS_ASSERT_MSG( !ha, "HA stack is installed on MN, not allowed");
 
 
-  Ptr<mipv6MN> mn = CreateObject<mipv6MN>(m_Haalist);
-  mn->SetRouteOptimizationReuiredField(m_rotopt);
-  
-  //Attach static source routing
-/*
-  Ptr<Ipv6> ipv6 = node->GetObject<Ipv6>();
-  
-  NS_ASSERT_MSG(ipv6, "Install Internet-stack first before installing MIPv6-related agents");
-  
-  Ptr<Ipv6RoutingProtocol> routingProtocol = ipv6->GetRoutingProtocol();
+  Ptr<mipv6MN> mn = CreateObject<mipv6MN>(m_Haalist, m_Index);  // Pass Home Agent Address List as argument
 
-  NS_ASSERT_MSG( routingProtocol, "MIPv6 needs Ipv6-routing protocol for operation");
-
-  Ptr<Ipv6ListRouting> listRouting = DynamicCast<Ipv6ListRouting>(routingProtocol);
-  
-  NS_ASSERT_MSG( listRouting, "MIPv6 needs Ipv6-list-routing protocol for operation");
-  
-  Ptr<Ipv6StaticSourceRouting> sourceRouting = CreateObject<Ipv6StaticSourceRouting>();
-  
-  listRouting->AddRoutingProtocol(sourceRouting, 10); //higher priority than static routing
-*/
-
-
-
-//NS_ASSERT_MSG("MAG HELPER INSTALL METHOD");	
+  mn->SetRouteOptimizationReuiredField(false);  //Set by default false as the current implementation does
+                                                //not support route optimization, otherwise set to m_rotopt
   node->AggregateObject(mn);
 }
-//CN
+
+//CN Helper
+
 mipv6CNHelper::mipv6CNHelper()
-  
 {
-//NS_ASSERT_MSG("MIPv6Helper HA constructor");
 }
 
 mipv6CNHelper::~mipv6CNHelper()
@@ -170,11 +162,12 @@ mipv6CNHelper::Install (Ptr<Node> node) const
   
       node->AggregateObject(mipv6);
   
-	  mipv6 = node->GetObject<MIPv6L4Protocol>();
+      mipv6 = node->GetObject<MIPv6L4Protocol>();
   
       mipv6->RegisterMobility();
-      
-	}
+
+      mipv6->RegisterMobilityOptions();
+    }
 	
 
   

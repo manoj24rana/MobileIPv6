@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2016 Jadavpur University, India
+ * Copyright (c) 2017 Jadavpur University, India
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -21,19 +21,28 @@
 #ifndef MIPV6_HELPER_H
 #define MIPV6_HELPER_H
 
-#include "ns3/node-container.h"
-#include "ns3/net-device-container.h"
-#include "ns3/packet.h"
 #include "ns3/ptr.h"
-#include "ns3/object-factory.h"
-#include "ns3/ipv4-l3-protocol.h"
-#include "ns3/ipv6-l3-protocol.h"
-#include "ns3/trace-helper.h"
+#include "ns3/ipv6-address.h"
 
 
 namespace ns3 {
 
 class Node;
+
+/**
+ * It is a supporting implementation module. It basically works above all the main implemented classes of MIPv6 module.
+ * Three helper classes are created for three agent classes:
+ * -mipv6MN
+ * -mipv6HA and
+ * -mipv6CN
+ * Users who want to run MIPv6, uses the helper classes to install the MIPv6 functionality to corresponding nodes.
+ * These classes implement an important function called Install() . This method takes a node pointer and install
+ * over a node. It installs the MIPv6MobL4Protocol and MIPv6TunL4Protocol following the CreateObject() and
+ * AggregateObject() functions, defined in the core part of ns-3. After that it registers the corresponding
+ * mobility messages using MIPv6MobL4Protocol class
+ */
+
+//HA Helper
 
 class mipv6HAHelper {
 public:
@@ -49,9 +58,11 @@ public:
 protected:
 
 private:
-Ptr<Node> m_node;
+  Ptr<Node> m_node;
   };
-//CN
+
+//CN Helper
+
 class mipv6CNHelper {
 public:
   mipv6CNHelper();
@@ -69,9 +80,11 @@ private:
   
 };
 
+//MN Helper
+
 class mipv6MNHelper {
 public:
-  mipv6MNHelper(std::list<Ipv6Address> haalist, bool rotopt);
+  mipv6MNHelper(std::list<Ipv6Address> haalist, bool rotopt, unsigned index=1);
   ~mipv6MNHelper();
   /**
    * 
@@ -85,6 +98,7 @@ protected:
 private:
 
   std::list<Ipv6Address> m_Haalist;
+  unsigned m_Index;
   bool m_rotopt;
 
   };
