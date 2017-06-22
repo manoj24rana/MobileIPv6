@@ -236,6 +236,5 @@ uint8_t mipv6Agent::HandleCoT (Ptr<Packet> packet, const Ipv6Address &src, const
   return 0;
 }
 
-
 } /* namespace ns3 */
 

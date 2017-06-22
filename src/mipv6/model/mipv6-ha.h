@@ -41,6 +41,8 @@ public:
    void DADFailureIndication(Ipv6Address addr);
    bool IsAddress(Ipv6Address addr);
    bool IsAddress2(Ipv6Address addr);
+   
+   void HandleNS(Ptr<Packet> packet, Ptr<Ipv6Interface> interface, Ipv6Address src, Ipv6Address target);
 
 protected:
   virtual void NotifyNewAggregate ();

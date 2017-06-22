@@ -70,6 +70,7 @@ void mipv6HA::NotifyNewAggregate ()
       Ptr<Ipv6L3Protocol> ipv6 = node->GetObject<Ipv6L3Protocol> ();
       icmpv6l4->SetDADCallback(MakeCallback(&mipv6HA::DADFailureIndication, this));
       icmpv6l4->SetNSCallback(MakeCallback(&mipv6HA::IsAddress, this));
+      icmpv6l4->SetHandleNSCallback(MakeCallback(&mipv6HA::HandleNS, this));
       ipv6->SetNSCallback2(MakeCallback(&mipv6HA::IsAddress2, this));
     }
     
@@ -85,11 +86,9 @@ bce->SetState(BCache::Entry::INVALID);
 
 bool mipv6HA::IsAddress(Ipv6Address addr)
 {
-std::cout<<"I am inside IsAddress1"<<addr<<"\n";
 BCache::Entry *bce = m_bCache->Lookup (addr);
 if(bce)
 return true;
-std::cout<<"I am inside IsAddress2"<<addr<<"\n";
 return false;
 }
 
@@ -178,21 +177,26 @@ NS_LOG_FUNCTION("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII"
 
   bce = m_bCache->Lookup (homeaddr);
 
+  if (src.IsEqual(homeaddr))
+   {
+     if (bce)
+      {
+      ClearTunnelAndRouting (bce);
+      m_bCache->Remove(bce);
+      }
+     free(bce2);
+     if(bu.GetFlagA())
+     SendMessage (ba, src, 64);
+     return 0;
+   }
+
 
   if(bce)
   {
   ClearTunnelAndRouting (bce); 
   m_bCache->Remove(bce);
 
-  //MN at Home
 
-  if(src.IsEqual(homeaddr))
-    {
-     free(bce2);
-     return 0;
-    }
-  else
-    {
      
 
      m_bCache->Add(bce2);
@@ -204,7 +208,7 @@ NS_LOG_FUNCTION("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII"
       }
 
     return 0;
-    }
+    
 
   }
 
@@ -318,6 +322,124 @@ void mipv6HA::FunctionDadTimeoutForOffLinkAddress (Ptr<Ipv6Interface> interface,
 if (m_bCache->Lookup (homeaddr)->GetState()!= BCache::Entry::INVALID)
 SendMessage (ba, m_bCache->Lookup (homeaddr)->GetCoa(), 64);
 SetupTunnelAndRouting (m_bCache->Lookup (homeaddr));
+}
+
+void mipv6HA::HandleNS(Ptr<Packet> packet, Ptr<Ipv6Interface> interface, Ipv6Address src, Ipv6Address target)
+{
+  Ipv6InterfaceAddress ifaddr(target);
+
+  if (packet->GetUid () == ifaddr.GetNsDadUid ())
+    {
+      /* don't process our own DAD probe */
+      NS_LOG_LOGIC ("Hey we receive our DAD probe!");
+      return;
+    }
+
+  Icmpv6OptionLinkLayerAddress lla (1);
+  Address hardwareAddress;
+  NdiscCache::Entry* entry = 0;
+  Ptr<Icmpv6L4Protocol> icmp =GetNode()->GetObject<Icmpv6L4Protocol> ();
+  Ptr<NdiscCache> cache = icmp->GetCache (interface->GetDevice ());
+  uint8_t flags = 0;
+
+  /* XXX search all options following the NS header */
+
+  if (src != Ipv6Address::GetAny ())
+    {
+      uint8_t type;
+      packet->CopyData (&type, sizeof(type));
+
+      if (type != Icmpv6Header::ICMPV6_OPT_LINK_LAYER_SOURCE)
+        {
+          return;
+        }
+
+      /* Get LLA */
+      packet->RemoveHeader (lla);
+
+      entry = cache->Lookup (src);
+
+      if (!entry)
+        {
+          entry = cache->Add (src);
+          entry->SetRouter (false);
+          entry->MarkStale (lla.GetAddress ());
+        }
+      else if (entry->GetMacAddress () != lla.GetAddress ())
+        {
+          entry->MarkStale (lla.GetAddress ());
+        }
+
+      flags = 3; /* S + O flags */
+    }
+  else
+    {
+      /* it means someone do a DAD */
+      flags = 1; /* O flag */
+    }
+
+  /* send a NA to src */
+  Ptr<Ipv6L3Protocol> ipv6 = GetNode()->GetObject<Ipv6L3Protocol> ();
+
+  if (ipv6->IsForwarding (ipv6->GetInterfaceForDevice (interface->GetDevice ())))
+    {
+      flags += 4; /* R flag */
+    }
+
+  hardwareAddress = interface->GetDevice ()->GetAddress ();
+  BCache::Entry *bce=m_bCache->Lookup (target);
+
+
+
+
+
+
+  Ptr<Packet> p = Create<Packet> ();
+  Ipv6Header ipHeader;
+  Icmpv6NA na;
+  Icmpv6OptionLinkLayerAddress llOption (0, hardwareAddress);  /* we give our mac address in response */
+
+
+  /* forge the entire NA packet from IPv6 header to ICMPv6 link-layer option, so that the packet does not pass by Icmpv6L4Protocol::Lookup again */
+
+  p->AddHeader (llOption);
+  na.SetIpv6Target (target);
+
+  if ((flags & 1))
+    {
+      na.SetFlagO (true);
+    }
+  if ((flags & 2) && bce->GetHA() != Ipv6Address::GetAny ())
+    {
+      na.SetFlagS (true);
+    }
+  if ((flags & 4))
+    {
+      na.SetFlagR (true);
+    }
+
+  na.CalculatePseudoHeaderChecksum (bce->GetHA(), src, p->GetSize () + na.GetSerializedSize (), Icmpv6L4Protocol::PROT_NUMBER);
+  p->AddHeader (na);
+
+  ipHeader.SetSourceAddress (bce->GetHA());
+  ipHeader.SetDestinationAddress (src);
+  ipHeader.SetNextHeader (Icmpv6L4Protocol::PROT_NUMBER);
+  ipHeader.SetPayloadLength (p->GetSize ());
+  ipHeader.SetHopLimit (255);
+
+
+
+
+
+
+
+
+
+  
+  NdiscCache::Ipv6PayloadHeaderPair pi(p, ipHeader);
+  interface->Send (pi.first, pi.second, src.IsAny () ? Ipv6Address::GetAllNodesMulticast () : src);
+
+  /* not a NS for us discard it */
 }
 
 } /* namespace ns3 */
