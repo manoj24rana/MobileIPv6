@@ -220,8 +220,13 @@ public:
   Callback<void, Ipv6Address> m_DADCallback;
   void SetDADCallback (Callback<void, Ipv6Address> dad);
 
-  Callback<bool, Ipv6Address> m_NSCallback2;
+  Callback<bool, Ipv6Address> m_NSCallback;
   void SetNSCallback (Callback<bool, Ipv6Address> ns);
+
+  Callback<void, Ptr<Packet>, Ptr<Ipv6Interface>, Ipv6Address, Ipv6Address> m_HandleNSCallback;
+  void SetHandleNSCallback (Callback<void, Ptr<Packet>, Ptr<Ipv6Interface>, Ipv6Address, Ipv6Address> handlens);
+
+  Ptr<NdiscCache> GetCache (Ptr<NetDevice> device);
 
   /**
    * \brief Do the Duplication Address Detection (DAD).

@@ -223,6 +223,14 @@ public:
   Callback<bool, Ipv6Address> m_NSCallback;
   void SetNSCallback (Callback<bool, Ipv6Address> ns);
 
+  Callback<void, Ptr<Packet>, Ptr<Ipv6Interface>, Ipv6Address, Ipv6Address> m_HandleNSCallback;
+  void SetHandleNSCallback (Callback<void, Ptr<Packet>, Ptr<Ipv6Interface>, Ipv6Address, Ipv6Address> handlens);
+
+  Callback<bool, Ipv6Address, Ipv6Address> m_CheckAddressCallback;
+  void SetCheckAddressCallback (Callback<bool, Ipv6Address, Ipv6Address> checkadr);
+
+  Ptr<NdiscCache> GetCache (Ptr<NetDevice> device);
+
   /**
    * \brief Do the Duplication Address Detection (DAD).
    * It consists in sending a NS with our IPv6 as target. If

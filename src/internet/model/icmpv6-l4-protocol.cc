@@ -476,9 +476,6 @@ void Icmpv6L4Protocol::HandleNS (Ptr<Packet> packet, Ipv6Address const &src, Ipv
 
   Ipv6Address target = nsHeader.GetIpv6Target ();
 
-if(target.IsEqual(Ipv6Address("5001:db80::200:ff:fe00:9")))
-std::cout<<"Me Inside Icmpv6L4Protocol 1 \n";
-
   for (i = 0; i < nb; i++)
     {
       ifaddr = interface->GetAddress (i);
@@ -490,12 +487,10 @@ std::cout<<"Me Inside Icmpv6L4Protocol 1 \n";
         }
     }
 //MIPv6 Extension starts
-  if(!m_NSCallback.IsNull() && !found)
+  if(!m_NSCallback.IsNull() && !found && m_NSCallback(target) && !m_HandleNSCallback.IsNull())
     {
-if(target.IsEqual(Ipv6Address("5001:db80::200:ff:fe00:9")))
-std::cout<<"Me Inside Icmpv6L4Protocol 2 \n";
-      found=m_NSCallback(target);
-      ifaddr=Ipv6InterfaceAddress(target);
+      m_HandleNSCallback(packet, interface, src, target);
+      return;
     }
 
 //MIPv6 Extension Ends
@@ -621,7 +616,6 @@ void Icmpv6L4Protocol::HandleNA (Ptr<Packet> packet, Ipv6Address const &src, Ipv
 
   packet->RemoveHeader (naHeader);
   Ipv6Address target = naHeader.GetIpv6Target ();
-
   Address hardwareAddress;
   NdiscCache::Entry* entry = 0;
   Ptr<NdiscCache> cache = FindCache (interface->GetDevice ());
@@ -649,7 +643,13 @@ void Icmpv6L4Protocol::HandleNA (Ptr<Packet> packet, Ipv6Address const &src, Ipv
             }
         }
 
-      if (found)
+      if (found && !m_CheckAddressCallback.IsNull() && m_CheckAddressCallback (src,target))  
+        {
+          
+          return; //MIPv6 Extension
+        }
+
+      else if (found)
         {
           if (ifaddr.GetState () == Ipv6InterfaceAddress::TENTATIVE || ifaddr.GetState () == Ipv6InterfaceAddress::TENTATIVE_OPTIMISTIC)
             {
@@ -1424,6 +1424,23 @@ void Icmpv6L4Protocol::SetNSCallback (Callback<bool, Ipv6Address> ns)
 {
   NS_LOG_FUNCTION (this);
   m_NSCallback = ns;
+}
+
+void Icmpv6L4Protocol::SetHandleNSCallback (Callback<void, Ptr<Packet>, Ptr<Ipv6Interface>, Ipv6Address, Ipv6Address> handlens)
+{
+  NS_LOG_FUNCTION (this);
+  m_HandleNSCallback = handlens;
+}
+
+void Icmpv6L4Protocol::SetCheckAddressCallback (Callback<bool, Ipv6Address, Ipv6Address> checkadr)
+{
+  NS_LOG_FUNCTION (this);
+  m_CheckAddressCallback = checkadr;
+}
+
+Ptr<NdiscCache> Icmpv6L4Protocol::GetCache (Ptr<NetDevice> device)
+{
+return FindCache (device);
 }
 
 //MIPv6 Extension Ends
