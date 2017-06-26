@@ -36,3 +36,4 @@ build-dir/
 build/
 /.cproject
 /.project
+/.settings/
