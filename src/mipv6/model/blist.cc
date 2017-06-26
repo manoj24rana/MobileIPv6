@@ -24,8 +24,7 @@
 #include "mipv6-l4-protocol.h"
 #include "mipv6-mn.h"
 
-namespace ns3
-{
+namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("BList");
 
@@ -33,9 +32,9 @@ TypeId BList::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::BList")
     .SetParent<Object> ()
-    ;
+  ;
   return tid;
-} 
+}
 
 
 BList::~BList ()
@@ -59,104 +58,104 @@ void BList::Flush ()
 }
 
 
-Ptr<Node> BList::GetNode() const
+Ptr<Node> BList::GetNode () const
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_node;
 }
 
-void BList::SetNode(Ptr<Node> node)
+void BList::SetNode (Ptr<Node> node)
 {
   NS_LOG_FUNCTION ( this << node );
-  
+
   m_node = node;
 }
 
-BList::BList(std::list<Ipv6Address> haalist)
-  :m_hstate (UNREACHABLE),
-  m_tunnelIfIndex(-1),
-  m_hpktbu(0),
+BList::BList (std::list<Ipv6Address> haalist)
+  : m_hstate (UNREACHABLE),
+  m_tunnelIfIndex (-1),
+  m_hpktbu (0),
   m_HaaList (haalist),
   m_hretransTimer (Timer::CANCEL_ON_DESTROY),
   m_hreachableTimer (Timer::CANCEL_ON_DESTROY),
-  m_hrefreshTimer (Timer::CANCEL_ON_DESTROY),  
+  m_hrefreshTimer (Timer::CANCEL_ON_DESTROY),
   m_cnstate (UNREACHABLE),
-  m_cnpktbu(0),
+  m_cnpktbu (0),
   m_cnretransTimer (Timer::CANCEL_ON_DESTROY),
   m_cnreachableTimer (Timer::CANCEL_ON_DESTROY),
-  m_cnrefreshTimer (Timer::CANCEL_ON_DESTROY), 
+  m_cnrefreshTimer (Timer::CANCEL_ON_DESTROY),
   m_hotiretransTimer (Timer::CANCEL_ON_DESTROY),
   m_cotiretransTimer (Timer::CANCEL_ON_DESTROY),
-  m_HomeAddressRegisteredFlag(false)   
+  m_HomeAddressRegisteredFlag (false)
 
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
 
-void BList::SetHomeAddressRegistered(bool flag)
+void BList::SetHomeAddressRegistered (bool flag)
 {
-m_HomeAddressRegisteredFlag=flag;
+  m_HomeAddressRegisteredFlag = flag;
 }
 
-bool BList::IsHomeAddressRegistered()
+bool BList::IsHomeAddressRegistered ()
 {
-return m_HomeAddressRegisteredFlag;
+  return m_HomeAddressRegisteredFlag;
 }
 
 void BList::FunctionHomeRefreshTimeout ()
 {
   NS_LOG_FUNCTION_NOARGS ();
   Ptr<mipv6MN> mn = GetNode ()->GetObject<mipv6MN> ();
-   
+
   if (mn == 0)
     {
-      NS_LOG_WARN("No MN for Binding Update List");
-      
+      NS_LOG_WARN ("No MN for Binding Update List");
+
       return;
     }
-    
+
   SetHomeLastBindingUpdateTime (MicroSeconds (Simulator::Now ().GetMicroSeconds ()));
   SetHomeLastBindingUpdateSequence (mn->GetHomeBUSequence ());
- 
-  Ptr<Packet> p = mn->BuildHomeBU();
-  
-  SetHomeBUPacket(p);
-  
-  ResetHomeRetryCount();
-  
-  mn->SendMessage(p->Copy(), GetHA(), 64);
-  
-  MarkHomeRefreshing();
-  
-  StartHomeRetransTimer();
+
+  Ptr<Packet> p = mn->BuildHomeBU ();
+
+  SetHomeBUPacket (p);
+
+  ResetHomeRetryCount ();
+
+  mn->SendMessage (p->Copy (), GetHA (), 64);
+
+  MarkHomeRefreshing ();
+
+  StartHomeRetransTimer ();
 }
 
-void BList::FunctionHomeReachableTimeout()
+void BList::FunctionHomeReachableTimeout ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
-  Ptr<mipv6MN> mn = GetNode()->GetObject<mipv6MN>();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
+  Ptr<mipv6MN> mn = GetNode ()->GetObject<mipv6MN>();
+
   NS_LOG_LOGIC ("Reachable Timeout");
-   
-  if( mn == 0)
+
+  if ( mn == 0)
     {
-      NS_LOG_WARN("No MN for Binding Update List");
-      
+      NS_LOG_WARN ("No MN for Binding Update List");
+
       return;
     }
-    
-  if(IsHomeReachable())
+
+  if (IsHomeReachable ())
     {
-      MarkHomeUnreachable();
+      MarkHomeUnreachable ();
     }
-  else if(IsHomeRefreshing())
+  else if (IsHomeRefreshing ())
     {
-      MarkHomeUpdating();
+      MarkHomeUpdating ();
     }
 
-      
+
   //delete routing && tunnel
   if (m_tunnelIfIndex >= 0)
     {
@@ -164,94 +163,94 @@ void BList::FunctionHomeReachableTimeout()
     }
 }
 
-void BList::FunctionHomeRetransTimeout()
+void BList::FunctionHomeRetransTimeout ()
 {
   //StopHomeRetransTimer();
-  NS_LOG_FUNCTION_NOARGS();
-  Ptr<mipv6MN> mn = GetNode()->GetObject<mipv6MN>();
-  
-  if( mn == 0)
+  NS_LOG_FUNCTION_NOARGS ();
+  Ptr<mipv6MN> mn = GetNode ()->GetObject<mipv6MN>();
+
+  if ( mn == 0)
     {
-      NS_LOG_WARN("No MN for Binding Update List");
-      
+      NS_LOG_WARN ("No MN for Binding Update List");
+
       return;
     }
-  
-  IncreaseHomeRetryCount();
-  
-  if ( GetHomeRetryCount() > MIPv6L4Protocol::MAX_BINDING_UPDATE_RETRY_COUNT )
+
+  IncreaseHomeRetryCount ();
+
+  if ( GetHomeRetryCount () > MIPv6L4Protocol::MAX_BINDING_UPDATE_RETRY_COUNT )
     {
       NS_LOG_LOGIC ("Maximum retry count reached. Giving up..");
-      
+
       return;
     }
-  
-  mn->SendMessage(GetHomeBUPacket ()->Copy (), GetHA (), 64);
-  
-  StartHomeRetransTimer();  
+
+  mn->SendMessage (GetHomeBUPacket ()->Copy (), GetHA (), 64);
+
+  StartHomeRetransTimer ();
 }
 
-bool BList::IsHomeUnreachable() const
+bool BList::IsHomeUnreachable () const
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_hstate == UNREACHABLE;
 }
 
-bool BList::IsHomeUpdating() const
+bool BList::IsHomeUpdating () const
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_hstate == UPDATING;
 }
 
-bool BList::IsHomeRefreshing() const
+bool BList::IsHomeRefreshing () const
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_hstate == REFRESHING;
 }
 
-bool BList::IsHomeReachable() const
+bool BList::IsHomeReachable () const
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_hstate == REACHABLE;
 }
 
-void BList::MarkHomeUnreachable()
+void BList::MarkHomeUnreachable ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_hstate = UNREACHABLE;
 }
 
-void BList::MarkHomeUpdating()
+void BList::MarkHomeUpdating ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_hstate = UPDATING;
 }
 
-void BList::MarkHomeRefreshing()
+void BList::MarkHomeRefreshing ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_hstate = REFRESHING;
 }
 
-void BList::MarkHomeReachable()
+void BList::MarkHomeReachable ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_hstate = REACHABLE;
 }
 
 void BList::StartHomeReachableTimer ()
 {
   NS_LOG_FUNCTION_NOARGS ();
-  NS_ASSERT ( !m_hreachableTime.IsZero() );
-  
+  NS_ASSERT ( !m_hreachableTime.IsZero () );
+
   m_hreachableTimer.SetFunction (&BList::FunctionHomeReachableTimeout, this);
   m_hreachableTimer.SetDelay ( Seconds (m_hreachableTime.GetSeconds ()));
   m_hreachableTimer.Schedule ();
@@ -267,37 +266,41 @@ void BList::StartHomeRetransTimer ()
 {
   NS_LOG_FUNCTION_NOARGS ();
   m_hretransTimer.SetFunction (&BList::FunctionHomeRetransTimeout, this);
-  
+
   if (GetHomeRetryCount () == 0)
     {
-      if(IsHomeAddressRegistered())
-       m_hretransTimer.SetDelay (Seconds (MIPv6L4Protocol::INITIAL_BINDING_ACK_TIMEOUT_FIRSTREG));
+      if (IsHomeAddressRegistered ())
+        {
+          m_hretransTimer.SetDelay (Seconds (MIPv6L4Protocol::INITIAL_BINDING_ACK_TIMEOUT_FIRSTREG));
+        }
       else
-       m_hretransTimer.SetDelay (Seconds (MIPv6L4Protocol::INITIAL_BINDING_ACK_TIMEOUT_FIRSTREG + 1.0));
+        {
+          m_hretransTimer.SetDelay (Seconds (MIPv6L4Protocol::INITIAL_BINDING_ACK_TIMEOUT_FIRSTREG + 1.0));
+        }
     }
   else
     {
       m_hretransTimer.SetDelay (Seconds (MIPv6L4Protocol::INITIAL_BINDING_ACK_TIMEOUT_REREG));
     }
-    
+
   m_hretransTimer.Schedule ();
 }
 
 void BList::StopHomeRetransTimer ()
 {
   NS_LOG_FUNCTION_NOARGS ();
-  
+
   m_hretransTimer.Cancel ();
 }
 
 void BList::StartHomeRefreshTimer ()
 {
   NS_LOG_FUNCTION_NOARGS ();
-  
-  NS_ASSERT ( !m_hreachableTime.IsZero() );
-  
+
+  NS_ASSERT ( !m_hreachableTime.IsZero () );
+
   m_hrefreshTimer.SetFunction (&BList::FunctionHomeRefreshTimeout, this);
-  m_hrefreshTimer.SetDelay ( Seconds ( m_hreachableTime.GetSeconds() * 0.9 ) );
+  m_hrefreshTimer.SetDelay ( Seconds ( m_hreachableTime.GetSeconds () * 0.9 ) );
   m_hrefreshTimer.Schedule ();
 }
 
@@ -307,351 +310,357 @@ void BList::StopHomeRefreshTimer ()
   m_hrefreshTimer.Cancel ();
 }
 
-Time BList::GetHomeReachableTime() const
+Time BList::GetHomeReachableTime () const
 {
   NS_LOG_FUNCTION_NOARGS ();
-  
+
   return m_hreachableTime;
 }
 
-void BList::SetHomeReachableTime(Time tm)
+void BList::SetHomeReachableTime (Time tm)
 {
   NS_LOG_FUNCTION (this << tm );
-  
+
   m_hreachableTime = tm;
 }
 
-uint8_t BList::GetHomeRetryCount() const
+uint8_t BList::GetHomeRetryCount () const
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_hretryCount;
 }
 
-void BList::ResetHomeRetryCount()
+void BList::ResetHomeRetryCount ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_hretryCount = 0;
 }
 
-void BList::IncreaseHomeRetryCount()
+void BList::IncreaseHomeRetryCount ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_hretryCount++;
 }
 
-Time BList::GetHomeInitialLifeTime() const
+Time BList::GetHomeInitialLifeTime () const
 {
   NS_LOG_FUNCTION_NOARGS ();
-  
+
   return m_hinitiallifetime;
 }
 
-void BList::SetHomeInitialLifeTime(Time tm)
+void BList::SetHomeInitialLifeTime (Time tm)
 {
   NS_LOG_FUNCTION ( this << tm );
-  
+
   m_hinitiallifetime = tm;
 }
 
-Time BList::GetHomeRemainingLifeTime() const
+Time BList::GetHomeRemainingLifeTime () const
 {
-NS_LOG_FUNCTION_NOARGS ();
-return m_hreachableTimer.GetDelayLeft();
+  NS_LOG_FUNCTION_NOARGS ();
+  return m_hreachableTimer.GetDelayLeft ();
 }
 
 
-Time BList::GetHomeLastBindingUpdateTime() const
+Time BList::GetHomeLastBindingUpdateTime () const
 {
-NS_LOG_FUNCTION_NOARGS ();
-return m_hbulastsent;
+  NS_LOG_FUNCTION_NOARGS ();
+  return m_hbulastsent;
 }
 
-void BList::SetHomeLastBindingUpdateTime(Time tm)
+void BList::SetHomeLastBindingUpdateTime (Time tm)
 {
-NS_LOG_FUNCTION ( this << tm );
-m_hbulastsent=tm;
+  NS_LOG_FUNCTION ( this << tm );
+  m_hbulastsent = tm;
 }
 
 
-uint16_t BList::GetHomeLastBindingUpdateSequence() const
+uint16_t BList::GetHomeLastBindingUpdateSequence () const
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_hlastBindingUpdateSequence;
 }
 
-void BList::SetHomeLastBindingUpdateSequence(uint16_t seq)
+void BList::SetHomeLastBindingUpdateSequence (uint16_t seq)
 {
-  NS_LOG_FUNCTION( this << seq);
-  
+  NS_LOG_FUNCTION ( this << seq);
+
   m_hlastBindingUpdateSequence = seq;
 }
 
-Ptr<Packet> BList::GetHomeBUPacket() const
+Ptr<Packet> BList::GetHomeBUPacket () const
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_hpktbu;
 }
 
-void BList::SetHomeBUPacket(Ptr<Packet> pkt)
+void BList::SetHomeBUPacket (Ptr<Packet> pkt)
 {
-  NS_LOG_FUNCTION( this << pkt );
-  
+  NS_LOG_FUNCTION ( this << pkt );
+
   m_hpktbu = pkt;
 }
 
-int16_t BList::GetTunnelIfIndex() const
+int16_t BList::GetTunnelIfIndex () const
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_tunnelIfIndex;
 }
 
-void BList::SetTunnelIfIndex(int16_t tunnelif)
+void BList::SetTunnelIfIndex (int16_t tunnelif)
 {
   NS_LOG_FUNCTION ( this << tunnelif );
-  
+
   m_tunnelIfIndex = tunnelif;
 }
-void BList::SetHoa(Ipv6Address hoa){
-m_hoa=hoa;
-}
-Ipv6Address BList::GetHoa(void) const {
-return m_hoa;
-}
-void BList::SetCoa(Ipv6Address addr){
-m_coa=addr;
-}
-Ipv6Address BList::GetCoa(void) const {
-NS_LOG_FUNCTION_NOARGS();
-return m_coa;
-}
-
-Ipv6Address BList::GetHA() const {
-return m_ha;
-}
-
-void BList::SetHA(Ipv6Address ha){
-m_ha=ha;
-}
-
-std::list<Ipv6Address> BList::GetHomeAgentList() const
+void BList::SetHoa (Ipv6Address hoa)
 {
-return m_HaaList;
+  m_hoa = hoa;
+}
+Ipv6Address BList::GetHoa (void) const
+{
+  return m_hoa;
+}
+void BList::SetCoa (Ipv6Address addr)
+{
+  m_coa = addr;
+}
+Ipv6Address BList::GetCoa (void) const
+{
+  NS_LOG_FUNCTION_NOARGS ();
+  return m_coa;
 }
 
-void BList::SetHomeAgentList(std::list<Ipv6Address> haalist)
+Ipv6Address BList::GetHA () const
 {
-m_HaaList=haalist;
+  return m_ha;
 }
 
-bool BList::GetHomeBUFlag() const
+void BList::SetHA (Ipv6Address ha)
 {
-return m_hflag;
+  m_ha = ha;
 }
 
-void BList::SetHomeBUFlag(bool f)
+std::list<Ipv6Address> BList::GetHomeAgentList () const
 {
-m_hflag=f;
+  return m_HaaList;
+}
+
+void BList::SetHomeAgentList (std::list<Ipv6Address> haalist)
+{
+  m_HaaList = haalist;
+}
+
+bool BList::GetHomeBUFlag () const
+{
+  return m_hflag;
+}
+
+void BList::SetHomeBUFlag (bool f)
+{
+  m_hflag = f;
 }
 
 void BList::FunctionCNRefreshTimeout ()
 {
   NS_LOG_FUNCTION_NOARGS ();
   Ptr<mipv6MN> mn = GetNode ()->GetObject<mipv6MN> ();
-   
+
   if (mn == 0)
     {
-      NS_LOG_WARN("No MN for Binding Update List");
-      
+      NS_LOG_WARN ("No MN for Binding Update List");
+
       return;
     }
-    
+
   SetCNLastBindingUpdateTime (MicroSeconds (Simulator::Now ().GetMicroSeconds ()));
   SetCNLastBindingUpdateSequence (mn->GetCNBUSequence ());
- 
-  Ptr<Packet> p = mn->BuildCNBU();
-  
-  SetCNBUPacket(p);
-  
-  ResetCNRetryCount();
-  
-  mn->SendMessage(p->Copy(), GetCN(), 64);
-  
-  MarkCNRefreshing();
-  
-  StartCNRetransTimer();
+
+  Ptr<Packet> p = mn->BuildCNBU ();
+
+  SetCNBUPacket (p);
+
+  ResetCNRetryCount ();
+
+  mn->SendMessage (p->Copy (), GetCN (), 64);
+
+  MarkCNRefreshing ();
+
+  StartCNRetransTimer ();
 }
 
-void BList::FunctionCNReachableTimeout()
+void BList::FunctionCNReachableTimeout ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
-  Ptr<mipv6MN> mn = GetNode()->GetObject<mipv6MN>();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
+  Ptr<mipv6MN> mn = GetNode ()->GetObject<mipv6MN>();
+
   NS_LOG_LOGIC ("Reachable Timeout");
-   
-  if( mn == 0)
+
+  if ( mn == 0)
     {
-      NS_LOG_WARN("No MN for Binding Update List");
-      
+      NS_LOG_WARN ("No MN for Binding Update List");
+
       return;
     }
-    
-  if(IsCNReachable())
+
+  if (IsCNReachable ())
     {
-      MarkCNUnreachable();
+      MarkCNUnreachable ();
     }
-  else if(IsCNRefreshing())
+  else if (IsCNRefreshing ())
     {
-      MarkCNUpdating();
+      MarkCNUpdating ();
     }
 
 }
 
-void BList::FunctionCNRetransTimeout()
+void BList::FunctionCNRetransTimeout ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  Ptr<mipv6MN> mn = GetNode()->GetObject<mipv6MN>();
-  
-  if( mn == 0)
+  NS_LOG_FUNCTION_NOARGS ();
+  Ptr<mipv6MN> mn = GetNode ()->GetObject<mipv6MN>();
+
+  if ( mn == 0)
     {
-      NS_LOG_WARN("No MN for Binding Update List");
-      
+      NS_LOG_WARN ("No MN for Binding Update List");
+
       return;
     }
 
-  IncreaseCNRetryCount();
-  
-  if ( GetCNRetryCount() > MIPv6L4Protocol::MAX_BINDING_UPDATE_RETRY_COUNT )
+  IncreaseCNRetryCount ();
+
+  if ( GetCNRetryCount () > MIPv6L4Protocol::MAX_BINDING_UPDATE_RETRY_COUNT )
     {
       NS_LOG_LOGIC ("Maximum retry count reached. Giving up..");
-      
+
       return;
     }
-  
-  mn->SendMessage(GetCNBUPacket ()->Copy (), GetCN (), 64);
-  
-  StartCNRetransTimer();  
+
+  mn->SendMessage (GetCNBUPacket ()->Copy (), GetCN (), 64);
+
+  StartCNRetransTimer ();
 }
 
-void BList::FunctionHoTIRetransTimeout()
+void BList::FunctionHoTIRetransTimeout ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  Ptr<mipv6MN> mn = GetNode()->GetObject<mipv6MN>();
-  
-  if( mn == 0)
+  NS_LOG_FUNCTION_NOARGS ();
+  Ptr<mipv6MN> mn = GetNode ()->GetObject<mipv6MN>();
+
+  if ( mn == 0)
     {
-      NS_LOG_WARN("No MN for Binding Update List");
-      
+      NS_LOG_WARN ("No MN for Binding Update List");
+
       return;
     }
-  
-  IncreaseHoTIRetryCount();
-  
-  if ( GetHoTIRetryCount() > MIPv6L4Protocol::MAX_HOTI_RETRY_COUNT )
+
+  IncreaseHoTIRetryCount ();
+
+  if ( GetHoTIRetryCount () > MIPv6L4Protocol::MAX_HOTI_RETRY_COUNT )
     {
       NS_LOG_LOGIC ("Maximum retry count reached. Giving up..");
-      
+
       return;
     }
-  
-  mn->SendMessage(GetHoTIPacket ()->Copy (), GetCN (), 64);
-  
-  StartHoTIRetransTimer();  
+
+  mn->SendMessage (GetHoTIPacket ()->Copy (), GetCN (), 64);
+
+  StartHoTIRetransTimer ();
 }
 
-void BList::FunctionCoTIRetransTimeout()
+void BList::FunctionCoTIRetransTimeout ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  Ptr<mipv6MN> mn = GetNode()->GetObject<mipv6MN>();
-  
-  if( mn == 0)
+  NS_LOG_FUNCTION_NOARGS ();
+  Ptr<mipv6MN> mn = GetNode ()->GetObject<mipv6MN>();
+
+  if ( mn == 0)
     {
-      NS_LOG_WARN("No MN for Binding Update List");
-      
+      NS_LOG_WARN ("No MN for Binding Update List");
+
       return;
     }
-  
-  IncreaseCoTIRetryCount();
-  
-  if ( GetCoTIRetryCount() > MIPv6L4Protocol::MAX_COTI_RETRY_COUNT )
+
+  IncreaseCoTIRetryCount ();
+
+  if ( GetCoTIRetryCount () > MIPv6L4Protocol::MAX_COTI_RETRY_COUNT )
     {
       NS_LOG_LOGIC ("Maximum retry count reached. Giving up..");
-      
+
       return;
     }
-  
-  mn->SendMessage(GetCoTIPacket ()->Copy (), GetCN (), 64);
-  
-  StartCoTIRetransTimer();  
+
+  mn->SendMessage (GetCoTIPacket ()->Copy (), GetCN (), 64);
+
+  StartCoTIRetransTimer ();
 }
 
-bool BList::IsCNUnreachable() const
+bool BList::IsCNUnreachable () const
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_cnstate == UNREACHABLE;
 }
 
-bool BList::IsCNUpdating() const
+bool BList::IsCNUpdating () const
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_cnstate == UPDATING;
 }
 
-bool BList::IsCNRefreshing() const
+bool BList::IsCNRefreshing () const
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_cnstate == REFRESHING;
 }
 
-bool BList::IsCNReachable() const
+bool BList::IsCNReachable () const
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_cnstate == REACHABLE;
 }
 
-void BList::MarkCNUnreachable()
+void BList::MarkCNUnreachable ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_cnstate = UNREACHABLE;
 }
 
-void BList::MarkCNUpdating()
+void BList::MarkCNUpdating ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_cnstate = UPDATING;
 }
 
-void BList::MarkCNRefreshing()
+void BList::MarkCNRefreshing ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_cnstate = REFRESHING;
 }
 
-void BList::MarkCNReachable()
+void BList::MarkCNReachable ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_cnstate = REACHABLE;
 }
 
 void BList::StartCNReachableTimer ()
 {
   NS_LOG_FUNCTION_NOARGS ();
-  NS_ASSERT ( !m_cnreachableTime.IsZero() );
-  
+  NS_ASSERT ( !m_cnreachableTime.IsZero () );
+
   m_cnreachableTimer.SetFunction (&BList::FunctionCNReachableTimeout, this);
   m_cnreachableTimer.SetDelay ( Seconds (m_cnreachableTime.GetSeconds ()));
   m_cnreachableTimer.Schedule ();
@@ -667,7 +676,7 @@ void BList::StartCNRetransTimer ()
 {
   NS_LOG_FUNCTION_NOARGS ();
   m_cnretransTimer.SetFunction (&BList::FunctionCNRetransTimeout, this);
-  
+
   if (GetCNRetryCount () == 0)
     {
       m_cnretransTimer.SetDelay (Seconds (MIPv6L4Protocol::INITIAL_BINDING_ACK_TIMEOUT_FIRSTREG));
@@ -676,14 +685,14 @@ void BList::StartCNRetransTimer ()
     {
       m_cnretransTimer.SetDelay (Seconds (MIPv6L4Protocol::INITIAL_BINDING_ACK_TIMEOUT_REREG));
     }
-    
+
   m_cnretransTimer.Schedule ();
 }
 
 void BList::StopCNRetransTimer ()
 {
   NS_LOG_FUNCTION_NOARGS ();
-  
+
   m_cnretransTimer.Cancel ();
 }
 
@@ -691,7 +700,7 @@ void BList::StartHoTIRetransTimer ()
 {
   NS_LOG_FUNCTION_NOARGS ();
   m_hotiretransTimer.SetFunction (&BList::FunctionHoTIRetransTimeout, this);
-  
+
   if (GetHoTIRetryCount () == 0)
     {
       m_hotiretransTimer.SetDelay (Seconds (MIPv6L4Protocol::INITIAL_BINDING_ACK_TIMEOUT_FIRSTREG));
@@ -700,14 +709,14 @@ void BList::StartHoTIRetransTimer ()
     {
       m_hotiretransTimer.SetDelay (Seconds (MIPv6L4Protocol::INITIAL_BINDING_ACK_TIMEOUT_REREG));
     }
-    
+
   m_hotiretransTimer.Schedule ();
 }
 
 void BList::StopHoTIRetransTimer ()
 {
   NS_LOG_FUNCTION_NOARGS ();
-  
+
   m_hotiretransTimer.Cancel ();
 }
 
@@ -715,7 +724,7 @@ void BList::StartCoTIRetransTimer ()
 {
   NS_LOG_FUNCTION_NOARGS ();
   m_cotiretransTimer.SetFunction (&BList::FunctionCoTIRetransTimeout, this);
-  
+
   if (GetCoTIRetryCount () == 0)
     {
       m_cotiretransTimer.SetDelay (Seconds (MIPv6L4Protocol::INITIAL_BINDING_ACK_TIMEOUT_FIRSTREG));
@@ -724,14 +733,14 @@ void BList::StartCoTIRetransTimer ()
     {
       m_cotiretransTimer.SetDelay (Seconds (MIPv6L4Protocol::INITIAL_BINDING_ACK_TIMEOUT_REREG));
     }
-    
+
   m_cotiretransTimer.Schedule ();
 }
 
 void BList::StopCoTIRetransTimer ()
 {
   NS_LOG_FUNCTION_NOARGS ();
-  
+
   m_cotiretransTimer.Cancel ();
 }
 
@@ -739,11 +748,11 @@ void BList::StopCoTIRetransTimer ()
 void BList::StartCNRefreshTimer ()
 {
   NS_LOG_FUNCTION_NOARGS ();
-  
-  NS_ASSERT ( !m_cnreachableTime.IsZero() );
-  
+
+  NS_ASSERT ( !m_cnreachableTime.IsZero () );
+
   m_cnrefreshTimer.SetFunction (&BList::FunctionCNRefreshTimeout, this);
-  m_cnrefreshTimer.SetDelay ( Seconds ( m_cnreachableTime.GetSeconds() * 0.9 ) );
+  m_cnrefreshTimer.SetDelay ( Seconds ( m_cnreachableTime.GetSeconds () * 0.9 ) );
   m_cnrefreshTimer.Schedule ();
 }
 
@@ -753,242 +762,244 @@ void BList::StopCNRefreshTimer ()
   m_cnrefreshTimer.Cancel ();
 }
 
-Time BList::GetCNReachableTime() const
+Time BList::GetCNReachableTime () const
 {
   NS_LOG_FUNCTION_NOARGS ();
-  
+
   return m_cnreachableTime;
 }
 
-void BList::SetCNReachableTime(Time tm)
+void BList::SetCNReachableTime (Time tm)
 {
   NS_LOG_FUNCTION (this << tm );
-  
+
   m_cnreachableTime = tm;
 }
 
-uint8_t BList::GetCNRetryCount() const
+uint8_t BList::GetCNRetryCount () const
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_cnretryCount;
 }
 
-void BList::ResetCNRetryCount()
+void BList::ResetCNRetryCount ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_cnretryCount = 0;
 }
 
-void BList::IncreaseCNRetryCount()
+void BList::IncreaseCNRetryCount ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_cnretryCount++;
 }
 
-uint8_t BList::GetHoTIRetryCount() const
+uint8_t BList::GetHoTIRetryCount () const
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_hotiretryCount;
 }
 
-void BList::ResetHoTIRetryCount()
+void BList::ResetHoTIRetryCount ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_hotiretryCount = 0;
 }
 
-void BList::IncreaseHoTIRetryCount()
+void BList::IncreaseHoTIRetryCount ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_hotiretryCount++;
 }
 
-uint8_t BList::GetCoTIRetryCount() const
+uint8_t BList::GetCoTIRetryCount () const
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_cotiretryCount;
 }
 
-void BList::ResetCoTIRetryCount()
+void BList::ResetCoTIRetryCount ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_cotiretryCount = 0;
 }
 
-void BList::IncreaseCoTIRetryCount()
+void BList::IncreaseCoTIRetryCount ()
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_cotiretryCount++;
 }
 
 
 
-Time BList::GetCNInitialLifeTime() const
+Time BList::GetCNInitialLifeTime () const
 {
   NS_LOG_FUNCTION_NOARGS ();
-  
+
   return m_cninitiallifetime;
 }
 
-void BList::SetCNInitialLifeTime(Time tm)
+void BList::SetCNInitialLifeTime (Time tm)
 {
   NS_LOG_FUNCTION ( this << tm );
-  
+
   m_cninitiallifetime = tm;
 }
 
-Time BList::GetCNRemainingLifeTime() const
+Time BList::GetCNRemainingLifeTime () const
 {
-NS_LOG_FUNCTION_NOARGS ();
-return m_cnreachableTimer.GetDelayLeft();
+  NS_LOG_FUNCTION_NOARGS ();
+  return m_cnreachableTimer.GetDelayLeft ();
 }
 
-Time BList::GetCNLastBindingUpdateTime() const
+Time BList::GetCNLastBindingUpdateTime () const
 {
-NS_LOG_FUNCTION_NOARGS ();
-return m_cnbulastsent;
+  NS_LOG_FUNCTION_NOARGS ();
+  return m_cnbulastsent;
 }
 
-void BList::SetCNLastBindingUpdateTime(Time tm)
+void BList::SetCNLastBindingUpdateTime (Time tm)
 {
-NS_LOG_FUNCTION ( this << tm );
-m_cnbulastsent=tm;
+  NS_LOG_FUNCTION ( this << tm );
+  m_cnbulastsent = tm;
 }
 
 
-uint16_t BList::GetCNLastBindingUpdateSequence() const
+uint16_t BList::GetCNLastBindingUpdateSequence () const
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_cnlastBindingUpdateSequence;
 }
 
-void BList::SetCNLastBindingUpdateSequence(uint16_t seq)
+void BList::SetCNLastBindingUpdateSequence (uint16_t seq)
 {
-  NS_LOG_FUNCTION( this << seq);
-  
+  NS_LOG_FUNCTION ( this << seq);
+
   m_cnlastBindingUpdateSequence = seq;
 }
 
-Ptr<Packet> BList::GetCNBUPacket() const
+Ptr<Packet> BList::GetCNBUPacket () const
 {
-  NS_LOG_FUNCTION_NOARGS();
-  
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_cnpktbu;
 }
 
-void BList::SetCNBUPacket(Ptr<Packet> pkt)
+void BList::SetCNBUPacket (Ptr<Packet> pkt)
 {
-  NS_LOG_FUNCTION( this << pkt );
-  
+  NS_LOG_FUNCTION ( this << pkt );
+
   m_cnpktbu = pkt;
 }
 
 
-void BList::SetCN(Ipv6Address addr){
-m_cn=addr;
+void BList::SetCN (Ipv6Address addr)
+{
+  m_cn = addr;
 }
-Ipv6Address BList::GetCN(void) const {
-return m_cn;
+Ipv6Address BList::GetCN (void) const
+{
+  return m_cn;
 }
 
-bool BList::GetCNBUFlag() const
+bool BList::GetCNBUFlag () const
 {
-return m_cnflag;
+  return m_cnflag;
 }
 
-void BList::SetCNBUFlag(bool f)
+void BList::SetCNBUFlag (bool f)
 {
-m_cnflag=f;
+  m_cnflag = f;
 }
 
-uint64_t BList::GetHomeInitCookie() const
+uint64_t BList::GetHomeInitCookie () const
 {
-return m_homeinitcookie;
+  return m_homeinitcookie;
 }
 
-void BList::SetHomeInitCookie(uint64_t hcookie)
+void BList::SetHomeInitCookie (uint64_t hcookie)
 {
-m_homeinitcookie=hcookie;
+  m_homeinitcookie = hcookie;
 }
 
-uint64_t BList::GetCareOfInitCookie() const
+uint64_t BList::GetCareOfInitCookie () const
 {
-return m_careofinitcookie;
+  return m_careofinitcookie;
 }
 
-void BList::SetCareOfInitCookie(uint64_t ccookie)
+void BList::SetCareOfInitCookie (uint64_t ccookie)
 {
-m_careofinitcookie=ccookie;
+  m_careofinitcookie = ccookie;
 }
 
-uint64_t BList::GetHomeKeygenToken() const
+uint64_t BList::GetHomeKeygenToken () const
 {
-return m_homekeygentoken;
+  return m_homekeygentoken;
 }
 
-void BList::SetHomeKeygenToken(uint64_t htoken)
+void BList::SetHomeKeygenToken (uint64_t htoken)
 {
-m_homekeygentoken=htoken;
+  m_homekeygentoken = htoken;
 }
 
-uint64_t BList::GetCareOfKeygenToken() const
+uint64_t BList::GetCareOfKeygenToken () const
 {
-return m_careofkeygentoken;
+  return m_careofkeygentoken;
 }
 
-void BList::SetCareOfKeygenToken(uint64_t ctoken)
+void BList::SetCareOfKeygenToken (uint64_t ctoken)
 {
-m_careofkeygentoken=ctoken;
+  m_careofkeygentoken = ctoken;
 }
 
-uint16_t BList::GetHomeNonceIndex() const
+uint16_t BList::GetHomeNonceIndex () const
 {
-return m_homenonceindex;
+  return m_homenonceindex;
 }
 
-void BList::SetHomeNonceIndex(uint16_t hnonce)
+void BList::SetHomeNonceIndex (uint16_t hnonce)
 {
-m_homenonceindex=hnonce;
+  m_homenonceindex = hnonce;
 }
 
-uint16_t BList::GetCareOfNonceIndex() const
+uint16_t BList::GetCareOfNonceIndex () const
 {
-return m_careofnonceindex;
+  return m_careofnonceindex;
 }
 
-void BList::SetCareOfNonceIndex(uint16_t cnonce)
+void BList::SetCareOfNonceIndex (uint16_t cnonce)
 {
-m_careofnonceindex=cnonce;
+  m_careofnonceindex = cnonce;
 }
 
-Ptr<Packet> BList::GetHoTIPacket() const
+Ptr<Packet> BList::GetHoTIPacket () const
 {
-return m_pkthoti;
+  return m_pkthoti;
 }
 
-void BList::SetHoTIPacket(Ptr<Packet> pkt)
+void BList::SetHoTIPacket (Ptr<Packet> pkt)
 {
-m_pkthoti=pkt;
+  m_pkthoti = pkt;
 }
 
-Ptr<Packet> BList::GetCoTIPacket() const
+Ptr<Packet> BList::GetCoTIPacket () const
 {
-return m_pktcoti;
+  return m_pktcoti;
 }
-	
-void BList::SetCoTIPacket(Ptr<Packet> pkt)
+
+void BList::SetCoTIPacket (Ptr<Packet> pkt)
 {
-m_pktcoti=pkt;
+  m_pktcoti = pkt;
 }
 
 } /* namespace ns3 */

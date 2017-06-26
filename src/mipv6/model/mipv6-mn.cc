@@ -47,22 +47,21 @@ using namespace std;
 
 NS_LOG_COMPONENT_DEFINE ("mipv6MN");
 
-namespace ns3
-{
+namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (mipv6MN);
 
 mipv6MN::mipv6MN (std::list<Ipv6Address> haalist)
 {
-m_Haalist=haalist;
-m_hsequence=0;
-m_cnsequence=0;
-m_roflag=false;
+  m_Haalist = haalist;
+  m_hsequence = 0;
+  m_cnsequence = 0;
+  m_roflag = false;
 }
 
 mipv6MN::~mipv6MN ()
 {
-delete this;
+  delete this;
 }
 
 void mipv6MN::NotifyNewAggregate ()
@@ -78,58 +77,62 @@ void mipv6MN::NotifyNewAggregate ()
       SetNode (node);
       m_buinf = CreateObject<BList> (m_Haalist);
       m_buinf->SetNode (node);
-    
 
-  //Fetch any link-local address of the node
-  Ptr<Ipv6> ip = GetNode ()->GetObject<Ipv6> ();
-  Ipv6InterfaceAddress ads = ip->GetAddress(1,0);                
+
+      //Fetch any link-local address of the node
+      Ptr<Ipv6> ip = GetNode ()->GetObject<Ipv6> ();
+      Ipv6InterfaceAddress ads = ip->GetAddress (1,0);
 
 
 //Set HAA and Forming HoA from HAA Prefix
 
-  if (m_Haalist.size())
-    {
-     m_buinf->SetHA(m_Haalist.front());  // The first address
-     (m_buinf->GetHA()).GetBytes(buf1); //Fetching Prefix
-     (ads.GetAddress()).GetBytes(buf2); //Fetching interface identifier
-     for (i=0;i<8;i++)
-       buf[i]=buf1[i];
-     for (i=0;i<8;i++)
-       buf[i+8]=buf2[i+8];    
-     Ipv6Address addr(buf);
-     m_buinf->SetHoa(addr);
-     Ptr<Ipv6TunnelL4Protocol> tunnel4prot = GetNode ()->GetObject<Ipv6TunnelL4Protocol> ();  
-     tunnel4prot->SetHomeAddress(addr);
+      if (m_Haalist.size ())
+        {
+          m_buinf->SetHA (m_Haalist.front ()); // The first address
+          (m_buinf->GetHA ()).GetBytes (buf1); //Fetching Prefix
+          (ads.GetAddress ()).GetBytes (buf2); //Fetching interface identifier
+          for (i = 0; i < 8; i++)
+            {
+              buf[i] = buf1[i];
+            }
+          for (i = 0; i < 8; i++)
+            {
+              buf[i + 8] = buf2[i + 8];
+            }
+          Ipv6Address addr (buf);
+          m_buinf->SetHoa (addr);
+          Ptr<Ipv6TunnelL4Protocol> tunnel4prot = GetNode ()->GetObject<Ipv6TunnelL4Protocol> ();
+          tunnel4prot->SetHomeAddress (addr);
+        }
+
+
+      m_buinf->SetHomeInitCookie (0xFFFFFFFFFFFFFFFF);
+      m_buinf->SetCareOfInitCookie (0xFFFFFFFFFFFFFFFF);
+      m_buinf->SetHomeKeygenToken (0x0);
+      m_buinf->SetCareOfKeygenToken (0x0);
+      m_buinf->SetHomeNonceIndex (0x0);
+      m_buinf->SetCareOfNonceIndex (0x0);
+      m_buinf->SetCN ("0::0");
+      m_OldinterfaceIndex = -1;
+
+
+      Ptr<Icmpv6L4Protocol> icmpv6l4 = GetNode ()->GetObject<Icmpv6L4Protocol> ();
+      icmpv6l4->SetNewIPCallback (MakeCallback (&mipv6MN::HandleNewAttachment, this));
+      icmpv6l4->SetCheckAddressCallback (MakeCallback (&mipv6MN::CheckAddresses, this));
+
+      Ptr<Ipv6L3Protocol> ipv6l3 = GetNode ()->GetObject<Ipv6L3Protocol> ();
+      ipv6l3->SetPrefixCallback (MakeCallback (&mipv6MN::SetDefaultRouterAddress, this));
+
+      Ptr<UdpL4Protocol> udpl4 = GetNode ()->GetObject<UdpL4Protocol> ();
+      udpl4->SetMipv6Callback (MakeCallback (&BList::GetHoa, m_buinf));
+
+      Ptr<TcpL4Protocol> tcpl4 = GetNode ()->GetObject<TcpL4Protocol> ();
+      tcpl4->SetMipv6Callback (MakeCallback (&BList::GetHoa, m_buinf));
+
+      Ptr<Ipv6TunnelL4Protocol> tunnell4 = GetNode ()->GetObject<Ipv6TunnelL4Protocol> ();
+      tunnell4->SetCacheAddressList (m_Haalist);
+      tunnell4->SetHA (m_buinf->GetHA ());
     }
-          
-              
-  m_buinf->SetHomeInitCookie(0xFFFFFFFFFFFFFFFF);
-  m_buinf->SetCareOfInitCookie(0xFFFFFFFFFFFFFFFF);
-  m_buinf->SetHomeKeygenToken(0x0);
-  m_buinf->SetCareOfKeygenToken(0x0);
-  m_buinf->SetHomeNonceIndex(0x0);
-  m_buinf->SetCareOfNonceIndex(0x0);
-  m_buinf->SetCN("0::0");
-  m_OldinterfaceIndex=-1;
-
-
-  Ptr<Icmpv6L4Protocol> icmpv6l4 = GetNode ()->GetObject<Icmpv6L4Protocol> ();
-  icmpv6l4->SetNewIPCallback(MakeCallback(&mipv6MN::HandleNewAttachment, this));
-  icmpv6l4->SetCheckAddressCallback(MakeCallback(&mipv6MN::CheckAddresses, this));
-
-  Ptr<Ipv6L3Protocol> ipv6l3 = GetNode ()->GetObject<Ipv6L3Protocol> ();
-  ipv6l3->SetPrefixCallback(MakeCallback(&mipv6MN::SetDefaultRouterAddress, this));
-
-  Ptr<UdpL4Protocol> udpl4 = GetNode ()->GetObject<UdpL4Protocol> ();
-  udpl4->SetMipv6Callback(MakeCallback(&BList::GetHoa, m_buinf));
-
-  Ptr<TcpL4Protocol> tcpl4 = GetNode ()->GetObject<TcpL4Protocol> ();
-  tcpl4->SetMipv6Callback(MakeCallback(&BList::GetHoa, m_buinf));
- 
-  Ptr<Ipv6TunnelL4Protocol> tunnell4 = GetNode ()->GetObject<Ipv6TunnelL4Protocol> ();
-  tunnell4->SetCacheAddressList(m_Haalist);
-  tunnell4->SetHA(m_buinf->GetHA());
- }
   mipv6Agent::NotifyNewAggregate ();
 }
 
@@ -158,26 +161,26 @@ Ptr<Packet> mipv6MN::BuildHomeBU ()
 
   Ipv6ExtensionDestinationHeader destextnhdr;
   Ipv6HomeAddressOptionHeader homeopt;
-  homeopt.SetHomeAddress(m_buinf->GetHoa());
-  destextnhdr.AddOption(homeopt);  
-  
-  destextnhdr.SetNextHeader(59);
-  p->AddHeader(destextnhdr);
+  homeopt.SetHomeAddress (m_buinf->GetHoa ());
+  destextnhdr.AddOption (homeopt);
+
+  destextnhdr.SetNextHeader (59);
+  p->AddHeader (destextnhdr);
 
 
   Ipv6MobilityBindingUpdateHeader bu;
 
-  
+
   bu.SetSequence (m_buinf->GetHomeLastBindingUpdateSequence ());
   bu.SetFlagA (true);
   bu.SetFlagH (true);
   bu.SetFlagL (true);
   bu.SetFlagK (true);
-  
+
 
   bu.SetLifetime ((uint16_t)MIPv6L4Protocol::MAX_BINDING_LIFETIME);
 
-  p->AddHeader(bu);
+  p->AddHeader (bu);
 
   return p;
 }
@@ -191,16 +194,16 @@ Ptr<Packet> mipv6MN::BuildCNBU ()
 
   Ipv6ExtensionDestinationHeader destextnhdr;
   Ipv6HomeAddressOptionHeader homeopt;
-  homeopt.SetHomeAddress(m_buinf->GetHoa());
-  destextnhdr.AddOption(homeopt);  
-  
-  destextnhdr.SetNextHeader(59);
-  p->AddHeader(destextnhdr);
+  homeopt.SetHomeAddress (m_buinf->GetHoa ());
+  destextnhdr.AddOption (homeopt);
+
+  destextnhdr.SetNextHeader (59);
+  p->AddHeader (destextnhdr);
 
 
   Ipv6MobilityBindingUpdateHeader bu;
 
-  
+
   bu.SetSequence (m_buinf->GetCNLastBindingUpdateSequence ());
   bu.SetFlagA (true);
   bu.SetFlagH (true);
@@ -210,7 +213,7 @@ Ptr<Packet> mipv6MN::BuildCNBU ()
 
   bu.SetLifetime ((uint16_t)MIPv6L4Protocol::MAX_BINDING_LIFETIME);
 
-  p->AddHeader(bu);
+  p->AddHeader (bu);
 
   return p;
 }
@@ -225,20 +228,20 @@ Ptr<Packet> mipv6MN::BuildHoTI ()
   Ipv6HoTIHeader hoti;
 
   hoti.SetReserved2 (0);
-  hoti.SetHomeInitCookie(m_buinf->GetHomeInitCookie());
+  hoti.SetHomeInitCookie (m_buinf->GetHomeInitCookie ());
 
 //Adding home address option
 
   Ipv6ExtensionDestinationHeader destextnhdr;
   Ipv6HomeAddressOptionHeader homeopt;
-  homeopt.SetHomeAddress(m_buinf->GetHoa());
-  destextnhdr.AddOption(homeopt);  
-  
-  destextnhdr.SetNextHeader(59);
-  p->AddHeader(destextnhdr);
+  homeopt.SetHomeAddress (m_buinf->GetHoa ());
+  destextnhdr.AddOption (homeopt);
 
- 
-  p->AddHeader(hoti);
+  destextnhdr.SetNextHeader (59);
+  p->AddHeader (destextnhdr);
+
+
+  p->AddHeader (hoti);
 
   return p;
 }
@@ -249,22 +252,22 @@ Ptr<Packet> mipv6MN::BuildCoTI ()
   Ptr<Packet> p = Create<Packet> ();
 
   Ipv6CoTIHeader coti;
- 
+
   coti.SetReserved2 (0);
-  coti.SetCareOfInitCookie(m_buinf->GetCareOfInitCookie());
+  coti.SetCareOfInitCookie (m_buinf->GetCareOfInitCookie ());
 
 //Adding home address option
 
   Ipv6ExtensionDestinationHeader destextnhdr;
   Ipv6HomeAddressOptionHeader homeopt;
-  homeopt.SetHomeAddress(m_buinf->GetHoa());
-  destextnhdr.AddOption(homeopt);  
-  
-  destextnhdr.SetNextHeader(59);
-  p->AddHeader(destextnhdr);
+  homeopt.SetHomeAddress (m_buinf->GetHoa ());
+  destextnhdr.AddOption (homeopt);
 
- 
-  p->AddHeader(coti);
+  destextnhdr.SetNextHeader (59);
+  p->AddHeader (destextnhdr);
+
+
+  p->AddHeader (coti);
 
   return p;
 }
@@ -273,54 +276,54 @@ Ptr<Packet> mipv6MN::BuildCoTI ()
 
 void mipv6MN::HandleNewAttachment (Ipv6Address ipr)
 {
-  if (!ipr.IsLinkLocal() )// && !ipr.IsEqual(m_buinf->GetHoa()))
-  {
-  Ipv6Address coa=ipr;
-  m_buinf->SetCoa(coa);
-  
-  ClearTunnelAndRouting ();
-  Ptr<Ipv6> ipv6 = GetNode ()->GetObject<Ipv6> ();
-  NS_ASSERT (ipv6);
-
- 
-  //preset header information
-  m_buinf->SetHomeLastBindingUpdateSequence (GetHomeBUSequence ());
-  //Cut to micro-seconds
-  m_buinf->SetHomeLastBindingUpdateTime (MicroSeconds (Simulator::Now ().GetMicroSeconds ()));
-  //reset (for the first registration)
-  m_buinf->ResetHomeRetryCount ();
-
-  Ptr<Packet> p = BuildHomeBU ();
-
-  //save packet
-  m_buinf->SetHomeBUPacket (p);
-
-
-  //send BU
-  NS_LOG_FUNCTION (this << p->GetSize());
-
-  SendMessage (p->Copy (), m_buinf->GetHA (), 64);
-  
-
-  m_buinf->StartHomeRetransTimer ();
-
-  if (m_buinf->IsHomeReachable ())
+  if (!ipr.IsLinkLocal () )// && !ipr.IsEqual(m_buinf->GetHoa()))
     {
-      m_buinf->MarkHomeRefreshing ();
+      Ipv6Address coa = ipr;
+      m_buinf->SetCoa (coa);
+
+      ClearTunnelAndRouting ();
+      Ptr<Ipv6> ipv6 = GetNode ()->GetObject<Ipv6> ();
+      NS_ASSERT (ipv6);
+
+
+      //preset header information
+      m_buinf->SetHomeLastBindingUpdateSequence (GetHomeBUSequence ());
+      //Cut to micro-seconds
+      m_buinf->SetHomeLastBindingUpdateTime (MicroSeconds (Simulator::Now ().GetMicroSeconds ()));
+      //reset (for the first registration)
+      m_buinf->ResetHomeRetryCount ();
+
+      Ptr<Packet> p = BuildHomeBU ();
+
+      //save packet
+      m_buinf->SetHomeBUPacket (p);
+
+
+      //send BU
+      NS_LOG_FUNCTION (this << p->GetSize ());
+
+      SendMessage (p->Copy (), m_buinf->GetHA (), 64);
+
+
+      m_buinf->StartHomeRetransTimer ();
+
+      if (m_buinf->IsHomeReachable ())
+        {
+          m_buinf->MarkHomeRefreshing ();
+        }
+      else
+        {
+          m_buinf->MarkHomeUpdating ();
+        }
     }
-  else
-    {
-      m_buinf->MarkHomeUpdating ();
-    }
-  }
 }
 
 uint8_t mipv6MN::HandleBA (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
 {
-  
+
 // Options are not implemented yet!!
 
-  NS_LOG_FUNCTION (this << packet << src << dst << interface<<"HANDLE BACK");
+  NS_LOG_FUNCTION (this << packet << src << dst << interface << "HANDLE BACK");
 
   Ptr<Packet> p = packet->Copy ();
 
@@ -337,140 +340,144 @@ uint8_t mipv6MN::HandleBA (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
   NS_ASSERT (ipv6Mobility);
 
   //check for sequence
-  if (IsHomeMatch(src) && (m_buinf->GetHoa()).IsEqual(exttype2.GetHomeAddress()))
-  {
+  if (IsHomeMatch (src) && (m_buinf->GetHoa ()).IsEqual (exttype2.GetHomeAddress ()))
+    {
       if (m_buinf->GetHomeLastBindingUpdateSequence () != ba.GetSequence ())
-       {
-	NS_LOG_LOGIC ("Sequence mismatch. Ignored. this: "
-                    << m_buinf->GetHomeLastBindingUpdateSequence ()
-                    << ", from: "
-                    << ba.GetSequence ());
-      
-      	return 0;
-    	}
-
-  //check status code
-  switch (ba.GetStatus ())
-    {
-    case MIPv6Header::BA_STATUS_BINDING_UPDATE_ACCEPTED:
-    {
-      m_buinf->StopHomeRetransTimer ();
-      m_buinf->SetHomeAddressRegistered(true);
-      m_buinf->SetHomeBUPacket (0);
-      m_buinf->SetHomeReachableTime (Seconds (ba.GetLifetime ()));
-
-
-      if (ba.GetLifetime () > 0)
         {
-          //if (m_buinf->IsHomeUpdating ())
-            //{
-              //create tunnel & setup routing
-              if(!(m_buinf->GetHoa()).IsEqual(m_buinf->GetCoa()))
-              SetupTunnelAndRouting ();
-            //}
+          NS_LOG_LOGIC ("Sequence mismatch. Ignored. this: "
+                        << m_buinf->GetHomeLastBindingUpdateSequence ()
+                        << ", from: "
+                        << ba.GetSequence ());
 
-          m_buinf->MarkHomeReachable ();
-
-          //Setup lifetime
-          m_buinf->StopHomeRefreshTimer ();
-          m_buinf->StartHomeRefreshTimer ();
-          m_buinf->StopHomeReachableTimer ();
-          m_buinf->StartHomeReachableTimer ();
-	  if (IsRouteOptimizationRequired() && !m_buinf->GetCN().IsEqual("0::0") && !(m_buinf->GetHoa()).IsEqual(m_buinf->GetCoa()))
-	  {
-	  Ptr<Packet> p = BuildHoTI ();
-	  m_buinf->SetHoTIPacket(p);
-	  m_buinf->ResetHoTIRetryCount();
-	  SendMessage (p->Copy (), m_buinf->GetCN(), 64);
-	  m_buinf->StartHoTIRetransTimer();
-	  }
-        }
-      else
-        {
-          ClearTunnelAndRouting ();
+          return 0;
         }
 
+      //check status code
+      switch (ba.GetStatus ())
+        {
+        case MIPv6Header::BA_STATUS_BINDING_UPDATE_ACCEPTED:
+          {
+            m_buinf->StopHomeRetransTimer ();
+            m_buinf->SetHomeAddressRegistered (true);
+            m_buinf->SetHomeBUPacket (0);
+            m_buinf->SetHomeReachableTime (Seconds (ba.GetLifetime ()));
 
-      
-      break;
-    }
 
-    default:
-      NS_LOG_LOGIC ("Error occurred code=" << ba.GetStatus ());
+            if (ba.GetLifetime () > 0)
+              {
+                //if (m_buinf->IsHomeUpdating ())
+                //{
+                //create tunnel & setup routing
+                if (!(m_buinf->GetHoa ()).IsEqual (m_buinf->GetCoa ()))
+                  {
+                    SetupTunnelAndRouting ();
+                  }
+                //}
 
-    }
+                m_buinf->MarkHomeReachable ();
 
-  return 0;
- }
-else if(src.IsEqual(m_buinf->GetCN()) && (m_buinf->GetHoa()).IsEqual(exttype2.GetHomeAddress()))
- {
-  if (m_buinf->GetCNLastBindingUpdateSequence () != ba.GetSequence ())
-       {
-	NS_LOG_LOGIC ("Sequence mismatch. Ignored. this: "
-                    << m_buinf->GetCNLastBindingUpdateSequence ()
-                    << ", from: "
-                    << ba.GetSequence ());
-      
+                //Setup lifetime
+                m_buinf->StopHomeRefreshTimer ();
+                m_buinf->StartHomeRefreshTimer ();
+                m_buinf->StopHomeReachableTimer ();
+                m_buinf->StartHomeReachableTimer ();
+                if (IsRouteOptimizationRequired () && !m_buinf->GetCN ().IsEqual ("0::0") && !(m_buinf->GetHoa ()).IsEqual (m_buinf->GetCoa ()))
+                  {
+                    Ptr<Packet> p = BuildHoTI ();
+                    m_buinf->SetHoTIPacket (p);
+                    m_buinf->ResetHoTIRetryCount ();
+                    SendMessage (p->Copy (), m_buinf->GetCN (), 64);
+                    m_buinf->StartHoTIRetransTimer ();
+                  }
+              }
+            else
+              {
+                ClearTunnelAndRouting ();
+              }
+
+
+
+            break;
+          }
+
+        default:
+          NS_LOG_LOGIC ("Error occurred code=" << ba.GetStatus ());
+
+        }
+
       return 0;
     }
-
-  //check status code
-  switch (ba.GetStatus ())
+  else if (src.IsEqual (m_buinf->GetCN ()) && (m_buinf->GetHoa ()).IsEqual (exttype2.GetHomeAddress ()))
     {
-    case MIPv6Header::BA_STATUS_BINDING_UPDATE_ACCEPTED:
-    {
-      m_buinf->StopCNRetransTimer ();
-      m_buinf->SetCNBUPacket (0);
-      m_buinf->SetCNReachableTime (Seconds (ba.GetLifetime ()));
-
-
-      if (ba.GetLifetime () > 0)
+      if (m_buinf->GetCNLastBindingUpdateSequence () != ba.GetSequence ())
         {
-          
-          m_buinf->MarkCNReachable ();
+          NS_LOG_LOGIC ("Sequence mismatch. Ignored. this: "
+                        << m_buinf->GetCNLastBindingUpdateSequence ()
+                        << ", from: "
+                        << ba.GetSequence ());
 
-          //Setup lifetime
-          m_buinf->StopCNRefreshTimer ();
-          m_buinf->StartCNRefreshTimer ();
-          m_buinf->StopCNReachableTimer ();
-          m_buinf->StartCNReachableTimer ();
+          return 0;
         }
-      
-      break;
+
+      //check status code
+      switch (ba.GetStatus ())
+        {
+        case MIPv6Header::BA_STATUS_BINDING_UPDATE_ACCEPTED:
+          {
+            m_buinf->StopCNRetransTimer ();
+            m_buinf->SetCNBUPacket (0);
+            m_buinf->SetCNReachableTime (Seconds (ba.GetLifetime ()));
+
+
+            if (ba.GetLifetime () > 0)
+              {
+
+                m_buinf->MarkCNReachable ();
+
+                //Setup lifetime
+                m_buinf->StopCNRefreshTimer ();
+                m_buinf->StartCNRefreshTimer ();
+                m_buinf->StopCNReachableTimer ();
+                m_buinf->StartCNReachableTimer ();
+              }
+
+            break;
+          }
+
+        default:
+          NS_LOG_LOGIC ("Error occurred code=" << ba.GetStatus ());
+        }
+
+      return 0;
+
     }
 
-    default:
-      NS_LOG_LOGIC ("Error occurred code=" << ba.GetStatus ());
+  else
+    {
+      NS_LOG_LOGIC ("Error occurred code, No source found");
     }
 
   return 0;
-
- }
-
-else
-NS_LOG_LOGIC ("Error occurred code, No source found");
-
-return 0;
 
 }
 
-bool mipv6MN::IsHomeMatch(Ipv6Address addr)
+bool mipv6MN::IsHomeMatch (Ipv6Address addr)
 {
-std::list<Ipv6Address>::iterator iter = std::find (m_Haalist.begin(), m_Haalist.end(), addr);
-if ( m_Haalist.end() == iter )
+  std::list<Ipv6Address>::iterator iter = std::find (m_Haalist.begin (), m_Haalist.end (), addr);
+  if ( m_Haalist.end () == iter )
     {
-        return false;
+      return false;
     }
-    else
+  else
     {
-        return true;
+      return true;
     }
 }
 
 
 uint8_t mipv6MN::HandleHoT (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
 {
-  NS_LOG_FUNCTION (this << packet << src << dst << interface<<"HANDLE HoT");
+  NS_LOG_FUNCTION (this << packet << src << dst << interface << "HANDLE HoT");
 
   Ptr<Packet> p = packet->Copy ();
 
@@ -487,30 +494,30 @@ uint8_t mipv6MN::HandleHoT (Ptr<Packet> packet, const Ipv6Address &src, const Ip
   NS_ASSERT (ipv6Mobility);
 
   //check for timestamp and sequence
-  if (m_buinf->GetHomeInitCookie() != hot.GetHomeInitCookie() )
-       {
-	NS_LOG_LOGIC ("Home Init Cookie mismatch. Ignored. this: "
-                    << m_buinf->GetHomeInitCookie()
-                    << ", from: "
-                    << hot.GetHomeInitCookie());
-      
-	}
-  if (!((m_buinf->GetHoa()).IsEqual(exttype2.GetHomeAddress())))
+  if (m_buinf->GetHomeInitCookie () != hot.GetHomeInitCookie () )
     {
-	NS_LOG_LOGIC ("Home Address mismatch. Ignored. this: ");
-	return 0;
+      NS_LOG_LOGIC ("Home Init Cookie mismatch. Ignored. this: "
+                    << m_buinf->GetHomeInitCookie ()
+                    << ", from: "
+                    << hot.GetHomeInitCookie ());
+
+    }
+  if (!((m_buinf->GetHoa ()).IsEqual (exttype2.GetHomeAddress ())))
+    {
+      NS_LOG_LOGIC ("Home Address mismatch. Ignored. this: ");
+      return 0;
     }
 
-	m_buinf->StopHoTIRetransTimer ();
-        m_buinf->SetHoTIPacket (0);
-	m_buinf->SetHomeNonceIndex(hot.GetHomeNonceIndex());
-        m_buinf->SetHomeKeygenToken(hot.GetHomeKeygenToken());
+  m_buinf->StopHoTIRetransTimer ();
+  m_buinf->SetHoTIPacket (0);
+  m_buinf->SetHomeNonceIndex (hot.GetHomeNonceIndex ());
+  m_buinf->SetHomeKeygenToken (hot.GetHomeKeygenToken ());
 
-	  Ptr<Packet> pc = BuildCoTI ();
-	  m_buinf->SetCoTIPacket(pc);
-	  m_buinf->ResetCoTIRetryCount();
-	  SendMessage (pc->Copy (), m_buinf->GetCN(), 64);
-	  m_buinf->StartCoTIRetransTimer();
+  Ptr<Packet> pc = BuildCoTI ();
+  m_buinf->SetCoTIPacket (pc);
+  m_buinf->ResetCoTIRetryCount ();
+  SendMessage (pc->Copy (), m_buinf->GetCN (), 64);
+  m_buinf->StartCoTIRetransTimer ();
 
 
   return 0;
@@ -518,7 +525,7 @@ uint8_t mipv6MN::HandleHoT (Ptr<Packet> packet, const Ipv6Address &src, const Ip
 
 uint8_t mipv6MN::HandleCoT (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
 {
-  NS_LOG_FUNCTION (this << packet << src << dst << interface<<"HANDLE CoT");
+  NS_LOG_FUNCTION (this << packet << src << dst << interface << "HANDLE CoT");
 
   Ptr<Packet> p = packet->Copy ();
 
@@ -535,24 +542,24 @@ uint8_t mipv6MN::HandleCoT (Ptr<Packet> packet, const Ipv6Address &src, const Ip
   NS_ASSERT (ipv6Mobility);
 
   //check for sequence
-  if (m_buinf->GetCareOfInitCookie() != cot.GetCareOfInitCookie() )
-       {
-	NS_LOG_LOGIC ("Care of Init Cookie mismatch. Ignored. this: "
-                    << m_buinf->GetCareOfInitCookie()
-                    << ", from: "
-                    << cot.GetCareOfInitCookie());
-      
-	}
-
-	m_buinf->StopCoTIRetransTimer ();
-        m_buinf->SetCoTIPacket (0);
-	m_buinf->SetCareOfNonceIndex(cot.GetCareOfNonceIndex());
-        m_buinf->SetCareOfKeygenToken(cot.GetCareOfKeygenToken());
- 
-    if (!((m_buinf->GetHoa()).IsEqual(exttype2.GetHomeAddress())))
+  if (m_buinf->GetCareOfInitCookie () != cot.GetCareOfInitCookie () )
     {
-	NS_LOG_LOGIC ("Home Address mismatch. Ignored. this: ");
-	return 0;
+      NS_LOG_LOGIC ("Care of Init Cookie mismatch. Ignored. this: "
+                    << m_buinf->GetCareOfInitCookie ()
+                    << ", from: "
+                    << cot.GetCareOfInitCookie ());
+
+    }
+
+  m_buinf->StopCoTIRetransTimer ();
+  m_buinf->SetCoTIPacket (0);
+  m_buinf->SetCareOfNonceIndex (cot.GetCareOfNonceIndex ());
+  m_buinf->SetCareOfKeygenToken (cot.GetCareOfKeygenToken ());
+
+  if (!((m_buinf->GetHoa ()).IsEqual (exttype2.GetHomeAddress ())))
+    {
+      NS_LOG_LOGIC ("Home Address mismatch. Ignored. this: ");
+      return 0;
     }
 
 
@@ -568,7 +575,7 @@ uint8_t mipv6MN::HandleCoT (Ptr<Packet> packet, const Ipv6Address &src, const Ip
   //save packet
   m_buinf->SetCNBUPacket (pc);
 
-  NS_LOG_FUNCTION (this << pc->GetSize());
+  NS_LOG_FUNCTION (this << pc->GetSize ());
   SendMessage (pc->Copy (), m_buinf->GetCN (), 64);
 
   m_buinf->StartCNRetransTimer ();
@@ -595,31 +602,35 @@ bool mipv6MN::SetupTunnelAndRouting ()
 
   Ipv6StaticRoutingHelper staticRoutingHelper;
   Ptr<Ipv6> ipv6 = GetNode ()->GetObject<Ipv6> ();
-  
+
   Ptr<Ipv6StaticRouting> staticRouting = staticRoutingHelper.GetStaticRouting (ipv6);
-  Ipv6RoutingTableEntry routeentry(staticRouting->GetDefaultRoute ());
+  Ipv6RoutingTableEntry routeentry (staticRouting->GetDefaultRoute ());
 
-  m_OldPrefixToUse=routeentry.GetPrefixToUse ();
+  m_OldPrefixToUse = routeentry.GetPrefixToUse ();
 
-  staticRouting->RemoveRoute (routeentry.GetDest (), routeentry.GetDestNetworkPrefix (), routeentry.GetInterface (), routeentry.GetPrefixToUse ()); 
+  staticRouting->RemoveRoute (routeentry.GetDest (), routeentry.GetDestNetworkPrefix (), routeentry.GetInterface (), routeentry.GetPrefixToUse ());
 
-   uint8_t buf1[8],buf2[16],buf[16];
-  (routeentry.GetPrefixToUse ()).GetBytes(buf1);
-   (m_defaultrouteraddress).GetBytes(buf2);
-   for (int i=0;i<8;i++)
-    buf[i]=buf1[i];
-   for (int i=0;i<8;i++)
-    buf[i+8]=buf2[i+8];    
-   Ipv6Address addr(buf);
- 
-  staticRouting->AddHostRouteTo (m_buinf->GetHA(), addr, m_IfIndex, Ipv6Address("::"), 0);
-  m_OldinterfaceIndex=m_IfIndex;
-  staticRouting->AddNetworkRouteTo (routeentry.GetDest (), routeentry.GetDestNetworkPrefix (), m_defaultrouteraddress, m_buinf->GetTunnelIfIndex(), routeentry.GetPrefixToUse (), 0);
+  uint8_t buf1[8],buf2[16],buf[16];
+  (routeentry.GetPrefixToUse ()).GetBytes (buf1);
+  (m_defaultrouteraddress).GetBytes (buf2);
+  for (int i = 0; i < 8; i++)
+    {
+      buf[i] = buf1[i];
+    }
+  for (int i = 0; i < 8; i++)
+    {
+      buf[i + 8] = buf2[i + 8];
+    }
+  Ipv6Address addr (buf);
+
+  staticRouting->AddHostRouteTo (m_buinf->GetHA (), addr, m_IfIndex, Ipv6Address ("::"), 0);
+  m_OldinterfaceIndex = m_IfIndex;
+  staticRouting->AddNetworkRouteTo (routeentry.GetDest (), routeentry.GetDestNetworkPrefix (), m_defaultrouteraddress, m_buinf->GetTunnelIfIndex (), routeentry.GetPrefixToUse (), 0);
 //  staticRouting->SetDefaultRoute(Ipv6Address("::"),m_buinf->GetTunnelIfIndex());
-  staticRouting->RemoveRoute (Ipv6Address("fe80::"), Ipv6Prefix(64), m_buinf->GetTunnelIfIndex(), Ipv6Address("fe80::"));
+  staticRouting->RemoveRoute (Ipv6Address ("fe80::"), Ipv6Prefix (64), m_buinf->GetTunnelIfIndex (), Ipv6Address ("fe80::"));
 
 
-    
+
   return true;
 
 
@@ -628,61 +639,63 @@ bool mipv6MN::SetupTunnelAndRouting ()
 void mipv6MN::ClearTunnelAndRouting ()
 {
   NS_LOG_FUNCTION (this);
-  
+
   Ipv6StaticRoutingHelper staticRoutingHelper;
   Ptr<Ipv6> ipv6 = GetNode ()->GetObject<Ipv6> ();
-  
-  
+
+
   Ptr<Ipv6StaticRouting> staticRouting = staticRoutingHelper.GetStaticRouting (ipv6);
   //Ipv6RoutingTableEntry routeentry(staticRouting->GetDefaultRoute ());
 
   //std::cout<< "Printing Deafult Route in Clear:" << routeentry.GetDest () << ",\t" << routeentry.GetDestNetworkPrefix () << ",\t" << routeentry.GetInterface () << ",\t" << routeentry.GetPrefixToUse () << "\n";
 
 //  staticRouting->RemoveRoute (routeentry.GetDest (), routeentry.GetDestNetworkPrefix (), routeentry.GetInterface (), routeentry.GetPrefixToUse ());
-  staticRouting->RemoveRoute (Ipv6Address("::"), Ipv6Prefix::GetZero(), m_buinf->GetTunnelIfIndex(), m_OldPrefixToUse);
-  staticRouting->RemoveRoute (m_buinf->GetHA(), Ipv6Prefix(128), m_OldinterfaceIndex, Ipv6Address("::"));
-  
+  staticRouting->RemoveRoute (Ipv6Address ("::"), Ipv6Prefix::GetZero (), m_buinf->GetTunnelIfIndex (), m_OldPrefixToUse);
+  staticRouting->RemoveRoute (m_buinf->GetHA (), Ipv6Prefix (128), m_OldinterfaceIndex, Ipv6Address ("::"));
+
 //staticRouting->AddNetworkRouteTo (routeentry.GetDest (), routeentry.GetDestNetworkPrefix (), Ipv6Address("fe80::200:ff:fe00:7"), 1, routeentry.GetPrefixToUse (), 0);
- //staticRouting->SetDefaultRoute(Ipv6Address("fe80::200:ff:fe00:7"),1);
+//staticRouting->SetDefaultRoute(Ipv6Address("fe80::200:ff:fe00:7"),1);
 
 
 
 
-  
-    NS_LOG_FUNCTION ("Inside Clear tunnel routing....................");
+
+  NS_LOG_FUNCTION ("Inside Clear tunnel routing....................");
   //clear tunnel
   Ptr<Ipv6TunnelL4Protocol> th = GetNode ()->GetObject<Ipv6TunnelL4Protocol> ();
   NS_ASSERT (th);
-  
+
   th->RemoveTunnel (m_buinf->GetHA ());
-  
+
   m_buinf->SetTunnelIfIndex (-1);
 }
 
 
-void mipv6MN::SetRouteOptimizationReuiredField(bool roflag)
+void mipv6MN::SetRouteOptimizationReuiredField (bool roflag)
 {
-m_roflag=roflag;
+  m_roflag = roflag;
 }
 
 
-bool mipv6MN::IsRouteOptimizationRequired()
+bool mipv6MN::IsRouteOptimizationRequired ()
 {
-return m_roflag;
+  return m_roflag;
 }
 
-void mipv6MN::SetDefaultRouterAddress(Ipv6Address addr,  uint32_t index)
+void mipv6MN::SetDefaultRouterAddress (Ipv6Address addr,  uint32_t index)
 {
-m_defaultrouteraddress=addr;
-m_IfIndex=index;
+  m_defaultrouteraddress = addr;
+  m_IfIndex = index;
 }
 
-bool mipv6MN::CheckAddresses(Ipv6Address ha, Ipv6Address hoa)
+bool mipv6MN::CheckAddresses (Ipv6Address ha, Ipv6Address hoa)
 {
-std::cout<<"uuuuuuuuuuuuuuuuuuuuuttttttttttttttttttttttttttttteeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
-if(ha.IsEqual(m_buinf->GetHA()) && hoa.IsEqual(m_buinf->GetHoa()))
- return true;
-return false;
+  std::cout << "uuuuuuuuuuuuuuuuuuuuuttttttttttttttttttttttttttttteeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+  if (ha.IsEqual (m_buinf->GetHA ()) && hoa.IsEqual (m_buinf->GetHoa ()))
+    {
+      return true;
+    }
+  return false;
 }
 
 } /* namespace ns3 */

@@ -41,14 +41,13 @@ using namespace std;
 
 NS_LOG_COMPONENT_DEFINE ("MIPv6L4Protocol");
 
-namespace ns3
-{
+namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (MIPv6L4Protocol);
 
 const uint8_t MIPv6L4Protocol::PROT_NUMBER = 135;
 
-const double MIPv6L4Protocol::MAX_BINDING_LIFETIME = (int)0xffff<<2;
+const double MIPv6L4Protocol::MAX_BINDING_LIFETIME = (int)0xffff << 2;
 
 const double MIPv6L4Protocol::INITIAL_BINDING_ACK_TIMEOUT_FIRSTREG = 1.5;
 
@@ -121,7 +120,7 @@ void MIPv6L4Protocol::SetNode (Ptr<Node> node)
 
 Ptr<Node> MIPv6L4Protocol::GetNode (void)
 {
-  NS_LOG_FUNCTION_NOARGS();
+  NS_LOG_FUNCTION_NOARGS ();
   return m_node;
 }
 
@@ -151,135 +150,145 @@ void MIPv6L4Protocol::SendMessage (Ptr<Packet> packet, Ipv6Address src, Ipv6Addr
 
 enum IpL4Protocol::RxStatus MIPv6L4Protocol::Receive (Ptr<Packet> packet, Ipv6Address const &src, Ipv6Address const &dst, Ptr<Ipv6Interface> interface)
 {
-  NS_LOG_FUNCTION (this << packet << src << dst << interface<<"VANCH");
+  NS_LOG_FUNCTION (this << packet << src << dst << interface << "VANCH");
   Ptr<Packet> p = packet->Copy ();
   Ptr<MIPv6Demux> ipv6MobilityDemux = GetObject<MIPv6Demux>();
   Ptr<MIPv6Mobility> ipv6Mobility = 0;
   MIPv6Header mh;
-  
+
   p->PeekHeader (mh);
-  
-  ipv6Mobility = ipv6MobilityDemux -> GetMobility ( mh.GetMhType() );
-  
-  if(ipv6Mobility)
+
+  ipv6Mobility = ipv6MobilityDemux->GetMobility ( mh.GetMhType () );
+
+  if (ipv6Mobility)
     {
-	  ipv6Mobility -> Process (p, src, dst, interface);
-	}
+      ipv6Mobility->Process (p, src, dst, interface);
+    }
   else
     {
-	  NS_LOG_FUNCTION( "Mobility Packet with Unknown MhType (" << (uint32_t)mh.GetMhType() << ")" );
-	}
+      NS_LOG_FUNCTION ( "Mobility Packet with Unknown MhType (" << (uint32_t)mh.GetMhType () << ")" );
+    }
 
   return IpL4Protocol::RX_OK;
 }
 
-enum IpL4Protocol::RxStatus MIPv6L4Protocol::Receive(Ptr<Packet> p, Ipv6Header const &header, Ptr<Ipv6Interface> incomingInterface)
+enum IpL4Protocol::RxStatus MIPv6L4Protocol::Receive (Ptr<Packet> p, Ipv6Header const &header, Ptr<Ipv6Interface> incomingInterface)
 {
 
-  NS_LOG_FUNCTION (this << p << header << incomingInterface<<"VAMCH");
+  NS_LOG_FUNCTION (this << p << header << incomingInterface << "VAMCH");
   Ptr<Packet> packet = p->Copy ();
   Ptr<MIPv6Demux> ipv6MobilityDemux = GetObject<MIPv6Demux>();
   Ptr<MIPv6Mobility> ipv6Mobility = 0;
   MIPv6Header mh;
-  
-  packet->PeekHeader (mh);
-  ipv6Mobility = ipv6MobilityDemux -> GetMobility ( mh.GetMhType() );
- if(ipv6Mobility)
-    {
-Ipv6Address src=header.GetSourceAddress ();
-Ipv6Address dst=header.GetDestinationAddress ();	  
 
-ipv6Mobility -> Process (packet, src, dst, incomingInterface);
-	}
+  packet->PeekHeader (mh);
+  ipv6Mobility = ipv6MobilityDemux->GetMobility ( mh.GetMhType () );
+  if (ipv6Mobility)
+    {
+      Ipv6Address src = header.GetSourceAddress ();
+      Ipv6Address dst = header.GetDestinationAddress ();
+
+      ipv6Mobility->Process (packet, src, dst, incomingInterface);
+    }
   else
     {
-	  NS_LOG_FUNCTION( "Mobility Packet with Unknown MhType (" << (uint32_t)mh.GetMhType() << ")" );
-	}
+      NS_LOG_FUNCTION ( "Mobility Packet with Unknown MhType (" << (uint32_t)mh.GetMhType () << ")" );
+    }
 
-  return IpL4Protocol::RX_OK; 
+  return IpL4Protocol::RX_OK;
 
 }
 
-enum IpL4Protocol::RxStatus MIPv6L4Protocol::Receive(Ptr<Packet> p, Ipv4Header const &header, Ptr<Ipv4Interface> incomingInterface)
+enum IpL4Protocol::RxStatus MIPv6L4Protocol::Receive (Ptr<Packet> p, Ipv4Header const &header, Ptr<Ipv4Interface> incomingInterface)
 {
 
 
-  return IpL4Protocol::RX_OK; 
+  return IpL4Protocol::RX_OK;
 
 }
 
 
-void MIPv6L4Protocol::RegisterMobility()
+void MIPv6L4Protocol::RegisterMobility ()
 {
   Ptr<MIPv6Demux> ipv6MobilityDemux = CreateObject<MIPv6Demux>();
-  ipv6MobilityDemux -> SetNode( m_node );
-  
-  m_node -> AggregateObject( ipv6MobilityDemux );
-  
+  ipv6MobilityDemux->SetNode ( m_node );
+
+  m_node->AggregateObject ( ipv6MobilityDemux );
+
   Ptr<Ipv6MobilityBindingUpdate> bu = CreateObject<Ipv6MobilityBindingUpdate>();
-  bu->SetNode(m_node);
-  ipv6MobilityDemux->Insert(bu);
-  
+  bu->SetNode (m_node);
+  ipv6MobilityDemux->Insert (bu);
+
   Ptr<Ipv6MobilityBindingAck> ba = CreateObject<Ipv6MobilityBindingAck>();
-  ba->SetNode(m_node);
-  ipv6MobilityDemux->Insert(ba);
+  ba->SetNode (m_node);
+  ipv6MobilityDemux->Insert (ba);
 
   Ptr<Ipv6MobilityHoTI> hoti = CreateObject<Ipv6MobilityHoTI>();
-  hoti->SetNode(m_node);
-  ipv6MobilityDemux->Insert(hoti);
-  
-  Ptr<Ipv6MobilityCoTI> coti = CreateObject<Ipv6MobilityCoTI>();
-  coti->SetNode(m_node);
-  ipv6MobilityDemux->Insert(coti);
-  
-  Ptr<Ipv6MobilityHoT> hot = CreateObject<Ipv6MobilityHoT>();
-  hot->SetNode(m_node);
-  ipv6MobilityDemux->Insert(hot);
-  
-  Ptr<Ipv6MobilityCoT> cot = CreateObject<Ipv6MobilityCoT>();
-  cot->SetNode(m_node);
-  ipv6MobilityDemux->Insert(cot);
-    
-}
-void MIPv6L4Protocol::SetDownTarget (IpL4Protocol::DownTargetCallback cb){}
-void MIPv6L4Protocol::SetDownTarget6 (IpL4Protocol::DownTargetCallback6 cb){}
-IpL4Protocol::DownTargetCallback MIPv6L4Protocol::GetDownTarget (void) const
-{IpL4Protocol::DownTargetCallback t;return t;}
-IpL4Protocol::DownTargetCallback6 MIPv6L4Protocol::GetDownTarget6 (void) const
-{IpL4Protocol::DownTargetCallback6 y;return y;}
+  hoti->SetNode (m_node);
+  ipv6MobilityDemux->Insert (hoti);
 
-void MIPv6L4Protocol::RegisterMobilityOptions()
+  Ptr<Ipv6MobilityCoTI> coti = CreateObject<Ipv6MobilityCoTI>();
+  coti->SetNode (m_node);
+  ipv6MobilityDemux->Insert (coti);
+
+  Ptr<Ipv6MobilityHoT> hot = CreateObject<Ipv6MobilityHoT>();
+  hot->SetNode (m_node);
+  ipv6MobilityDemux->Insert (hot);
+
+  Ptr<Ipv6MobilityCoT> cot = CreateObject<Ipv6MobilityCoT>();
+  cot->SetNode (m_node);
+  ipv6MobilityDemux->Insert (cot);
+
+}
+void MIPv6L4Protocol::SetDownTarget (IpL4Protocol::DownTargetCallback cb)
+{
+}
+void MIPv6L4Protocol::SetDownTarget6 (IpL4Protocol::DownTargetCallback6 cb)
+{
+}
+IpL4Protocol::DownTargetCallback MIPv6L4Protocol::GetDownTarget (void) const
+{
+  IpL4Protocol::DownTargetCallback t;
+  return t;
+}
+IpL4Protocol::DownTargetCallback6 MIPv6L4Protocol::GetDownTarget6 (void) const
+{
+  IpL4Protocol::DownTargetCallback6 y;
+  return y;
+}
+
+void MIPv6L4Protocol::RegisterMobilityOptions ()
 {
   Ptr<MIPv6OptionDemux> ipv6MobilityOptionDemux = CreateObject<MIPv6OptionDemux>();
-  ipv6MobilityOptionDemux -> SetNode( m_node );
-  
-  m_node -> AggregateObject( ipv6MobilityOptionDemux );
-  
+  ipv6MobilityOptionDemux->SetNode ( m_node );
+
+  m_node->AggregateObject ( ipv6MobilityOptionDemux );
+
   Ptr<Ipv6MobilityOptionPad1> pad1 = CreateObject<Ipv6MobilityOptionPad1>();
-  pad1->SetNode(m_node);
-  ipv6MobilityOptionDemux->Insert(pad1);
-  
+  pad1->SetNode (m_node);
+  ipv6MobilityOptionDemux->Insert (pad1);
+
   Ptr<Ipv6MobilityOptionPadn> padn = CreateObject<Ipv6MobilityOptionPadn>();
-  padn->SetNode(m_node);
-  ipv6MobilityOptionDemux->Insert(padn);
-  
+  padn->SetNode (m_node);
+  ipv6MobilityOptionDemux->Insert (padn);
+
   //for MIPv6
   Ptr<Ipv6MobilityOptionBindingRefreshAdvice> adv = CreateObject<Ipv6MobilityOptionBindingRefreshAdvice>();
-  adv->SetNode(m_node);
-  ipv6MobilityOptionDemux->Insert(adv);
-  
+  adv->SetNode (m_node);
+  ipv6MobilityOptionDemux->Insert (adv);
+
   Ptr<Ipv6MobilityOptionAlternateCareofAddress> acoa = CreateObject<Ipv6MobilityOptionAlternateCareofAddress>();
-  acoa->SetNode(m_node);
-  ipv6MobilityOptionDemux->Insert(acoa);
-  
+  acoa->SetNode (m_node);
+  ipv6MobilityOptionDemux->Insert (acoa);
+
   Ptr<Ipv6MobilityOptionNonceIndices> ni = CreateObject<Ipv6MobilityOptionNonceIndices>();
-  ni->SetNode(m_node);
-  ipv6MobilityOptionDemux->Insert(ni);
-  
+  ni->SetNode (m_node);
+  ipv6MobilityOptionDemux->Insert (ni);
+
   Ptr<Ipv6MobilityOptionBindingAuthorizationData> auth = CreateObject<Ipv6MobilityOptionBindingAuthorizationData>();
-  auth->SetNode(m_node);
-  ipv6MobilityOptionDemux->Insert(auth);
-  
+  auth->SetNode (m_node);
+  ipv6MobilityOptionDemux->Insert (auth);
+
 }
 
 } /* namespace ns3 */

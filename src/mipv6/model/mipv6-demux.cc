@@ -24,8 +24,7 @@
 #include "mipv6-demux.h"
 #include "mipv6-mobility.h"
 
-namespace ns3
-{
+namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (MIPv6Demux);
 
@@ -37,7 +36,7 @@ TypeId MIPv6Demux::GetTypeId ()
                    ObjectVectorValue (),
                    MakeObjectVectorAccessor (&MIPv6Demux::m_mobilities),
                    MakeObjectVectorChecker<MIPv6Mobility> ())
-    ;
+  ;
   return tid;
 }
 

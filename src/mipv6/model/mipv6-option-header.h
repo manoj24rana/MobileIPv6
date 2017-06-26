@@ -25,8 +25,7 @@
 #include "ns3/ipv6-address.h"
 #include "ns3/packet.h"
 
-namespace ns3
-{
+namespace ns3 {
 
 /**
  * \class Ipv6MobilityOptionHeader
@@ -42,12 +41,12 @@ public:
    * Represented ad facter*n+offset (eg. 8n+2) See RFC 2460.
    * No alignment is represented as 1n+0
    */
-   struct Alignment
-   {
-     uint8_t factor;
-     uint8_t offset;
-   };
-  
+  struct Alignment
+  {
+    uint8_t factor;
+    uint8_t offset;
+  };
+
   /**
    * \brief Get the UID of this class.
    * \return UID
@@ -118,7 +117,7 @@ public:
    * \return length of packet
    */
   virtual uint32_t Deserialize (Buffer::Iterator start);
-  
+
   /**
    * \brief Get the Alignment requirement of this option header
    * \return the required alignment
@@ -146,19 +145,17 @@ public:
   static TypeId GetTypeId ();
   virtual TypeId GetInstanceTypeId () const;
 
-  Ipv6MobilityOptionPad1Header();
-  
-  virtual ~Ipv6MobilityOptionPad1Header();
+  Ipv6MobilityOptionPad1Header ();
+
+  virtual ~Ipv6MobilityOptionPad1Header ();
 
   virtual void Print (std::ostream& os) const;
   virtual uint32_t GetSerializedSize () const;
   virtual void Serialize (Buffer::Iterator start) const;
   virtual uint32_t Deserialize (Buffer::Iterator start);
-  
+
 protected:
-
 private:
-
 };
 
 class Ipv6MobilityOptionPadnHeader : public MIPv6OptionHeader
@@ -167,19 +164,17 @@ public:
   static TypeId GetTypeId ();
   virtual TypeId GetInstanceTypeId () const;
 
-  Ipv6MobilityOptionPadnHeader( uint8_t length = 2 );
-  
-  virtual ~Ipv6MobilityOptionPadnHeader();
+  Ipv6MobilityOptionPadnHeader ( uint8_t length = 2 );
+
+  virtual ~Ipv6MobilityOptionPadnHeader ();
 
   virtual void Print (std::ostream& os) const;
   virtual uint32_t GetSerializedSize () const;
   virtual void Serialize (Buffer::Iterator start) const;
   virtual uint32_t Deserialize (Buffer::Iterator start);
- 
+
 protected:
-
 private:
-
 };
 
 class Ipv6MobilityOptionBindingRefreshAdviceHeader : public MIPv6OptionHeader
@@ -188,13 +183,13 @@ public:
   static TypeId GetTypeId ();
   virtual TypeId GetInstanceTypeId () const;
 
-  Ipv6MobilityOptionBindingRefreshAdviceHeader();
-  
-  virtual ~Ipv6MobilityOptionBindingRefreshAdviceHeader();
-  
-  
-  uint16_t GetRefreshInterval() const;
-  void SetRefreshInterval(uint16_t intvl);
+  Ipv6MobilityOptionBindingRefreshAdviceHeader ();
+
+  virtual ~Ipv6MobilityOptionBindingRefreshAdviceHeader ();
+
+
+  uint16_t GetRefreshInterval () const;
+  void SetRefreshInterval (uint16_t intvl);
 
   virtual void Print (std::ostream& os) const;
   virtual uint32_t GetSerializedSize () const;
@@ -202,7 +197,6 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start);
   virtual Alignment GetAlignment () const;
 protected:
-
 private:
   uint16_t m_refreshinterval;
 };
@@ -213,23 +207,22 @@ public:
   static TypeId GetTypeId ();
   virtual TypeId GetInstanceTypeId () const;
 
-  Ipv6MobilityOptionAlternateCareofAddressHeader();
-  
-  virtual ~Ipv6MobilityOptionAlternateCareofAddressHeader();
+  Ipv6MobilityOptionAlternateCareofAddressHeader ();
 
-  
- 
-  Ipv6Address GetAlternateCareofAddress() const;
-  void SetAlternateCareofAddress(Ipv6Address coa);
+  virtual ~Ipv6MobilityOptionAlternateCareofAddressHeader ();
+
+
+
+  Ipv6Address GetAlternateCareofAddress () const;
+  void SetAlternateCareofAddress (Ipv6Address coa);
 
   virtual void Print (std::ostream& os) const;
   virtual uint32_t GetSerializedSize () const;
   virtual void Serialize (Buffer::Iterator start) const;
   virtual uint32_t Deserialize (Buffer::Iterator start);
   virtual Alignment GetAlignment () const;
-  
-protected:
 
+protected:
 private:
   Ipv6Address m_coa;
 };
@@ -240,23 +233,22 @@ public:
   static TypeId GetTypeId ();
   virtual TypeId GetInstanceTypeId () const;
 
-  Ipv6MobilityOptionNonceIndicesHeader();
-  
-  virtual ~Ipv6MobilityOptionNonceIndicesHeader();
-  
-  uint16_t GetHomeNonceIndex() const;
-  void SetHomeNonceIndex(uint16_t hi);
-  
-  uint16_t GetCareOfNonceIndex() const;
-  void SetCareOfNonceIndex(uint16_t coi);
+  Ipv6MobilityOptionNonceIndicesHeader ();
+
+  virtual ~Ipv6MobilityOptionNonceIndicesHeader ();
+
+  uint16_t GetHomeNonceIndex () const;
+  void SetHomeNonceIndex (uint16_t hi);
+
+  uint16_t GetCareOfNonceIndex () const;
+  void SetCareOfNonceIndex (uint16_t coi);
 
   virtual void Print (std::ostream& os) const;
   virtual uint32_t GetSerializedSize () const;
   virtual void Serialize (Buffer::Iterator start) const;
   virtual uint32_t Deserialize (Buffer::Iterator start);
-    virtual Alignment GetAlignment () const;
+  virtual Alignment GetAlignment () const;
 protected:
-
 private:
   uint16_t m_homenonceindex;
   uint16_t m_careofnonceindex;
@@ -269,20 +261,19 @@ public:
   static TypeId GetTypeId ();
   virtual TypeId GetInstanceTypeId () const;
 
-  Ipv6MobilityOptionBindingAuthorizationDataHeader();
-  
-  virtual ~Ipv6MobilityOptionBindingAuthorizationDataHeader();
- //Taking 64 bit authenticator instead of 96 bits 
-  uint64_t GetAuthenticator() const;
-  void SetAuthenticator(uint64_t auth);   
+  Ipv6MobilityOptionBindingAuthorizationDataHeader ();
+
+  virtual ~Ipv6MobilityOptionBindingAuthorizationDataHeader ();
+  //Taking 64 bit authenticator instead of 96 bits
+  uint64_t GetAuthenticator () const;
+  void SetAuthenticator (uint64_t auth);
 
   virtual void Print (std::ostream& os) const;
   virtual uint32_t GetSerializedSize () const;
   virtual void Serialize (Buffer::Iterator start) const;
   virtual uint32_t Deserialize (Buffer::Iterator start);
-    virtual Alignment GetAlignment () const;
+  virtual Alignment GetAlignment () const;
 protected:
-
 private:
   uint64_t m_auth;
 };

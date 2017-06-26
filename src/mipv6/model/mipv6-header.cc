@@ -22,8 +22,7 @@
 #include "ns3/log.h"
 #include "mipv6-header.h"
 
-namespace ns3
-{
+namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (MIPv6Header);
 
@@ -34,7 +33,7 @@ TypeId MIPv6Header::GetTypeId ()
   static TypeId tid = TypeId ("ns3::MIPv6Header")
     .SetParent<Header> ()
     .AddConstructor<MIPv6Header> ()
-    ;
+  ;
   return tid;
 }
 
@@ -44,11 +43,11 @@ TypeId MIPv6Header::GetInstanceTypeId () const
 }
 
 MIPv6Header::MIPv6Header ()
-  : m_payload_proto(59),
-  m_header_len(0),
-  m_mh_type(0),
-  m_reserved(0),
-  m_checksum(0)
+  : m_payload_proto (59),
+  m_header_len (0),
+  m_mh_type (0),
+  m_reserved (0),
+  m_checksum (0)
 {
 }
 
@@ -108,7 +107,7 @@ void MIPv6Header::SetChecksum (uint16_t checksum)
 
 void MIPv6Header::Print (std::ostream& os) const
 {
-  os << "( payload_proto = " << (uint32_t)GetPayloadProto() << " header_len = " << (uint32_t)GetHeaderLen() << " mh_type = " << (uint32_t)GetMhType() << " checksum = " << (uint32_t)GetChecksum() <<")";
+  os << "( payload_proto = " << (uint32_t)GetPayloadProto () << " header_len = " << (uint32_t)GetHeaderLen () << " mh_type = " << (uint32_t)GetMhType () << " checksum = " << (uint32_t)GetChecksum () << ")";
 }
 
 uint32_t MIPv6Header::GetSerializedSize () const
@@ -120,11 +119,11 @@ uint32_t MIPv6Header::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
 
-  m_payload_proto = i.ReadU8();
-  m_header_len = i.ReadU8();
-  m_mh_type = i.ReadU8();
-  m_reserved = i.ReadU8();
-  m_checksum = i.ReadNtohU16();
+  m_payload_proto = i.ReadU8 ();
+  m_header_len = i.ReadU8 ();
+  m_mh_type = i.ReadU8 ();
+  m_reserved = i.ReadU8 ();
+  m_checksum = i.ReadNtohU16 ();
 
   return GetSerializedSize ();
 }
@@ -160,15 +159,18 @@ void MIPv6OptionField::Serialize (Buffer::Iterator start) const
 {
   start.Write (m_optionData.Begin (), m_optionData.End ());
   uint32_t fill = CalculatePad ((MIPv6OptionHeader::Alignment) {8,0});
-  
+
   NS_LOG_LOGIC ("fill with " << fill << " bytes padding");
   switch (fill)
     {
-    case 0: return;
-    case 1: Ipv6MobilityOptionPad1Header ().Serialize (start);
-            return;
-    default: Ipv6MobilityOptionPadnHeader (fill).Serialize (start);
-             return;
+    case 0:
+      return;
+    case 1:
+      Ipv6MobilityOptionPad1Header ().Serialize (start);
+      return;
+    default:
+      Ipv6MobilityOptionPadnHeader (fill).Serialize (start);
+      return;
     }
 }
 
@@ -187,15 +189,18 @@ void MIPv6OptionField::AddOption (MIPv6OptionHeader const& option)
   NS_LOG_FUNCTION_NOARGS ();
 
   uint32_t pad = CalculatePad (option.GetAlignment ());
-  
+
   NS_LOG_LOGIC ("need " << pad << " bytes padding");
   switch (pad)
     {
-    case 0: break; //no padding needed
-    case 1: AddOption (Ipv6MobilityOptionPad1Header ());
-            break;
-    default: AddOption (Ipv6MobilityOptionPadnHeader (pad));
-             break;
+    case 0:
+      break;       //no padding needed
+    case 1:
+      AddOption (Ipv6MobilityOptionPad1Header ());
+      break;
+    default:
+      AddOption (Ipv6MobilityOptionPadnHeader (pad));
+      break;
     }
 
   m_optionData.AddAtEnd (option.GetSerializedSize ());
@@ -227,7 +232,7 @@ TypeId Ipv6MobilityBindingUpdateHeader::GetTypeId ()
   static TypeId tid = TypeId ("ns3::Ipv6MobilityBindingUpdateHeader")
     .SetParent<MIPv6Header> ()
     .AddConstructor<Ipv6MobilityBindingUpdateHeader> ()
-    ;
+  ;
   return tid;
 }
 
@@ -237,20 +242,20 @@ TypeId Ipv6MobilityBindingUpdateHeader::GetInstanceTypeId () const
 }
 
 Ipv6MobilityBindingUpdateHeader::Ipv6MobilityBindingUpdateHeader ()
-: MIPv6OptionField(12)
+  : MIPv6OptionField (12)
 {
-  SetHeaderLen(0);
-  SetMhType(IPV6_MOBILITY_BINDING_UPDATE);
-  SetReserved(0);
-  SetChecksum(0);
-  
-  SetSequence(0);
-  SetFlagA(0);
-  SetFlagH(0);
-  SetFlagL(0);
-  SetFlagK(0);
-  SetReserved2(0);
-  SetLifetime(0);
+  SetHeaderLen (0);
+  SetMhType (IPV6_MOBILITY_BINDING_UPDATE);
+  SetReserved (0);
+  SetChecksum (0);
+
+  SetSequence (0);
+  SetFlagA (0);
+  SetFlagH (0);
+  SetFlagL (0);
+  SetFlagK (0);
+  SetReserved2 (0);
+  SetLifetime (0);
 }
 
 Ipv6MobilityBindingUpdateHeader::~Ipv6MobilityBindingUpdateHeader ()
@@ -330,7 +335,7 @@ void Ipv6MobilityBindingUpdateHeader::SetLifetime (uint16_t lifetime)
 
 void Ipv6MobilityBindingUpdateHeader::Print (std::ostream& os) const
 {
-  os << "( payload_proto = " << (uint32_t)GetPayloadProto() << " header_len = " << (uint32_t)GetHeaderLen() << " mh_type = " << (uint32_t)GetMhType() << " checksum = " << (uint32_t)GetChecksum();
+  os << "( payload_proto = " << (uint32_t)GetPayloadProto () << " header_len = " << (uint32_t)GetHeaderLen () << " mh_type = " << (uint32_t)GetMhType () << " checksum = " << (uint32_t)GetChecksum ();
   os << " sequence = " << (uint32_t)GetSequence () << ")";
 }
 
@@ -344,57 +349,61 @@ void Ipv6MobilityBindingUpdateHeader::Serialize (Buffer::Iterator start) const
   Buffer::Iterator i = start;
   uint32_t reserved2 = m_reserved2;
 
-  i.WriteU8 (GetPayloadProto());
-  
-  i.WriteU8 ((uint8_t) (( GetSerializedSize() >> 3) - 1));
-  i.WriteU8 (GetMhType());
-  i.WriteU8 (GetReserved());
-  
+  i.WriteU8 (GetPayloadProto ());
+
+  i.WriteU8 ((uint8_t) (( GetSerializedSize () >> 3) - 1));
+  i.WriteU8 (GetMhType ());
+  i.WriteU8 (GetReserved ());
+
   i.WriteU16 (0);
-  
+
   i.WriteHtonU16 (m_sequence);
-  
-  if (m_flagA) {
-    reserved2 |= (uint16_t)(1 << 15);
-  }
-  
-  if (m_flagH) {
-    reserved2 |= (uint16_t)(1 << 14);
-  }
-  
-  if (m_flagL) {
-    reserved2 |= (uint16_t)(1 << 13);
-  }
-  
-  if (m_flagK) {
-    reserved2 |= (uint16_t)(1 << 12);
-  }
+
+  if (m_flagA)
+    {
+      reserved2 |= (uint16_t)(1 << 15);
+    }
+
+  if (m_flagH)
+    {
+      reserved2 |= (uint16_t)(1 << 14);
+    }
+
+  if (m_flagL)
+    {
+      reserved2 |= (uint16_t)(1 << 13);
+    }
+
+  if (m_flagK)
+    {
+      reserved2 |= (uint16_t)(1 << 12);
+    }
 
   i.WriteHtonU16 (reserved2);
   i.WriteHtonU16 (m_lifetime);
-  
+
 }
 
 uint32_t Ipv6MobilityBindingUpdateHeader::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
 
-  SetPayloadProto(i.ReadU8 ());
-  SetHeaderLen(i.ReadU8 ());
-  SetMhType(i.ReadU8 ());
-  SetReserved(i.ReadU8 ());
-  
-  SetChecksum(i.ReadU16 ());
-  
+  SetPayloadProto (i.ReadU8 ());
+  SetHeaderLen (i.ReadU8 ());
+  SetMhType (i.ReadU8 ());
+  SetReserved (i.ReadU8 ());
+
+  SetChecksum (i.ReadU16 ());
+
   m_sequence = i.ReadNtohU16 ();
-  
+
   m_reserved2 = i.ReadNtohU16 ();
-  
+
   m_flagA = false;
   m_flagH = false;
   m_flagL = false;
   m_flagK = false;
-  
+
   if (m_reserved2 & (1 << 15))
     {
       m_flagA = true;
@@ -416,7 +425,7 @@ uint32_t Ipv6MobilityBindingUpdateHeader::Deserialize (Buffer::Iterator start)
     }
 
   m_lifetime = i.ReadNtohU16 ();
-  
+
   return GetSerializedSize ();
 }
 
@@ -427,7 +436,7 @@ TypeId Ipv6MobilityBindingAckHeader::GetTypeId ()
   static TypeId tid = TypeId ("ns3::Ipv6MobilityBindingAckHeader")
     .SetParent<MIPv6Header> ()
     .AddConstructor<Ipv6MobilityBindingAckHeader> ()
-    ;
+  ;
   return tid;
 }
 
@@ -437,18 +446,18 @@ TypeId Ipv6MobilityBindingAckHeader::GetInstanceTypeId () const
 }
 
 Ipv6MobilityBindingAckHeader::Ipv6MobilityBindingAckHeader ()
-: MIPv6OptionField(12)
+  : MIPv6OptionField (12)
 {
-  SetHeaderLen(0);
-  SetMhType(IPV6_MOBILITY_BINDING_ACKNOWLEDGEMENT);
-  SetReserved(0);
-  SetChecksum(0);
-  
-  SetStatus(0);
-  SetFlagK(0);
-  SetReserved2(0);
-  SetSequence(0);
-  SetLifetime(0);
+  SetHeaderLen (0);
+  SetMhType (IPV6_MOBILITY_BINDING_ACKNOWLEDGEMENT);
+  SetReserved (0);
+  SetChecksum (0);
+
+  SetStatus (0);
+  SetFlagK (0);
+  SetReserved2 (0);
+  SetSequence (0);
+  SetLifetime (0);
 }
 
 Ipv6MobilityBindingAckHeader::~Ipv6MobilityBindingAckHeader ()
@@ -507,8 +516,8 @@ void Ipv6MobilityBindingAckHeader::SetLifetime (uint16_t lifetime)
 
 void Ipv6MobilityBindingAckHeader::Print (std::ostream& os) const
 {
-  os << "( payload_proto = " << (uint32_t)GetPayloadProto() << " header_len = " << (uint32_t)GetHeaderLen() << " mh_type = " << (uint32_t)GetMhType() << " checksum = " << (uint32_t)GetChecksum();
-  os << " status = " << (uint32_t)GetStatus() << " sequence = " << (uint32_t)GetSequence () << ")";
+  os << "( payload_proto = " << (uint32_t)GetPayloadProto () << " header_len = " << (uint32_t)GetHeaderLen () << " mh_type = " << (uint32_t)GetMhType () << " checksum = " << (uint32_t)GetChecksum ();
+  os << " status = " << (uint32_t)GetStatus () << " sequence = " << (uint32_t)GetSequence () << ")";
 }
 
 uint32_t Ipv6MobilityBindingAckHeader::GetSerializedSize () const
@@ -521,23 +530,24 @@ void Ipv6MobilityBindingAckHeader::Serialize (Buffer::Iterator start) const
   Buffer::Iterator i = start;
   uint32_t reserved2 = m_reserved2;
 
-  i.WriteU8 (GetPayloadProto());
-  
-  i.WriteU8 ( (uint8_t) (( GetSerializedSize() >> 3) - 1) );
-  i.WriteU8 (GetMhType());
-  i.WriteU8 (GetReserved());
+  i.WriteU8 (GetPayloadProto ());
+
+  i.WriteU8 ( (uint8_t) (( GetSerializedSize () >> 3) - 1) );
+  i.WriteU8 (GetMhType ());
+  i.WriteU8 (GetReserved ());
   i.WriteU16 (0);
-  
+
   i.WriteU8 (m_status);
-  
-  if (m_flagK) {
-    reserved2 |= (uint8_t)(1 << 7);
-  }
-  
+
+  if (m_flagK)
+    {
+      reserved2 |= (uint8_t)(1 << 7);
+    }
+
   i.WriteU8 (reserved2);
   i.WriteHtonU16 (m_sequence);
   i.WriteHtonU16 (m_lifetime);
-  
+
 
 }
 
@@ -545,18 +555,18 @@ uint32_t Ipv6MobilityBindingAckHeader::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
 
-  SetPayloadProto(i.ReadU8 ());
-  SetHeaderLen(i.ReadU8 ());
-  SetMhType(i.ReadU8 ());
-  SetReserved(i.ReadU8 ());
-  
-  SetChecksum(i.ReadU16 ());
-  
+  SetPayloadProto (i.ReadU8 ());
+  SetHeaderLen (i.ReadU8 ());
+  SetMhType (i.ReadU8 ());
+  SetReserved (i.ReadU8 ());
+
+  SetChecksum (i.ReadU16 ());
+
   m_status = i.ReadU8 ();
-  
+
   m_reserved2 = i.ReadU8 ();
-  
-  
+
+
   if (m_reserved2 & (1 << 7))
     {
       m_flagK = true;
@@ -577,7 +587,7 @@ TypeId Ipv6HoTIHeader::GetTypeId ()
   static TypeId tid = TypeId ("ns3::Ipv6HoTIHeader")
     .SetParent<MIPv6Header> ()
     .AddConstructor<Ipv6HoTIHeader> ()
-    ;
+  ;
   return tid;
 }
 TypeId Ipv6HoTIHeader::GetInstanceTypeId () const
@@ -587,13 +597,13 @@ TypeId Ipv6HoTIHeader::GetInstanceTypeId () const
 Ipv6HoTIHeader::Ipv6HoTIHeader ()
 {
 
-  SetHeaderLen(0);
-  SetMhType(HOME_TEST_INIT);
-  SetReserved(0);
-  SetChecksum(0);
-  
-  SetReserved2(0);
-  SetHomeInitCookie(0);
+  SetHeaderLen (0);
+  SetMhType (HOME_TEST_INIT);
+  SetReserved (0);
+  SetChecksum (0);
+
+  SetReserved2 (0);
+  SetHomeInitCookie (0);
 }
 Ipv6HoTIHeader::~Ipv6HoTIHeader ()
 {
@@ -605,17 +615,17 @@ uint16_t Ipv6HoTIHeader::GetReserved2 () const
 
 void Ipv6HoTIHeader::SetReserved2 (uint16_t reserved2)
 {
-  m_reserved2=reserved2;
+  m_reserved2 = reserved2;
 }
 
-uint64_t Ipv6HoTIHeader::GetHomeInitCookie() const
+uint64_t Ipv6HoTIHeader::GetHomeInitCookie () const
 {
-return m_homeinitcookie;
+  return m_homeinitcookie;
 }
 
-void Ipv6HoTIHeader::SetHomeInitCookie(uint64_t hicookie)
+void Ipv6HoTIHeader::SetHomeInitCookie (uint64_t hicookie)
 {
-m_homeinitcookie=hicookie;
+  m_homeinitcookie = hicookie;
 }
 
 uint32_t Ipv6HoTIHeader::GetSerializedSize () const
@@ -625,37 +635,37 @@ uint32_t Ipv6HoTIHeader::GetSerializedSize () const
 
 void Ipv6HoTIHeader::Print (std::ostream& os) const
 {
-  os << "( payload_proto = " << (uint32_t)GetPayloadProto() << " header_len = " << (uint32_t)GetHeaderLen() << " mh_type = " << (uint32_t)GetMhType() << " checksum = " << (uint32_t)GetChecksum();
-  os << " reserved2 = " << (uint16_t)GetReserved2() << ")"<<"home_init_cookie = "<<(uint64_t)GetHomeInitCookie();
+  os << "( payload_proto = " << (uint32_t)GetPayloadProto () << " header_len = " << (uint32_t)GetHeaderLen () << " mh_type = " << (uint32_t)GetMhType () << " checksum = " << (uint32_t)GetChecksum ();
+  os << " reserved2 = " << (uint16_t)GetReserved2 () << ")" << "home_init_cookie = " << (uint64_t)GetHomeInitCookie ();
 }
 
 void Ipv6HoTIHeader::Serialize (Buffer::Iterator start) const
 {
   Buffer::Iterator i = start;
-  i.WriteU8 (GetPayloadProto());
-  
-  i.WriteU8 ((uint8_t) (( GetSerializedSize() >> 3) - 1));
-  i.WriteU8 (GetMhType());
-  i.WriteU8 (GetReserved());
-  i.WriteU16 (0);
-  
+  i.WriteU8 (GetPayloadProto ());
 
-  i.WriteU16(0);
-  i.WriteU64(GetHomeInitCookie());
+  i.WriteU8 ((uint8_t) (( GetSerializedSize () >> 3) - 1));
+  i.WriteU8 (GetMhType ());
+  i.WriteU8 (GetReserved ());
+  i.WriteU16 (0);
+
+
+  i.WriteU16 (0);
+  i.WriteU64 (GetHomeInitCookie ());
 }
 uint32_t Ipv6HoTIHeader::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
 
-  SetPayloadProto(i.ReadU8 ());
-  SetHeaderLen(i.ReadU8 ());
-  SetMhType(i.ReadU8 ());
-  SetReserved(i.ReadU8 ());
-  SetChecksum(i.ReadU16 ());
-  
-  
-  SetReserved2(i.ReadU16 ());
-  SetHomeInitCookie(i.ReadU64 ());
+  SetPayloadProto (i.ReadU8 ());
+  SetHeaderLen (i.ReadU8 ());
+  SetMhType (i.ReadU8 ());
+  SetReserved (i.ReadU8 ());
+  SetChecksum (i.ReadU16 ());
+
+
+  SetReserved2 (i.ReadU16 ());
+  SetHomeInitCookie (i.ReadU64 ());
   return GetSerializedSize ();
 
 }
@@ -668,7 +678,7 @@ TypeId Ipv6CoTIHeader::GetTypeId ()
   static TypeId tid = TypeId ("ns3::Ipv6CoTIHeader")
     .SetParent<MIPv6Header> ()
     .AddConstructor<Ipv6CoTIHeader> ()
-    ;
+  ;
   return tid;
 }
 TypeId Ipv6CoTIHeader::GetInstanceTypeId () const
@@ -678,12 +688,12 @@ TypeId Ipv6CoTIHeader::GetInstanceTypeId () const
 Ipv6CoTIHeader::Ipv6CoTIHeader ()
 {
 
-  SetHeaderLen(0);
-  SetMhType(CARE_OF_TEST_INIT);
-  SetReserved(0);
-  SetChecksum(0);
-  
-  SetReserved2(0);
+  SetHeaderLen (0);
+  SetMhType (CARE_OF_TEST_INIT);
+  SetReserved (0);
+  SetChecksum (0);
+
+  SetReserved2 (0);
 }
 Ipv6CoTIHeader::~Ipv6CoTIHeader ()
 {
@@ -695,17 +705,17 @@ uint16_t Ipv6CoTIHeader::GetReserved2 () const
 
 void Ipv6CoTIHeader::SetReserved2 (uint16_t reserved2)
 {
-  m_reserved2=reserved2;
+  m_reserved2 = reserved2;
 }
 
-uint64_t Ipv6CoTIHeader::GetCareOfInitCookie() const
+uint64_t Ipv6CoTIHeader::GetCareOfInitCookie () const
 {
-return m_careofinitcookie;
+  return m_careofinitcookie;
 }
 
-void Ipv6CoTIHeader::SetCareOfInitCookie(uint64_t coaicookie)
+void Ipv6CoTIHeader::SetCareOfInitCookie (uint64_t coaicookie)
 {
-m_careofinitcookie=coaicookie;
+  m_careofinitcookie = coaicookie;
 }
 
 uint32_t Ipv6CoTIHeader::GetSerializedSize () const
@@ -715,38 +725,38 @@ uint32_t Ipv6CoTIHeader::GetSerializedSize () const
 
 void Ipv6CoTIHeader::Print (std::ostream& os) const
 {
-  os << "( payload_proto = " << (uint32_t)GetPayloadProto() << " header_len = " << (uint32_t)GetHeaderLen() << " mh_type = " << (uint32_t)GetMhType() << " checksum = " << (uint32_t)GetChecksum();
-  os << " reserved2 = " << (uint16_t)GetReserved2() << " care_of_init_cookie = " << (uint64_t)GetCareOfInitCookie()<<")";
+  os << "( payload_proto = " << (uint32_t)GetPayloadProto () << " header_len = " << (uint32_t)GetHeaderLen () << " mh_type = " << (uint32_t)GetMhType () << " checksum = " << (uint32_t)GetChecksum ();
+  os << " reserved2 = " << (uint16_t)GetReserved2 () << " care_of_init_cookie = " << (uint64_t)GetCareOfInitCookie () << ")";
 }
 
 void Ipv6CoTIHeader::Serialize (Buffer::Iterator start) const
 {
   Buffer::Iterator i = start;
-  i.WriteU8 (GetPayloadProto());
-  
-  i.WriteU8 ((uint8_t) (( GetSerializedSize() >> 3) - 1));
-  i.WriteU8 (GetMhType());
-  i.WriteU8 (GetReserved());
+  i.WriteU8 (GetPayloadProto ());
+
+  i.WriteU8 ((uint8_t) (( GetSerializedSize () >> 3) - 1));
+  i.WriteU8 (GetMhType ());
+  i.WriteU8 (GetReserved ());
   i.WriteU16 (0);
-  
-  
-  i.WriteU16(0);
-  i.WriteU64(0);
+
+
+  i.WriteU16 (0);
+  i.WriteU64 (0);
 }
 uint32_t Ipv6CoTIHeader::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
 
-  SetPayloadProto(i.ReadU8 ());
-  SetHeaderLen(i.ReadU8 ());
-  SetMhType(i.ReadU8 ());
-  SetReserved(i.ReadU8 ());
-  SetChecksum(i.ReadU16 ());
-  
-  
-  SetReserved2(i.ReadU16 ());
-  SetCareOfInitCookie(i.ReadU64());
-  
+  SetPayloadProto (i.ReadU8 ());
+  SetHeaderLen (i.ReadU8 ());
+  SetMhType (i.ReadU8 ());
+  SetReserved (i.ReadU8 ());
+  SetChecksum (i.ReadU16 ());
+
+
+  SetReserved2 (i.ReadU16 ());
+  SetCareOfInitCookie (i.ReadU64 ());
+
   return GetSerializedSize ();
 
 }
@@ -758,7 +768,7 @@ TypeId Ipv6HoTHeader::GetTypeId ()
   static TypeId tid = TypeId ("ns3::Ipv6HoTHeader")
     .SetParent<MIPv6Header> ()
     .AddConstructor<Ipv6HoTHeader> ()
-    ;
+  ;
   return tid;
 }
 TypeId Ipv6HoTHeader::GetInstanceTypeId () const
@@ -768,46 +778,46 @@ TypeId Ipv6HoTHeader::GetInstanceTypeId () const
 Ipv6HoTHeader::Ipv6HoTHeader ()
 {
 
-  SetHeaderLen(0);
-  SetMhType(HOME_TEST);
-  SetReserved(0);
-  SetChecksum(0);
-  
-  SetHomeNonceIndex(0);
-  SetHomeInitCookie(0);
-  SetHomeKeygenToken(0);  
+  SetHeaderLen (0);
+  SetMhType (HOME_TEST);
+  SetReserved (0);
+  SetChecksum (0);
+
+  SetHomeNonceIndex (0);
+  SetHomeInitCookie (0);
+  SetHomeKeygenToken (0);
 }
 Ipv6HoTHeader::~Ipv6HoTHeader ()
 {
 }
-uint16_t Ipv6HoTHeader::GetHomeNonceIndex() const
+uint16_t Ipv6HoTHeader::GetHomeNonceIndex () const
 {
   return m_homenonceindex;
 }
 
-void Ipv6HoTHeader::SetHomeNonceIndex(uint16_t homenonceind)
+void Ipv6HoTHeader::SetHomeNonceIndex (uint16_t homenonceind)
 {
-  m_homenonceindex=homenonceind;
+  m_homenonceindex = homenonceind;
 }
 
-uint64_t Ipv6HoTHeader::GetHomeInitCookie() const
+uint64_t Ipv6HoTHeader::GetHomeInitCookie () const
 {
-return m_homeinitcookie;
+  return m_homeinitcookie;
 }
 
-void Ipv6HoTHeader::SetHomeInitCookie(uint64_t homeinitcookie)
+void Ipv6HoTHeader::SetHomeInitCookie (uint64_t homeinitcookie)
 {
-m_homeinitcookie=homeinitcookie;
+  m_homeinitcookie = homeinitcookie;
 }
 
-uint64_t Ipv6HoTHeader::GetHomeKeygenToken() const
+uint64_t Ipv6HoTHeader::GetHomeKeygenToken () const
 {
-return m_homekeygentoken;
+  return m_homekeygentoken;
 }
 
-void Ipv6HoTHeader::SetHomeKeygenToken(uint64_t homekeygentoken)
+void Ipv6HoTHeader::SetHomeKeygenToken (uint64_t homekeygentoken)
 {
-m_homekeygentoken=homekeygentoken;
+  m_homekeygentoken = homekeygentoken;
 }
 
 uint32_t Ipv6HoTHeader::GetSerializedSize () const
@@ -817,39 +827,39 @@ uint32_t Ipv6HoTHeader::GetSerializedSize () const
 
 void Ipv6HoTHeader::Print (std::ostream& os) const
 {
-  os << "( payload_proto = " << (uint32_t)GetPayloadProto() << " header_len = " << (uint32_t)GetHeaderLen() << " mh_type = " << (uint32_t)GetMhType() << " checksum = " << (uint32_t)GetChecksum();
-  os << " homenonceindex = " << (uint16_t)GetHomeNonceIndex() <<" homeinitcookie = " << (uint64_t)GetHomeInitCookie() << "HomeKeygenToken="<< (uint64_t) GetHomeKeygenToken();
+  os << "( payload_proto = " << (uint32_t)GetPayloadProto () << " header_len = " << (uint32_t)GetHeaderLen () << " mh_type = " << (uint32_t)GetMhType () << " checksum = " << (uint32_t)GetChecksum ();
+  os << " homenonceindex = " << (uint16_t)GetHomeNonceIndex () << " homeinitcookie = " << (uint64_t)GetHomeInitCookie () << "HomeKeygenToken=" << (uint64_t) GetHomeKeygenToken ();
 }
 
 void Ipv6HoTHeader::Serialize (Buffer::Iterator start) const
 {
   Buffer::Iterator i = start;
-  i.WriteU8 (GetPayloadProto());
-  
-  i.WriteU8 ((uint8_t) (( GetSerializedSize() >> 3) - 1));
-  i.WriteU8 (GetMhType());
-  i.WriteU8 (GetReserved());
+  i.WriteU8 (GetPayloadProto ());
+
+  i.WriteU8 ((uint8_t) (( GetSerializedSize () >> 3) - 1));
+  i.WriteU8 (GetMhType ());
+  i.WriteU8 (GetReserved ());
   i.WriteU16 (0);
-  
-  
-  i.WriteU16(GetHomeNonceIndex());
-  i.WriteU64(GetHomeInitCookie());
-  i.WriteU64(GetHomeKeygenToken());
+
+
+  i.WriteU16 (GetHomeNonceIndex ());
+  i.WriteU64 (GetHomeInitCookie ());
+  i.WriteU64 (GetHomeKeygenToken ());
 }
 uint32_t Ipv6HoTHeader::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
 
-  SetPayloadProto(i.ReadU8 ());
-  SetHeaderLen(i.ReadU8 ());
-  SetMhType(i.ReadU8 ());
-  SetReserved(i.ReadU8 ());
-  SetChecksum(i.ReadU16 ());
-  
-  
-  SetHomeNonceIndex(i.ReadU16 ());
-  SetHomeInitCookie(i.ReadU64 ());
-  SetHomeKeygenToken(i.ReadU64 ());
+  SetPayloadProto (i.ReadU8 ());
+  SetHeaderLen (i.ReadU8 ());
+  SetMhType (i.ReadU8 ());
+  SetReserved (i.ReadU8 ());
+  SetChecksum (i.ReadU16 ());
+
+
+  SetHomeNonceIndex (i.ReadU16 ());
+  SetHomeInitCookie (i.ReadU64 ());
+  SetHomeKeygenToken (i.ReadU64 ());
   return GetSerializedSize ();
 
 }
@@ -861,7 +871,7 @@ TypeId Ipv6CoTHeader::GetTypeId ()
   static TypeId tid = TypeId ("ns3::Ipv6CoTHeader")
     .SetParent<MIPv6Header> ()
     .AddConstructor<Ipv6CoTHeader> ()
-    ;
+  ;
   return tid;
 }
 TypeId Ipv6CoTHeader::GetInstanceTypeId () const
@@ -871,47 +881,47 @@ TypeId Ipv6CoTHeader::GetInstanceTypeId () const
 Ipv6CoTHeader::Ipv6CoTHeader ()
 {
 
-  SetHeaderLen(0);
-  SetMhType(CARE_OF_TEST);
-  SetReserved(0);
-  SetChecksum(0);
-  
-  SetCareOfNonceIndex(0);
-  SetCareOfInitCookie(0);
-  SetCareOfKeygenToken(0);  
+  SetHeaderLen (0);
+  SetMhType (CARE_OF_TEST);
+  SetReserved (0);
+  SetChecksum (0);
+
+  SetCareOfNonceIndex (0);
+  SetCareOfInitCookie (0);
+  SetCareOfKeygenToken (0);
 
 }
 Ipv6CoTHeader::~Ipv6CoTHeader ()
 {
 }
-uint16_t Ipv6CoTHeader::GetCareOfNonceIndex() const
+uint16_t Ipv6CoTHeader::GetCareOfNonceIndex () const
 {
   return m_careofnonceindex;
 }
 
-void Ipv6CoTHeader::SetCareOfNonceIndex(uint16_t careofnonceind)
+void Ipv6CoTHeader::SetCareOfNonceIndex (uint16_t careofnonceind)
 {
-  m_careofnonceindex=careofnonceind;
+  m_careofnonceindex = careofnonceind;
 }
 
-uint64_t Ipv6CoTHeader::GetCareOfInitCookie() const
+uint64_t Ipv6CoTHeader::GetCareOfInitCookie () const
 {
-return m_careofinitcookie;
+  return m_careofinitcookie;
 }
 
-void Ipv6CoTHeader::SetCareOfInitCookie(uint64_t careofinitcookie)
+void Ipv6CoTHeader::SetCareOfInitCookie (uint64_t careofinitcookie)
 {
-m_careofinitcookie=careofinitcookie;
+  m_careofinitcookie = careofinitcookie;
 }
 
-uint64_t Ipv6CoTHeader::GetCareOfKeygenToken() const
+uint64_t Ipv6CoTHeader::GetCareOfKeygenToken () const
 {
-return m_careofkeygenoken;
+  return m_careofkeygenoken;
 }
 
-void Ipv6CoTHeader::SetCareOfKeygenToken(uint64_t careofkeygentoken)
+void Ipv6CoTHeader::SetCareOfKeygenToken (uint64_t careofkeygentoken)
 {
-m_careofkeygenoken=careofkeygentoken;
+  m_careofkeygenoken = careofkeygentoken;
 }
 
 uint32_t Ipv6CoTHeader::GetSerializedSize () const
@@ -921,40 +931,40 @@ uint32_t Ipv6CoTHeader::GetSerializedSize () const
 
 void Ipv6CoTHeader::Print (std::ostream& os) const
 {
-  os << "( payload_proto = " << (uint32_t)GetPayloadProto() << " header_len = " << (uint32_t)GetHeaderLen() << " mh_type = " << (uint32_t)GetMhType() << " checksum = " << (uint32_t)GetChecksum();
-  os << " care_of_nonceindex = " << (uint16_t)GetCareOfNonceIndex() <<"care_of_initcookie"<< (uint64_t) GetCareOfInitCookie() <<"care_of_keygenoken"<< (uint64_t) GetCareOfKeygenToken() << ")";
+  os << "( payload_proto = " << (uint32_t)GetPayloadProto () << " header_len = " << (uint32_t)GetHeaderLen () << " mh_type = " << (uint32_t)GetMhType () << " checksum = " << (uint32_t)GetChecksum ();
+  os << " care_of_nonceindex = " << (uint16_t)GetCareOfNonceIndex () << "care_of_initcookie" << (uint64_t) GetCareOfInitCookie () << "care_of_keygenoken" << (uint64_t) GetCareOfKeygenToken () << ")";
 }
 
 void Ipv6CoTHeader::Serialize (Buffer::Iterator start) const
 {
   Buffer::Iterator i = start;
-  i.WriteU8 (GetPayloadProto());
-  
-  i.WriteU8 ((uint8_t) (( GetSerializedSize() >> 3) - 1));
-  i.WriteU8 (GetMhType());
-  i.WriteU8 (GetReserved());
+  i.WriteU8 (GetPayloadProto ());
+
+  i.WriteU8 ((uint8_t) (( GetSerializedSize () >> 3) - 1));
+  i.WriteU8 (GetMhType ());
+  i.WriteU8 (GetReserved ());
   i.WriteU16 (0);
-  
-  
-  i.WriteU16(GetCareOfNonceIndex());
-  i.WriteU64(GetCareOfInitCookie());
-  i.WriteU64(GetCareOfKeygenToken());
+
+
+  i.WriteU16 (GetCareOfNonceIndex ());
+  i.WriteU64 (GetCareOfInitCookie ());
+  i.WriteU64 (GetCareOfKeygenToken ());
 }
 
 uint32_t Ipv6CoTHeader::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
 
-  SetPayloadProto(i.ReadU8 ());
-  SetHeaderLen(i.ReadU8 ());
-  SetMhType(i.ReadU8 ());
-  SetReserved(i.ReadU8 ());
-  SetChecksum(i.ReadU16 ());
-  
-  
-  SetCareOfNonceIndex(i.ReadU16 ());
-  SetCareOfInitCookie(i.ReadU64 ());
-  SetCareOfKeygenToken(i.ReadU64 ());
+  SetPayloadProto (i.ReadU8 ());
+  SetHeaderLen (i.ReadU8 ());
+  SetMhType (i.ReadU8 ());
+  SetReserved (i.ReadU8 ());
+  SetChecksum (i.ReadU16 ());
+
+
+  SetCareOfNonceIndex (i.ReadU16 ());
+  SetCareOfInitCookie (i.ReadU64 ());
+  SetCareOfKeygenToken (i.ReadU64 ());
   return GetSerializedSize ();
 
 }
@@ -966,7 +976,7 @@ TypeId Ipv6BindingErrorHeader::GetTypeId ()
   static TypeId tid = TypeId ("ns3::Ipv6BindingErrorHeader")
     .SetParent<MIPv6Header> ()
     .AddConstructor<Ipv6BindingErrorHeader> ()
-    ;
+  ;
   return tid;
 }
 TypeId Ipv6BindingErrorHeader::GetInstanceTypeId () const
@@ -975,14 +985,14 @@ TypeId Ipv6BindingErrorHeader::GetInstanceTypeId () const
 }
 Ipv6BindingErrorHeader::Ipv6BindingErrorHeader ()
 {
-  SetHeaderLen(0);
-  SetMhType(IPv6_BINDING_ERROR);
-  SetReserved(0);
-  SetChecksum(0);
-  
-  SetStatus(0);
-  SetReserved2(0);
-  SetHomeAddress("0::0");
+  SetHeaderLen (0);
+  SetMhType (IPv6_BINDING_ERROR);
+  SetReserved (0);
+  SetChecksum (0);
+
+  SetStatus (0);
+  SetReserved2 (0);
+  SetHomeAddress ("0::0");
 
 }
 Ipv6BindingErrorHeader::~Ipv6BindingErrorHeader ()
@@ -995,27 +1005,27 @@ uint8_t Ipv6BindingErrorHeader::GetReserved2 () const
 
 void Ipv6BindingErrorHeader::SetReserved2 (uint8_t reserved2)
 {
-  m_reserved2=reserved2;
+  m_reserved2 = reserved2;
 }
 
-void Ipv6BindingErrorHeader::SetStatus(uint8_t stat)
+void Ipv6BindingErrorHeader::SetStatus (uint8_t stat)
 {
-m_status=stat;
+  m_status = stat;
 }
 
-uint8_t Ipv6BindingErrorHeader::GetStatus() const
+uint8_t Ipv6BindingErrorHeader::GetStatus () const
 {
-return m_status;
+  return m_status;
 }
 
-Ipv6Address Ipv6BindingErrorHeader::GetHomeAddress() const
+Ipv6Address Ipv6BindingErrorHeader::GetHomeAddress () const
 {
-return m_hoa;
+  return m_hoa;
 }
 
-void Ipv6BindingErrorHeader::SetHomeAddress(Ipv6Address hoa)
+void Ipv6BindingErrorHeader::SetHomeAddress (Ipv6Address hoa)
 {
-m_hoa=hoa;
+  m_hoa = hoa;
 }
 
 uint32_t Ipv6BindingErrorHeader::GetSerializedSize () const
@@ -1025,47 +1035,47 @@ uint32_t Ipv6BindingErrorHeader::GetSerializedSize () const
 
 void Ipv6BindingErrorHeader::Print (std::ostream& os) const
 {
-  os << "( payload_proto = " << (uint32_t)GetPayloadProto() << " header_len = " << (uint32_t)GetHeaderLen() << " mh_type = " << (uint32_t)GetMhType() << " checksum = " << (uint32_t)GetChecksum();
-  os << " status = " << (uint8_t)GetStatus() <<"Home_Address"<< (Ipv6Address) GetHomeAddress() << ")";
+  os << "( payload_proto = " << (uint32_t)GetPayloadProto () << " header_len = " << (uint32_t)GetHeaderLen () << " mh_type = " << (uint32_t)GetMhType () << " checksum = " << (uint32_t)GetChecksum ();
+  os << " status = " << (uint8_t)GetStatus () << "Home_Address" << (Ipv6Address) GetHomeAddress () << ")";
 }
 
 void Ipv6BindingErrorHeader::Serialize (Buffer::Iterator start) const
 {
   Buffer::Iterator i = start;
-  i.WriteU8 (GetPayloadProto());
-  
-  i.WriteU8 ((uint8_t) (( GetSerializedSize() >> 3) - 1));
-  i.WriteU8 (GetMhType());
-  i.WriteU8 (GetReserved());
+  i.WriteU8 (GetPayloadProto ());
+
+  i.WriteU8 ((uint8_t) (( GetSerializedSize () >> 3) - 1));
+  i.WriteU8 (GetMhType ());
+  i.WriteU8 (GetReserved ());
   i.WriteU16 (0);
-  
-  i.WriteU8(GetStatus());
-  
-  i.WriteU8(GetReserved2());
+
+  i.WriteU8 (GetStatus ());
+
+  i.WriteU8 (GetReserved2 ());
 
   uint8_t buf[16];
   Ipv6Address addr;
-  addr=GetHomeAddress();
-  addr.Serialize(buf);
-  i.Write(buf,16);
+  addr = GetHomeAddress ();
+  addr.Serialize (buf);
+  i.Write (buf,16);
 }
 
 uint32_t Ipv6BindingErrorHeader::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
 
-  SetPayloadProto(i.ReadU8 ());
-  SetHeaderLen(i.ReadU8 ());
-  SetMhType(i.ReadU8 ());
-  SetReserved(i.ReadU8 ());
-  SetChecksum(i.ReadU16 ());
-  
-  
-  SetStatus(i.ReadU8 ());
-  SetReserved2(i.ReadU8 ());
+  SetPayloadProto (i.ReadU8 ());
+  SetHeaderLen (i.ReadU8 ());
+  SetMhType (i.ReadU8 ());
+  SetReserved (i.ReadU8 ());
+  SetChecksum (i.ReadU16 ());
+
+
+  SetStatus (i.ReadU8 ());
+  SetReserved2 (i.ReadU8 ());
   uint8_t buf[16];
-  i.Read(buf,16);
-  SetHomeAddress(Ipv6Address::Deserialize (buf));
+  i.Read (buf,16);
+  SetHomeAddress (Ipv6Address::Deserialize (buf));
   return GetSerializedSize ();
 
 }
@@ -1077,7 +1087,7 @@ TypeId Ipv6BindingRefreshRequestHeader::GetTypeId ()
   static TypeId tid = TypeId ("ns3::Ipv6BindingRefreshRequestHeader")
     .SetParent<MIPv6Header> ()
     .AddConstructor<Ipv6BindingRefreshRequestHeader> ()
-    ;
+  ;
   return tid;
 }
 TypeId Ipv6BindingRefreshRequestHeader::GetInstanceTypeId () const
@@ -1086,14 +1096,14 @@ TypeId Ipv6BindingRefreshRequestHeader::GetInstanceTypeId () const
 }
 Ipv6BindingRefreshRequestHeader::Ipv6BindingRefreshRequestHeader ()
 {
-  SetHeaderLen(0);
-  SetMhType(IPv6_BINDING_REFRESH_REQUEST);
-  SetReserved(0);
-  SetChecksum(0);
-  
-  
-  SetReserved2(0);
-  
+  SetHeaderLen (0);
+  SetMhType (IPv6_BINDING_REFRESH_REQUEST);
+  SetReserved (0);
+  SetChecksum (0);
+
+
+  SetReserved2 (0);
+
 }
 Ipv6BindingRefreshRequestHeader::~Ipv6BindingRefreshRequestHeader ()
 {
@@ -1105,7 +1115,7 @@ uint16_t Ipv6BindingRefreshRequestHeader::GetReserved2 () const
 
 void Ipv6BindingRefreshRequestHeader::SetReserved2 (uint16_t reserved2)
 {
-  m_reserved2=reserved2;
+  m_reserved2 = reserved2;
 }
 
 
@@ -1116,35 +1126,35 @@ uint32_t Ipv6BindingRefreshRequestHeader::GetSerializedSize () const
 
 void Ipv6BindingRefreshRequestHeader::Print (std::ostream& os) const
 {
-  os << "( payload_proto = " << (uint32_t)GetPayloadProto() << " header_len = " << (uint32_t)GetHeaderLen() << " mh_type = " << (uint32_t)GetMhType() << " checksum = " << (uint32_t)GetChecksum();
-  
+  os << "( payload_proto = " << (uint32_t)GetPayloadProto () << " header_len = " << (uint32_t)GetHeaderLen () << " mh_type = " << (uint32_t)GetMhType () << " checksum = " << (uint32_t)GetChecksum ();
+
 }
 
 void Ipv6BindingRefreshRequestHeader::Serialize (Buffer::Iterator start) const
 {
   Buffer::Iterator i = start;
-  i.WriteU8 (GetPayloadProto());
-  
-  i.WriteU8 ((uint8_t) (( GetSerializedSize() >> 3) - 1));
-  i.WriteU8 (GetMhType());
-  i.WriteU8 (GetReserved());
+  i.WriteU8 (GetPayloadProto ());
+
+  i.WriteU8 ((uint8_t) (( GetSerializedSize () >> 3) - 1));
+  i.WriteU8 (GetMhType ());
+  i.WriteU8 (GetReserved ());
   i.WriteU16 (0);
-  
-  
-  i.WriteU16(GetReserved2());
+
+
+  i.WriteU16 (GetReserved2 ());
 }
 
 uint32_t Ipv6BindingRefreshRequestHeader::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
 
-  SetPayloadProto(i.ReadU8 ());
-  SetHeaderLen(i.ReadU8 ());
-  SetMhType(i.ReadU8 ());
-  SetReserved(i.ReadU8 ());
-  SetChecksum(i.ReadU16 ());
-  
-  SetReserved2(i.ReadU8 ());
+  SetPayloadProto (i.ReadU8 ());
+  SetHeaderLen (i.ReadU8 ());
+  SetMhType (i.ReadU8 ());
+  SetReserved (i.ReadU8 ());
+  SetChecksum (i.ReadU16 ());
+
+  SetReserved2 (i.ReadU8 ());
   return GetSerializedSize ();
 
 }

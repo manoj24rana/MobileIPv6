@@ -44,63 +44,61 @@ class Node;
 
 //HA Helper
 
-class mipv6HAHelper {
+class mipv6HAHelper
+{
 public:
-  mipv6HAHelper();
-  ~mipv6HAHelper();
+  mipv6HAHelper ();
+  ~mipv6HAHelper ();
   /**
-   * 
+   *
    * \param node The node on which to install the stack.
    */
   void Install (Ptr<Node> node);
-  
-  std::list<Ipv6Address> GetHomeAgentAddressList();
-protected:
 
+  std::list<Ipv6Address> GetHomeAgentAddressList ();
+protected:
 private:
   Ptr<Node> m_node;
-  };
+};
 
 //CN Helper
 
-class mipv6CNHelper {
+class mipv6CNHelper
+{
 public:
-  mipv6CNHelper();
-  ~mipv6CNHelper();
-  
+  mipv6CNHelper ();
+  ~mipv6CNHelper ();
+
   /**
-   * 
+   *
    * \param node The node on which to install the stack.
    */
   void Install (Ptr<Node> node) const;
-  
-protected:
 
+protected:
 private:
-  
 };
 
 //MN Helper
 
-class mipv6MNHelper {
+class mipv6MNHelper
+{
 public:
-  mipv6MNHelper(std::list<Ipv6Address> haalist, bool rotopt);
-  ~mipv6MNHelper();
+  mipv6MNHelper (std::list<Ipv6Address> haalist, bool rotopt);
+  ~mipv6MNHelper ();
   /**
-   * 
+   *
    * \param node The node on which to install the stack.
    */
   void Install (Ptr<Node> node) const;
-  
-  
+
+
 protected:
-
 private:
-
   std::list<Ipv6Address> m_Haalist;
   bool m_rotopt;
 
-  };
+};
 
 } // namespace ns3
 

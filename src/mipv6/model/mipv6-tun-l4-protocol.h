@@ -25,8 +25,7 @@
 #include "ns3/ip-l4-protocol.h"
 #include "ns3/tunnel-net-device.h"
 
-namespace ns3
-{
+namespace ns3 {
 
 class Node;
 class Packet;
@@ -47,7 +46,7 @@ public:
    * \brief IPv6 Mobility protocol number (135).
    */
   static const uint8_t PROT_NUMBER;
-  
+
   /**
    * \brief Get MIPv6 protocol number.
    * \return protocol number
@@ -69,17 +68,17 @@ public:
    * \param node the node to set
    */
   void SetNode (Ptr<Node> node);
-  
+
   /**
    * \brief Get the node.
    * \return node
    */
   Ptr<Node> GetNode (void);
 
-    /**
-   * \brief This method is called by AddAgregate and completes the aggregation
-   * by setting the node in the Ipv6 Mobility stack.
-   */
+  /**
+ * \brief This method is called by AddAgregate and completes the aggregation
+ * by setting the node in the Ipv6 Mobility stack.
+ */
   virtual void NotifyNewAggregate ();
 
   /**
@@ -96,7 +95,7 @@ public:
    * \param ttl next hop limit
    */
   void SendMessage (Ptr<Packet> packet, Ipv6Address src, Ipv6Address dst, uint8_t ttl);
-  
+
   /**
    * \brief Receive method.
    * \param p the packet
@@ -104,45 +103,44 @@ public:
    * \param dst destination address
    * \param interface the interface from which the packet is coming
    */
-  virtual enum IpL4Protocol::RxStatus Receive (Ptr<Packet> p,Ipv6Header const &header,Ptr<Ipv6Interface> incomingInterface); 
+  virtual enum IpL4Protocol::RxStatus Receive (Ptr<Packet> p,Ipv6Header const &header,Ptr<Ipv6Interface> incomingInterface);
   virtual void SetDownTarget (IpL4Protocol::DownTargetCallback cb);
   virtual void SetDownTarget6 (IpL4Protocol::DownTargetCallback6 cb);
   virtual IpL4Protocol::DownTargetCallback GetDownTarget (void) const;
   virtual IpL4Protocol::DownTargetCallback6 GetDownTarget6 (void) const;
   virtual enum IpL4Protocol::RxStatus Receive (Ptr<Packet> p,
-                                 Ipv4Header const &header,
-                                 Ptr<Ipv4Interface> incomingInterface);
+                                               Ipv4Header const &header,
+                                               Ptr<Ipv4Interface> incomingInterface);
 
-  uint16_t AddTunnel(Ipv6Address remote, Ipv6Address local=Ipv6Address::GetZero());
-  void RemoveTunnel(Ipv6Address remote);
-  uint16_t ModifyTunnel(Ipv6Address remote, Ipv6Address newRemote, Ipv6Address local=Ipv6Address::GetZero());
-  Ptr<TunnelNetDevice> GetTunnelDevice(Ipv6Address remote);
-  
-  
-  
+  uint16_t AddTunnel (Ipv6Address remote, Ipv6Address local = Ipv6Address::GetZero ());
+  void RemoveTunnel (Ipv6Address remote);
+  uint16_t ModifyTunnel (Ipv6Address remote, Ipv6Address newRemote, Ipv6Address local = Ipv6Address::GetZero ());
+  Ptr<TunnelNetDevice> GetTunnelDevice (Ipv6Address remote);
+
+
+
   // myfile.open ("example.txt");
   //myfile.close();
   //void filewriter(uint64_t u, Time t);
-  void SetHomeAddress(Ipv6Address hoa);
-  Ipv6Address GetHomeAddress();
+  void SetHomeAddress (Ipv6Address hoa);
+  Ipv6Address GetHomeAddress ();
 
-  void SetCacheAddressList(std::list<Ipv6Address> list);
-  std::list<Ipv6Address> GetCacheAddressList();
+  void SetCacheAddressList (std::list<Ipv6Address> list);
+  std::list<Ipv6Address> GetCacheAddressList ();
 
-  void SetHA(Ipv6Address ha);
-  Ipv6Address GetHA();
-  
+  void SetHA (Ipv6Address ha);
+  Ipv6Address GetHA ();
+
 protected:
- 
   /**
    * \brief Dispose this object.
    */
   virtual void DoDispose ();
-  
+
 private:
   typedef std::map<Ipv6Address, Ptr<TunnelNetDevice> > TunnelMap;
   typedef std::map<Ipv6Address, Ptr<TunnelNetDevice> >::iterator TunnelMapI;
-  
+
   /**
    * \brief The node.
    */

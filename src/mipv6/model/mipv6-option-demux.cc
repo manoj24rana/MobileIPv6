@@ -24,8 +24,7 @@
 #include "mipv6-option.h"
 #include "mipv6-option-demux.h"
 
-namespace ns3
-{
+namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (MIPv6OptionDemux);
 
@@ -37,7 +36,7 @@ TypeId MIPv6OptionDemux::GetTypeId ()
                    ObjectVectorValue (),
                    MakeObjectVectorAccessor (&MIPv6OptionDemux::m_options),
                    MakeObjectVectorChecker<MIPv6Option> ())
-    ;
+  ;
   return tid;
 }
 

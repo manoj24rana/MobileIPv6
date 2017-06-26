@@ -25,8 +25,7 @@
 
 NS_LOG_COMPONENT_DEFINE ("MIPv6OptionHeader");
 
-namespace ns3
-{
+namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (MIPv6OptionHeader);
 
@@ -35,7 +34,7 @@ TypeId MIPv6OptionHeader::GetTypeId ()
   static TypeId tid = TypeId ("ns3::MIPv6OptionHeader")
     .SetParent<Header> ()
     .AddConstructor<MIPv6OptionHeader> ()
-    ;
+  ;
   return tid;
 }
 
@@ -102,7 +101,9 @@ void MIPv6OptionHeader::Serialize (Buffer::Iterator start) const
 
 MIPv6OptionHeader::Alignment MIPv6OptionHeader::GetAlignment () const
 {
-  return (Alignment){1,0};
+  return (Alignment){
+           1,0
+  };
 }
 
 NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityOptionPad1Header);
@@ -112,7 +113,7 @@ TypeId Ipv6MobilityOptionPad1Header::GetTypeId ()
   static TypeId tid = TypeId ("ns3::Ipv6MobilityOptionPad1Header")
     .SetParent<MIPv6OptionHeader> ()
     .AddConstructor<Ipv6MobilityOptionPad1Header> ()
-    ;
+  ;
   return tid;
 }
 
@@ -121,19 +122,19 @@ TypeId Ipv6MobilityOptionPad1Header::GetInstanceTypeId () const
   return GetTypeId ();
 }
 
-Ipv6MobilityOptionPad1Header::Ipv6MobilityOptionPad1Header()
+Ipv6MobilityOptionPad1Header::Ipv6MobilityOptionPad1Header ()
 {
-  SetType(MIPv6Header::IPV6_MOBILITY_OPT_PAD1);
-  SetLength(0);
+  SetType (MIPv6Header::IPV6_MOBILITY_OPT_PAD1);
+  SetLength (0);
 }
 
-Ipv6MobilityOptionPad1Header::~Ipv6MobilityOptionPad1Header()
+Ipv6MobilityOptionPad1Header::~Ipv6MobilityOptionPad1Header ()
 {
 }
 
 void Ipv6MobilityOptionPad1Header::Print (std::ostream& os) const
 {
-  os << "( type=" << GetType() << ")";
+  os << "( type=" << GetType () << ")";
 }
 
 uint32_t Ipv6MobilityOptionPad1Header::GetSerializedSize () const
@@ -145,26 +146,26 @@ void Ipv6MobilityOptionPad1Header::Serialize (Buffer::Iterator start) const
 {
   Buffer::Iterator i = start;
 
-  i.WriteU8(GetType());
+  i.WriteU8 (GetType ());
 }
 
 uint32_t Ipv6MobilityOptionPad1Header::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
-  
-  SetType(i.ReadU8());
-  
-  return GetSerializedSize();
+
+  SetType (i.ReadU8 ());
+
+  return GetSerializedSize ();
 }
 
-NS_OBJECT_ENSURE_REGISTERED(Ipv6MobilityOptionPadnHeader);
+NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityOptionPadnHeader);
 
 TypeId Ipv6MobilityOptionPadnHeader::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityOptionPadnHeader")
     .SetParent<MIPv6OptionHeader> ()
     .AddConstructor<Ipv6MobilityOptionPadnHeader> ()
-    ;
+  ;
   return tid;
 }
 
@@ -173,37 +174,37 @@ TypeId Ipv6MobilityOptionPadnHeader::GetInstanceTypeId () const
   return GetTypeId ();
 }
 
-Ipv6MobilityOptionPadnHeader::Ipv6MobilityOptionPadnHeader(uint8_t length)
+Ipv6MobilityOptionPadnHeader::Ipv6MobilityOptionPadnHeader (uint8_t length)
 {
-  SetType(MIPv6Header::IPV6_MOBILITY_OPT_PADN);
-  SetLength(length-2);
+  SetType (MIPv6Header::IPV6_MOBILITY_OPT_PADN);
+  SetLength (length - 2);
 }
 
-Ipv6MobilityOptionPadnHeader::~Ipv6MobilityOptionPadnHeader()
+Ipv6MobilityOptionPadnHeader::~Ipv6MobilityOptionPadnHeader ()
 {
 }
 
 void Ipv6MobilityOptionPadnHeader::Print (std::ostream& os) const
 {
-  os << "( type=" << GetType() << ", length(excluding TL)=" << GetLength() <<")";
+  os << "( type=" << GetType () << ", length(excluding TL)=" << GetLength () << ")";
 }
 
 uint32_t Ipv6MobilityOptionPadnHeader::GetSerializedSize () const
 {
-  return GetLength() + 2;
+  return GetLength () + 2;
 }
 
 void Ipv6MobilityOptionPadnHeader::Serialize (Buffer::Iterator start) const
 {
   Buffer::Iterator i = start;
-  uint8_t len = GetLength();
+  uint8_t len = GetLength ();
 
-  i.WriteU8(GetType());
-  i.WriteU8(len);
-  
-  while(len-- > 0)
+  i.WriteU8 (GetType ());
+  i.WriteU8 (len);
+
+  while (len-- > 0)
     {
-      i.WriteU8(0);
+      i.WriteU8 (0);
     }
 }
 
@@ -211,26 +212,26 @@ uint32_t Ipv6MobilityOptionPadnHeader::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
   uint8_t len;
-  
-  SetType(i.ReadU8());
-  SetLength((len=i.ReadU8()));
-  
-  while(len-- > 0)
+
+  SetType (i.ReadU8 ());
+  SetLength ((len = i.ReadU8 ()));
+
+  while (len-- > 0)
     {
-	  i.ReadU8();
-	}
-	
-  return GetSerializedSize();
+      i.ReadU8 ();
+    }
+
+  return GetSerializedSize ();
 }
 
-NS_OBJECT_ENSURE_REGISTERED(Ipv6MobilityOptionBindingRefreshAdviceHeader);
+NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityOptionBindingRefreshAdviceHeader);
 
 TypeId Ipv6MobilityOptionBindingRefreshAdviceHeader::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityOptionBindingRefreshAdviceHeader")
     .SetParent<MIPv6OptionHeader> ()
     .AddConstructor<Ipv6MobilityOptionBindingRefreshAdviceHeader> ()
-    ;
+  ;
   return tid;
 }
 
@@ -239,77 +240,79 @@ TypeId Ipv6MobilityOptionBindingRefreshAdviceHeader::GetInstanceTypeId () const
   return GetTypeId ();
 }
 
-Ipv6MobilityOptionBindingRefreshAdviceHeader::Ipv6MobilityOptionBindingRefreshAdviceHeader()
+Ipv6MobilityOptionBindingRefreshAdviceHeader::Ipv6MobilityOptionBindingRefreshAdviceHeader ()
 {
-  SetType(MIPv6Header::IPV6_MOBILITY_OPT_BINDING_REFRESH_ADVICE);
-  SetLength(2);
-  SetRefreshInterval(10);
+  SetType (MIPv6Header::IPV6_MOBILITY_OPT_BINDING_REFRESH_ADVICE);
+  SetLength (2);
+  SetRefreshInterval (10);
 }
 
-Ipv6MobilityOptionBindingRefreshAdviceHeader::~Ipv6MobilityOptionBindingRefreshAdviceHeader()
+Ipv6MobilityOptionBindingRefreshAdviceHeader::~Ipv6MobilityOptionBindingRefreshAdviceHeader ()
 {
 }
 
-uint16_t Ipv6MobilityOptionBindingRefreshAdviceHeader::GetRefreshInterval() const
+uint16_t Ipv6MobilityOptionBindingRefreshAdviceHeader::GetRefreshInterval () const
 {
   return m_refreshinterval;
 }
 
-void Ipv6MobilityOptionBindingRefreshAdviceHeader::SetRefreshInterval(uint16_t intvl)
+void Ipv6MobilityOptionBindingRefreshAdviceHeader::SetRefreshInterval (uint16_t intvl)
 {
-  m_refreshinterval=intvl;
+  m_refreshinterval = intvl;
 }
 
 void Ipv6MobilityOptionBindingRefreshAdviceHeader::Print (std::ostream& os) const
 {
-  os << "( type=" << GetType() << ", length(excluding TL)=" << GetLength() << ", RefreshInterval=" << GetRefreshInterval() << ")";
+  os << "( type=" << GetType () << ", length(excluding TL)=" << GetLength () << ", RefreshInterval=" << GetRefreshInterval () << ")";
 }
 
 uint32_t Ipv6MobilityOptionBindingRefreshAdviceHeader::GetSerializedSize () const
 {
-  return GetLength() + 2;
+  return GetLength () + 2;
 }
 
 void Ipv6MobilityOptionBindingRefreshAdviceHeader::Serialize (Buffer::Iterator start) const
 {
-  
+
   Buffer::Iterator i = start;
 
-  i.WriteU8(GetType());
-  i.WriteU8(GetLength());
-  
-  i.WriteU16(GetRefreshInterval());
-  
+  i.WriteU8 (GetType ());
+  i.WriteU8 (GetLength ());
+
+  i.WriteU16 (GetRefreshInterval ());
+
 }
 
 uint32_t Ipv6MobilityOptionBindingRefreshAdviceHeader::Deserialize (Buffer::Iterator start)
 {
-  
+
   Buffer::Iterator i = start;
-  
-  
-  SetType(i.ReadU8());
-  SetLength(i.ReadU8());
-  
-  SetRefreshInterval(i.ReadU16());
-	
-  return GetSerializedSize();
+
+
+  SetType (i.ReadU8 ());
+  SetLength (i.ReadU8 ());
+
+  SetRefreshInterval (i.ReadU16 ());
+
+  return GetSerializedSize ();
 }
 
 MIPv6OptionHeader::Alignment Ipv6MobilityOptionBindingRefreshAdviceHeader::GetAlignment () const
 {
-  return (Alignment){2,0}; //2n
+  return (Alignment){
+           2,0
+  };                       //2n
 }
 
 
-NS_OBJECT_ENSURE_REGISTERED(Ipv6MobilityOptionAlternateCareofAddressHeader);
+NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityOptionAlternateCareofAddressHeader);
 
 TypeId Ipv6MobilityOptionAlternateCareofAddressHeader::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityOptionAlternateCareofAddressHeader")
     .SetParent<MIPv6OptionHeader> ()
     .AddConstructor<Ipv6MobilityOptionAlternateCareofAddressHeader> ()
-    ;
+  ;
   return tid;
 }
 
@@ -318,40 +321,40 @@ TypeId Ipv6MobilityOptionAlternateCareofAddressHeader::GetInstanceTypeId () cons
   return GetTypeId ();
 }
 
-Ipv6MobilityOptionAlternateCareofAddressHeader::Ipv6MobilityOptionAlternateCareofAddressHeader()
+Ipv6MobilityOptionAlternateCareofAddressHeader::Ipv6MobilityOptionAlternateCareofAddressHeader ()
 {
-  SetType(MIPv6Header::IPV6_MOBILITY_OPT_ALTERNATE_CARE_OF_ADDRESS);
-  SetLength(16);
-  
-  m_coa.Set("::");
-  
+  SetType (MIPv6Header::IPV6_MOBILITY_OPT_ALTERNATE_CARE_OF_ADDRESS);
+  SetLength (16);
+
+  m_coa.Set ("::");
+
 }
 
 
 
-Ipv6MobilityOptionAlternateCareofAddressHeader::~Ipv6MobilityOptionAlternateCareofAddressHeader()
+Ipv6MobilityOptionAlternateCareofAddressHeader::~Ipv6MobilityOptionAlternateCareofAddressHeader ()
 {
 }
 
-  
-Ipv6Address Ipv6MobilityOptionAlternateCareofAddressHeader::GetAlternateCareofAddress() const
+
+Ipv6Address Ipv6MobilityOptionAlternateCareofAddressHeader::GetAlternateCareofAddress () const
 {
   return m_coa;
 }
 
-void Ipv6MobilityOptionAlternateCareofAddressHeader::SetAlternateCareofAddress(Ipv6Address coa)
+void Ipv6MobilityOptionAlternateCareofAddressHeader::SetAlternateCareofAddress (Ipv6Address coa)
 {
   m_coa = coa;
 }
 
 void Ipv6MobilityOptionAlternateCareofAddressHeader::Print (std::ostream& os) const
 {
-  os << "( type=" << GetType() << ", length(excluding TL)=" << GetLength() <<  ", coa=" << GetAlternateCareofAddress() <<")";
+  os << "( type=" << GetType () << ", length(excluding TL)=" << GetLength () <<  ", coa=" << GetAlternateCareofAddress () << ")";
 }
 
 uint32_t Ipv6MobilityOptionAlternateCareofAddressHeader::GetSerializedSize () const
 {
-  return GetLength()+2;
+  return GetLength () + 2;
 }
 
 void Ipv6MobilityOptionAlternateCareofAddressHeader::Serialize (Buffer::Iterator start) const
@@ -359,42 +362,44 @@ void Ipv6MobilityOptionAlternateCareofAddressHeader::Serialize (Buffer::Iterator
   uint8_t buff_prefix[16];
   Buffer::Iterator i = start;
 
-  i.WriteU8(GetType());
-  i.WriteU8(GetLength());
-  
-  
-  m_coa.Serialize(buff_prefix);
-  i.Write(buff_prefix, 16);
+  i.WriteU8 (GetType ());
+  i.WriteU8 (GetLength ());
+
+
+  m_coa.Serialize (buff_prefix);
+  i.Write (buff_prefix, 16);
 }
 
 uint32_t Ipv6MobilityOptionAlternateCareofAddressHeader::Deserialize (Buffer::Iterator start)
 {
   uint8_t buff[16];
   Buffer::Iterator i = start;
-  
-  SetType(i.ReadU8());
-  SetLength(i.ReadU8());
-  
-    
-  i.Read(buff, 16);
-  m_coa.Set(buff);
-  
-  return GetSerializedSize();
+
+  SetType (i.ReadU8 ());
+  SetLength (i.ReadU8 ());
+
+
+  i.Read (buff, 16);
+  m_coa.Set (buff);
+
+  return GetSerializedSize ();
 }
 
 MIPv6OptionHeader::Alignment Ipv6MobilityOptionAlternateCareofAddressHeader::GetAlignment () const
 {
-  return (Alignment){8,6}; //8n+6
+  return (Alignment){
+           8,6
+  };                       //8n+6
 }
 
-NS_OBJECT_ENSURE_REGISTERED(Ipv6MobilityOptionNonceIndicesHeader);
+NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityOptionNonceIndicesHeader);
 
 TypeId Ipv6MobilityOptionNonceIndicesHeader::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityOptionNonceIndicesHeader")
     .SetParent<MIPv6OptionHeader> ()
     .AddConstructor<Ipv6MobilityOptionNonceIndicesHeader> ()
-    ;
+  ;
   return tid;
 }
 
@@ -403,87 +408,89 @@ TypeId Ipv6MobilityOptionNonceIndicesHeader::GetInstanceTypeId () const
   return GetTypeId ();
 }
 
-Ipv6MobilityOptionNonceIndicesHeader::Ipv6MobilityOptionNonceIndicesHeader()
+Ipv6MobilityOptionNonceIndicesHeader::Ipv6MobilityOptionNonceIndicesHeader ()
 {
-  SetType(MIPv6Header::IPV6_MOBILITY_OPT_NONCE_INDICES);
-  SetLength(4);
-  
+  SetType (MIPv6Header::IPV6_MOBILITY_OPT_NONCE_INDICES);
+  SetLength (4);
+
   m_homenonceindex = 0;
   m_careofnonceindex = 0;
 }
 
-Ipv6MobilityOptionNonceIndicesHeader::~Ipv6MobilityOptionNonceIndicesHeader()
+Ipv6MobilityOptionNonceIndicesHeader::~Ipv6MobilityOptionNonceIndicesHeader ()
 {
 }
 
-uint16_t Ipv6MobilityOptionNonceIndicesHeader::GetHomeNonceIndex() const
+uint16_t Ipv6MobilityOptionNonceIndicesHeader::GetHomeNonceIndex () const
 {
   return m_homenonceindex;
 }
 
-void Ipv6MobilityOptionNonceIndicesHeader::SetHomeNonceIndex(uint16_t hi)
+void Ipv6MobilityOptionNonceIndicesHeader::SetHomeNonceIndex (uint16_t hi)
 {
   m_homenonceindex = hi;
 }
 
-uint16_t Ipv6MobilityOptionNonceIndicesHeader::GetCareOfNonceIndex() const
+uint16_t Ipv6MobilityOptionNonceIndicesHeader::GetCareOfNonceIndex () const
 {
   return m_careofnonceindex;
 }
 
-void Ipv6MobilityOptionNonceIndicesHeader::SetCareOfNonceIndex(uint16_t coi)
+void Ipv6MobilityOptionNonceIndicesHeader::SetCareOfNonceIndex (uint16_t coi)
 {
   m_careofnonceindex = coi;
 }
 
 void Ipv6MobilityOptionNonceIndicesHeader::Print (std::ostream& os) const
 {
-  os << "( type=" << (uint32_t)GetType() << ", length(excluding TL)=" << (uint32_t)GetLength() << ", home_index=" << (uint16_t)GetHomeNonceIndex() <<", care_of_index=" << (uint16_t)GetCareOfNonceIndex() << ")";
+  os << "( type=" << (uint32_t)GetType () << ", length(excluding TL)=" << (uint32_t)GetLength () << ", home_index=" << (uint16_t)GetHomeNonceIndex () << ", care_of_index=" << (uint16_t)GetCareOfNonceIndex () << ")";
 }
 
 uint32_t Ipv6MobilityOptionNonceIndicesHeader::GetSerializedSize () const
 {
-  return GetLength() + 2;
+  return GetLength () + 2;
 }
 
 void Ipv6MobilityOptionNonceIndicesHeader::Serialize (Buffer::Iterator start) const
 {
   Buffer::Iterator i = start;
 
-  i.WriteU8(GetType());
-  i.WriteU8(GetLength());
-  
-  i.WriteU16(m_homenonceindex);
-  i.WriteU16(m_careofnonceindex);
+  i.WriteU8 (GetType ());
+  i.WriteU8 (GetLength ());
+
+  i.WriteU16 (m_homenonceindex);
+  i.WriteU16 (m_careofnonceindex);
 }
 
 uint32_t Ipv6MobilityOptionNonceIndicesHeader::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
-  
-  SetType(i.ReadU8());
-  SetLength(i.ReadU8());
-  
-  m_homenonceindex = i.ReadU16();
-  m_careofnonceindex = i.ReadU16();
-  
-  return GetSerializedSize();
+
+  SetType (i.ReadU8 ());
+  SetLength (i.ReadU8 ());
+
+  m_homenonceindex = i.ReadU16 ();
+  m_careofnonceindex = i.ReadU16 ();
+
+  return GetSerializedSize ();
 }
 
 
 MIPv6OptionHeader::Alignment Ipv6MobilityOptionNonceIndicesHeader::GetAlignment () const
 {
-  return (Alignment){2,0}; //2n
+  return (Alignment){
+           2,0
+  };                       //2n
 }
 
-NS_OBJECT_ENSURE_REGISTERED(Ipv6MobilityOptionBindingAuthorizationDataHeader);
+NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityOptionBindingAuthorizationDataHeader);
 
 TypeId Ipv6MobilityOptionBindingAuthorizationDataHeader::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityOptionBindingAuthorizationDataHeader")
     .SetParent<MIPv6OptionHeader> ()
     .AddConstructor<Ipv6MobilityOptionBindingAuthorizationDataHeader> ()
-    ;
+  ;
   return tid;
 }
 
@@ -492,25 +499,25 @@ TypeId Ipv6MobilityOptionBindingAuthorizationDataHeader::GetInstanceTypeId () co
   return GetTypeId ();
 }
 
-Ipv6MobilityOptionBindingAuthorizationDataHeader::Ipv6MobilityOptionBindingAuthorizationDataHeader()
+Ipv6MobilityOptionBindingAuthorizationDataHeader::Ipv6MobilityOptionBindingAuthorizationDataHeader ()
 {
-  SetType(MIPv6Header::IPV6_MOBILITY_OPT_BINDING_AUTHORIZATION_DATA);
-  SetLength(8);
-  
+  SetType (MIPv6Header::IPV6_MOBILITY_OPT_BINDING_AUTHORIZATION_DATA);
+  SetLength (8);
+
   m_auth = 0;
 }
 
 
-Ipv6MobilityOptionBindingAuthorizationDataHeader::~Ipv6MobilityOptionBindingAuthorizationDataHeader()
+Ipv6MobilityOptionBindingAuthorizationDataHeader::~Ipv6MobilityOptionBindingAuthorizationDataHeader ()
 {
 }
 
-uint64_t Ipv6MobilityOptionBindingAuthorizationDataHeader::GetAuthenticator() const
+uint64_t Ipv6MobilityOptionBindingAuthorizationDataHeader::GetAuthenticator () const
 {
   return m_auth;
 }
 
-void Ipv6MobilityOptionBindingAuthorizationDataHeader::SetAuthenticator(uint64_t auth)
+void Ipv6MobilityOptionBindingAuthorizationDataHeader::SetAuthenticator (uint64_t auth)
 {
   m_auth = auth;
 }
@@ -518,40 +525,42 @@ void Ipv6MobilityOptionBindingAuthorizationDataHeader::SetAuthenticator(uint64_t
 
 void Ipv6MobilityOptionBindingAuthorizationDataHeader::Print (std::ostream& os) const
 {
-  os << "( type=" << (uint32_t)GetType() << ", length(excluding TL)=" << (uint32_t)GetLength() << ", Authenticator=" << (uint64_t)GetAuthenticator() << ")";
+  os << "( type=" << (uint32_t)GetType () << ", length(excluding TL)=" << (uint32_t)GetLength () << ", Authenticator=" << (uint64_t)GetAuthenticator () << ")";
 }
 
 uint32_t Ipv6MobilityOptionBindingAuthorizationDataHeader::GetSerializedSize () const
 {
-  return GetLength()+2;
+  return GetLength () + 2;
 }
 
 void Ipv6MobilityOptionBindingAuthorizationDataHeader::Serialize (Buffer::Iterator start) const
 {
   Buffer::Iterator i = start;
 
-  i.WriteU8(GetType());
-  i.WriteU8(GetLength());
-  
-  i.WriteU64(m_auth);
+  i.WriteU8 (GetType ());
+  i.WriteU8 (GetLength ());
+
+  i.WriteU64 (m_auth);
 }
 
 uint32_t Ipv6MobilityOptionBindingAuthorizationDataHeader::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
-  
-  SetType(i.ReadU8());
-  SetLength(i.ReadU8());
-  
-  m_auth = i.ReadU64();
-  
-  return GetSerializedSize();
+
+  SetType (i.ReadU8 ());
+  SetLength (i.ReadU8 ());
+
+  m_auth = i.ReadU64 ();
+
+  return GetSerializedSize ();
 }
 
 
 MIPv6OptionHeader::Alignment Ipv6MobilityOptionBindingAuthorizationDataHeader::GetAlignment () const
 {
-  return (Alignment){8,2}; //8n+2
+  return (Alignment){
+           8,2
+  };                       //8n+2
 }
 
 

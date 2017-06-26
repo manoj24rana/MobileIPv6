@@ -40,7 +40,6 @@ namespace ns3 {
 class TunnelNetDevice : public NetDevice
 {
 public:
-
   static TypeId GetTypeId (void);
   TunnelNetDevice ();
 
@@ -74,16 +73,16 @@ public:
    * \return whether the MTU value was within legal bounds
    */
   bool SetMtu (const uint16_t mtu);
-  
-  Ipv6Address GetLocalAddress() const;
-  void SetLocalAddress(Ipv6Address laddr);
-  
-  Ipv6Address GetRemoteAddress() const;
-  void SetRemoteAddress(Ipv6Address raddr);
-  
-  void IncreaseRefCount();
-  void DecreaseRefCount();
-  uint32_t GetRefCount() const;
+
+  Ipv6Address GetLocalAddress () const;
+  void SetLocalAddress (Ipv6Address laddr);
+
+  Ipv6Address GetRemoteAddress () const;
+  void SetRemoteAddress (Ipv6Address raddr);
+
+  void IncreaseRefCount ();
+  void DecreaseRefCount ();
+  uint32_t GetRefCount () const;
 
   /**
    * \param packet packet sent from below up to Network Device
@@ -102,8 +101,8 @@ public:
 
 
   // inherited from NetDevice base class.
-  virtual void SetIfIndex(const uint32_t index);
-  virtual uint32_t GetIfIndex(void) const;
+  virtual void SetIfIndex (const uint32_t index);
+  virtual uint32_t GetIfIndex (void) const;
   virtual Ptr<Channel> GetChannel (void) const;
   virtual void SetAddress (Address address);
   virtual Address GetAddress (void) const;
@@ -127,11 +126,9 @@ public:
   virtual bool IsBridge (void) const;
 
 protected:
-
   virtual void DoDispose (void);
 
 private:
-
   Address m_myAddress;
   TracedCallback<Ptr<const Packet> > m_macRxTrace;
   TracedCallback<Ptr<const Packet> > m_macTxTrace;
@@ -147,13 +144,13 @@ private:
   bool m_needsArp;
   bool m_supportsSendFrom;
   bool m_isPointToPoint;
-  
+
   Ipv6Address m_localAddress;
   Ipv6Address m_remoteAddress;
   uint32_t m_refCount;
 };
 
-}; // namespace ns3
+}  // namespace ns3
 
 #endif /* TUNNEL_NET_DEVICE_H */
 

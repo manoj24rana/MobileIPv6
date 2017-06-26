@@ -42,235 +42,242 @@ using namespace std;
 
 NS_LOG_COMPONENT_DEFINE ("mipv6HA");
 
-namespace ns3
-{
+namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (mipv6HA);
 
 mipv6HA::mipv6HA ()
-: m_bCache (0)
+  : m_bCache (0)
 {
 }
 
 mipv6HA::~mipv6HA ()
 {
-m_bCache = 0;
+  m_bCache = 0;
 }
 
 void mipv6HA::NotifyNewAggregate ()
 {
-  if(GetNode () == 0)
+  if (GetNode () == 0)
     {
       Ptr<Node> node = this->GetObject<Node> ();
-      m_bCache = CreateObject<BCache> ();	    
-      
+      m_bCache = CreateObject<BCache> ();
+
       SetNode (node);
       m_bCache->SetNode (node);
       Ptr<Icmpv6L4Protocol> icmpv6l4 = node->GetObject<Icmpv6L4Protocol> ();
       Ptr<Ipv6L3Protocol> ipv6 = node->GetObject<Ipv6L3Protocol> ();
-      icmpv6l4->SetDADCallback(MakeCallback(&mipv6HA::DADFailureIndication, this));
-      icmpv6l4->SetNSCallback(MakeCallback(&mipv6HA::IsAddress, this));
-      icmpv6l4->SetHandleNSCallback(MakeCallback(&mipv6HA::HandleNS, this));
-      ipv6->SetNSCallback2(MakeCallback(&mipv6HA::IsAddress2, this));
+      icmpv6l4->SetDADCallback (MakeCallback (&mipv6HA::DADFailureIndication, this));
+      icmpv6l4->SetNSCallback (MakeCallback (&mipv6HA::IsAddress, this));
+      icmpv6l4->SetHandleNSCallback (MakeCallback (&mipv6HA::HandleNS, this));
+      ipv6->SetNSCallback2 (MakeCallback (&mipv6HA::IsAddress2, this));
     }
-    
+
   mipv6Agent::NotifyNewAggregate ();
 }
 
-void mipv6HA::DADFailureIndication(Ipv6Address addr)
+void mipv6HA::DADFailureIndication (Ipv6Address addr)
 {
-BCache::Entry *bce = m_bCache->Lookup (addr);
-if(bce)
-bce->SetState(BCache::Entry::INVALID);
+  BCache::Entry *bce = m_bCache->Lookup (addr);
+  if (bce)
+    {
+      bce->SetState (BCache::Entry::INVALID);
+    }
 }
 
-bool mipv6HA::IsAddress(Ipv6Address addr)
+bool mipv6HA::IsAddress (Ipv6Address addr)
 {
-BCache::Entry *bce = m_bCache->Lookup (addr);
-if(bce)
-return true;
-return false;
+  BCache::Entry *bce = m_bCache->Lookup (addr);
+  if (bce)
+    {
+      return true;
+    }
+  return false;
 }
 
-bool mipv6HA::IsAddress2(Ipv6Address addr)
+bool mipv6HA::IsAddress2 (Ipv6Address addr)
 {
-return m_bCache->LookupSHoa (addr);
+  return m_bCache->LookupSHoa (addr);
 }
 
-Ptr<Packet> mipv6HA::BuildBA(Ipv6MobilityBindingUpdateHeader bu,Ipv6Address hoa, uint8_t status) 
+Ptr<Packet> mipv6HA::BuildBA (Ipv6MobilityBindingUpdateHeader bu,Ipv6Address hoa, uint8_t status)
 {
   NS_LOG_FUNCTION (this << status << "BUILD BACK");
-  
-   Ptr<Packet> p = Create<Packet> ();
+
+  Ptr<Packet> p = Create<Packet> ();
 
   Ipv6MobilityBindingAckHeader ba;
   Ipv6ExtensionType2RoutingHeader type2extn;
-  
-  type2extn.SetReserved(0);
-  type2extn.SetHomeAddress(hoa);
+
+  type2extn.SetReserved (0);
+  type2extn.SetHomeAddress (hoa);
   ba.SetSequence (bu.GetSequence ());
   ba.SetFlagK (true);
   ba.SetStatus (status);
   ba.SetLifetime ((uint16_t)MIPv6L4Protocol::MAX_BINDING_LIFETIME);
-  p->AddHeader(type2extn);
+  p->AddHeader (type2extn);
   p->AddHeader (ba);
-  
+
   return p;
 }
 
 
-uint8_t mipv6HA::HandleBU(Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
+uint8_t mipv6HA::HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
 {
   NS_LOG_FUNCTION (this << packet << src << dst << interface);
-  uint32_t r=interface->GetNAddresses ();
- for(uint32_t s=0;s<r;s++)
-{
-Ipv6Address addr = (interface->GetAddress(s)).GetAddress ();
-NS_LOG_FUNCTION("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII" << addr);
-}
+  uint32_t r = interface->GetNAddresses ();
+  for (uint32_t s = 0; s < r; s++)
+    {
+      Ipv6Address addr = (interface->GetAddress (s)).GetAddress ();
+      NS_LOG_FUNCTION ("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII" << addr);
+    }
 
   Ptr<Packet> p = packet->Copy ();
-  
+
   Ipv6MobilityBindingUpdateHeader bu;
   p->RemoveHeader (bu);
-  
+
   Ipv6ExtensionDestinationHeader dest;
   p->RemoveHeader (dest);
 
   Buffer buf;
-  
+
   Buffer::Iterator start;
-  buf=dest.GetOptionBuffer();
-  start=buf.Begin();
+  buf = dest.GetOptionBuffer ();
+  start = buf.Begin ();
   Ipv6HomeAddressOptionHeader homopt;
-  homopt.Deserialize(start);
+  homopt.Deserialize (start);
   Ipv6Address homeaddr;
-  homeaddr=homopt.GetHomeAddress();
+  homeaddr = homopt.GetHomeAddress ();
 
   Ptr<MIPv6Demux> ipv6MobilityDemux = GetNode ()->GetObject<MIPv6Demux> ();
   NS_ASSERT (ipv6MobilityDemux);
-  
+
   Ptr<MIPv6Mobility> ipv6Mobility = ipv6MobilityDemux->GetMobility (bu.GetMhType ());
   NS_ASSERT (ipv6Mobility);
-  
+
 
   uint8_t errStatus = 0;
   BCache::Entry *bce = 0;
   BCache::Entry *bce2 = 0;
-  
+
   //bool delayedRegister = false;
 
-  bce2=new BCache::Entry(m_bCache); 
-  bce2->SetCoa(src);
-  bce2->SetHoa(homeaddr);
-  bce2->SetState(BCache::Entry::PREFERRED);
-  bce2->SetHA(dst);
-  bce2->SetSolicitedHoA(Ipv6Address::MakeSolicitedAddress (homeaddr));
-  bce2->SetLastBindingUpdateSequence(bu.GetSequence());
-  bce2->SetLastBindingUpdateTime(Time(bu.GetLifetime()));
+  bce2 = new BCache::Entry (m_bCache);
+  bce2->SetCoa (src);
+  bce2->SetHoa (homeaddr);
+  bce2->SetState (BCache::Entry::PREFERRED);
+  bce2->SetHA (dst);
+  bce2->SetSolicitedHoA (Ipv6Address::MakeSolicitedAddress (homeaddr));
+  bce2->SetLastBindingUpdateSequence (bu.GetSequence ());
+  bce2->SetLastBindingUpdateTime (Time (bu.GetLifetime ()));
   errStatus = MIPv6Header::BA_STATUS_BINDING_UPDATE_ACCEPTED;
-  bce2->MarkReachable();  
-  
+  bce2->MarkReachable ();
+
 
   Ptr<Packet> ba;
   ba = BuildBA (bu, homeaddr, errStatus);
 
   bce = m_bCache->Lookup (homeaddr);
 
-  if (src.IsEqual(homeaddr))
-   {
-     if (bce)
-      {
+  if (src.IsEqual (homeaddr))
+    {
+      if (bce)
+        {
+          ClearTunnelAndRouting (bce);
+          m_bCache->Remove (bce);
+        }
+      free (bce2);
+      if (bu.GetFlagA ())
+        {
+          SendMessage (ba, src, 64);
+        }
+      return 0;
+    }
+
+
+  if (bce)
+    {
       ClearTunnelAndRouting (bce);
-      m_bCache->Remove(bce);
-      }
-     free(bce2);
-     if(bu.GetFlagA())
-     SendMessage (ba, src, 64);
-     return 0;
-   }
+      m_bCache->Remove (bce);
 
 
-  if(bce)
-  {
-  ClearTunnelAndRouting (bce); 
-  m_bCache->Remove(bce);
 
 
-     
+      m_bCache->Add (bce2);
 
-     m_bCache->Add(bce2);
+      if (bu.GetFlagA ())
+        {
+          SendMessage (ba, src, 64);
+          SetupTunnelAndRouting (bce2);
+        }
 
-     if(bu.GetFlagA())
-      {
-      SendMessage (ba, src, 64);
-      SetupTunnelAndRouting (bce2);
-      }
+      return 0;
 
-    return 0;
-    
 
-  }
+    }
 
   else
-  {
-  if(bu.GetFlagA())
-   {
-    m_bCache->Add(bce2);
-    Simulator::Schedule (Seconds (0.), &mipv6HA::DoDADForOffLinkAddress, this, homeaddr, interface);
-    Simulator::Schedule (Seconds (1.), &mipv6HA::FunctionDadTimeoutForOffLinkAddress, this, interface , ba, homeaddr);  
-   }
-   return 0;
-  }
+    {
+      if (bu.GetFlagA ())
+        {
+          m_bCache->Add (bce2);
+          Simulator::Schedule (Seconds (0.), &mipv6HA::DoDADForOffLinkAddress, this, homeaddr, interface);
+          Simulator::Schedule (Seconds (1.), &mipv6HA::FunctionDadTimeoutForOffLinkAddress, this, interface, ba, homeaddr);
+        }
+      return 0;
+    }
 
 
 
 }
 
-std::list<Ipv6Address> mipv6HA::HomeAgentAddressList()
+std::list<Ipv6Address> mipv6HA::HomeAgentAddressList ()
 {
-NS_LOG_FUNCTION (this);
-std::list<Ipv6Address> HaaList;
-uint32_t ndevices=GetNode()->GetNDevices();
-Ptr<Ipv6L3Protocol> ipv6proto = GetNode()->GetObject<Ipv6L3Protocol> ();
-Ipv6InterfaceAddress ipv6Addr;
-Ipv6Address addr;
-for(uint32_t i=0; i< ndevices; i++)
- {
-   Ptr<Ipv6Interface> in = ipv6proto->GetInterface (i);
-   for(uint32_t j=0; j<in->GetNAddresses();j++)
+  NS_LOG_FUNCTION (this);
+  std::list<Ipv6Address> HaaList;
+  uint32_t ndevices = GetNode ()->GetNDevices ();
+  Ptr<Ipv6L3Protocol> ipv6proto = GetNode ()->GetObject<Ipv6L3Protocol> ();
+  Ipv6InterfaceAddress ipv6Addr;
+  Ipv6Address addr;
+  for (uint32_t i = 0; i < ndevices; i++)
     {
-     ipv6Addr=in->GetAddress(j);
-     addr=ipv6Addr.GetAddress();
-     if(!addr.IsLocalhost() && !addr.IsLinkLocal())
-      HaaList.push_back (addr);
+      Ptr<Ipv6Interface> in = ipv6proto->GetInterface (i);
+      for (uint32_t j = 0; j < in->GetNAddresses (); j++)
+        {
+          ipv6Addr = in->GetAddress (j);
+          addr = ipv6Addr.GetAddress ();
+          if (!addr.IsLocalhost () && !addr.IsLinkLocal ())
+            {
+              HaaList.push_back (addr);
+            }
+        }
     }
-  }
-m_bCache->SetHomePrefixes(HaaList);
-return HaaList;
+  m_bCache->SetHomePrefixes (HaaList);
+  return HaaList;
 }
 
 bool mipv6HA::SetupTunnelAndRouting (BCache::Entry *bce)
 {
   NS_LOG_FUNCTION (this << bce);
-  
+
   //create tunnel
   Ptr<Ipv6TunnelL4Protocol> th = GetNode ()->GetObject<Ipv6TunnelL4Protocol> ();
   NS_ASSERT (th);
-  
+
   uint16_t tunnelIf = th->AddTunnel (bce->GetCoa ());
-  
+
   bce->SetTunnelIfIndex (tunnelIf);
-  
+
   //routing setup by static routing protocol
   Ipv6StaticRoutingHelper staticRoutingHelper;
   Ptr<Ipv6> ipv6 = GetNode ()->GetObject<Ipv6> ();
-  
+
   Ptr<Ipv6StaticRouting> staticRouting = staticRoutingHelper.GetStaticRouting (ipv6);
-  
-  staticRouting->AddHostRouteTo (bce->GetHoa(), bce->GetTunnelIfIndex(),10);
-  staticRouting->RemoveRoute ("fe80::", Ipv6Prefix (64), bce->GetTunnelIfIndex(), "fe80::");
-    
+
+  staticRouting->AddHostRouteTo (bce->GetHoa (), bce->GetTunnelIfIndex (),10);
+  staticRouting->RemoveRoute ("fe80::", Ipv6Prefix (64), bce->GetTunnelIfIndex (), "fe80::");
+
   return true;
 }
 
@@ -278,22 +285,22 @@ bool mipv6HA::SetupTunnelAndRouting (BCache::Entry *bce)
 bool mipv6HA::ClearTunnelAndRouting (BCache::Entry *bce)
 {
   NS_LOG_FUNCTION (this << bce);
-  
+
   //routing setup by static routing protocol
   Ipv6StaticRoutingHelper staticRoutingHelper;
   Ptr<Ipv6> ipv6 = GetNode ()->GetObject<Ipv6> ();
-  
-  
+
+
   Ptr<Ipv6StaticRouting> staticRouting = staticRoutingHelper.GetStaticRouting (ipv6);
-  
-  staticRouting->RemoveRoute (bce->GetHoa(), Ipv6Prefix (64), bce->GetTunnelIfIndex(), bce->GetHoa());
-    
+
+  staticRouting->RemoveRoute (bce->GetHoa (), Ipv6Prefix (64), bce->GetTunnelIfIndex (), bce->GetHoa ());
+
   //create tunnel
   Ptr<Ipv6TunnelL4Protocol> th = GetNode ()->GetObject<Ipv6TunnelL4Protocol> ();
   NS_ASSERT (th);
-  
+
   th->RemoveTunnel (bce->GetCoa ());
-  
+
   bce->SetTunnelIfIndex (-1);
   return true;
 }
@@ -302,8 +309,8 @@ void mipv6HA::DoDADForOffLinkAddress (Ipv6Address target, Ptr<Ipv6Interface> int
 {
   NS_LOG_FUNCTION (this << target << interface);
   Ipv6Address addr;
-  Ptr<Ipv6L3Protocol> ipv6 =GetNode()->GetObject<Ipv6L3Protocol> ();
-  Ptr<Icmpv6L4Protocol> icmp =GetNode()->GetObject<Icmpv6L4Protocol> ();
+  Ptr<Ipv6L3Protocol> ipv6 = GetNode ()->GetObject<Ipv6L3Protocol> ();
+  Ptr<Icmpv6L4Protocol> icmp = GetNode ()->GetObject<Icmpv6L4Protocol> ();
 
   NS_ASSERT (ipv6);
 
@@ -319,14 +326,16 @@ void mipv6HA::DoDADForOffLinkAddress (Ipv6Address target, Ptr<Ipv6Interface> int
 
 void mipv6HA::FunctionDadTimeoutForOffLinkAddress (Ptr<Ipv6Interface> interface, Ptr<Packet> ba, Ipv6Address homeaddr)
 {
-if (m_bCache->Lookup (homeaddr)->GetState()!= BCache::Entry::INVALID)
-SendMessage (ba, m_bCache->Lookup (homeaddr)->GetCoa(), 64);
-SetupTunnelAndRouting (m_bCache->Lookup (homeaddr));
+  if (m_bCache->Lookup (homeaddr)->GetState () != BCache::Entry::INVALID)
+    {
+      SendMessage (ba, m_bCache->Lookup (homeaddr)->GetCoa (), 64);
+    }
+  SetupTunnelAndRouting (m_bCache->Lookup (homeaddr));
 }
 
-void mipv6HA::HandleNS(Ptr<Packet> packet, Ptr<Ipv6Interface> interface, Ipv6Address src, Ipv6Address target)
+void mipv6HA::HandleNS (Ptr<Packet> packet, Ptr<Ipv6Interface> interface, Ipv6Address src, Ipv6Address target)
 {
-  Ipv6InterfaceAddress ifaddr(target);
+  Ipv6InterfaceAddress ifaddr (target);
 
   if (packet->GetUid () == ifaddr.GetNsDadUid ())
     {
@@ -338,7 +347,7 @@ void mipv6HA::HandleNS(Ptr<Packet> packet, Ptr<Ipv6Interface> interface, Ipv6Add
   Icmpv6OptionLinkLayerAddress lla (1);
   Address hardwareAddress;
   NdiscCache::Entry* entry = 0;
-  Ptr<Icmpv6L4Protocol> icmp =GetNode()->GetObject<Icmpv6L4Protocol> ();
+  Ptr<Icmpv6L4Protocol> icmp = GetNode ()->GetObject<Icmpv6L4Protocol> ();
   Ptr<NdiscCache> cache = icmp->GetCache (interface->GetDevice ());
   uint8_t flags = 0;
 
@@ -379,7 +388,7 @@ void mipv6HA::HandleNS(Ptr<Packet> packet, Ptr<Ipv6Interface> interface, Ipv6Add
     }
 
   /* send a NA to src */
-  Ptr<Ipv6L3Protocol> ipv6 = GetNode()->GetObject<Ipv6L3Protocol> ();
+  Ptr<Ipv6L3Protocol> ipv6 = GetNode ()->GetObject<Ipv6L3Protocol> ();
 
   if (ipv6->IsForwarding (ipv6->GetInterfaceForDevice (interface->GetDevice ())))
     {
@@ -387,7 +396,7 @@ void mipv6HA::HandleNS(Ptr<Packet> packet, Ptr<Ipv6Interface> interface, Ipv6Add
     }
 
   hardwareAddress = interface->GetDevice ()->GetAddress ();
-  BCache::Entry *bce=m_bCache->Lookup (target);
+  BCache::Entry *bce = m_bCache->Lookup (target);
 
 
 
@@ -409,7 +418,7 @@ void mipv6HA::HandleNS(Ptr<Packet> packet, Ptr<Ipv6Interface> interface, Ipv6Add
     {
       na.SetFlagO (true);
     }
-  if ((flags & 2) && bce->GetHA() != Ipv6Address::GetAny ())
+  if ((flags & 2) && bce->GetHA () != Ipv6Address::GetAny ())
     {
       na.SetFlagS (true);
     }
@@ -418,10 +427,10 @@ void mipv6HA::HandleNS(Ptr<Packet> packet, Ptr<Ipv6Interface> interface, Ipv6Add
       na.SetFlagR (true);
     }
 
-  na.CalculatePseudoHeaderChecksum (bce->GetHA(), src, p->GetSize () + na.GetSerializedSize (), Icmpv6L4Protocol::PROT_NUMBER);
+  na.CalculatePseudoHeaderChecksum (bce->GetHA (), src, p->GetSize () + na.GetSerializedSize (), Icmpv6L4Protocol::PROT_NUMBER);
   p->AddHeader (na);
 
-  ipHeader.SetSourceAddress (bce->GetHA());
+  ipHeader.SetSourceAddress (bce->GetHA ());
   ipHeader.SetDestinationAddress (src);
   ipHeader.SetNextHeader (Icmpv6L4Protocol::PROT_NUMBER);
   ipHeader.SetPayloadLength (p->GetSize ());
@@ -435,8 +444,8 @@ void mipv6HA::HandleNS(Ptr<Packet> packet, Ptr<Ipv6Interface> interface, Ipv6Add
 
 
 
-  
-  NdiscCache::Ipv6PayloadHeaderPair pi(p, ipHeader);
+
+  NdiscCache::Ipv6PayloadHeaderPair pi (p, ipHeader);
   interface->Send (pi.first, pi.second, src.IsAny () ? Ipv6Address::GetAllNodesMulticast () : src);
 
   /* not a NS for us discard it */

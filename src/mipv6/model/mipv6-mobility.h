@@ -27,8 +27,7 @@
 #include "ns3/ipv6-address.h"
 #include "ns3/ipv6-interface.h"
 
-namespace ns3
-{
+namespace ns3 {
 
 class MIPv6OptionBundle;
 /**
@@ -46,26 +45,26 @@ public:
    * \return type identificator
    */
   static TypeId GetTypeId (void);
-  
+
   /**
    * \brief Destructor.
    */
   virtual ~MIPv6Mobility ();
-  
+
   /**
    * \brief Set the node.
    * \param node the node to set
    */
   void SetNode (Ptr<Node> node);
-  
-  Ptr<Node> GetNode() const;
-  
+
+  Ptr<Node> GetNode () const;
+
   /**
    * \brief Get the option number.
    * \return option number
    */
   virtual uint8_t GetMobilityNumber () const = 0;
-  
+
   /**
    * \brief Process method
    *
@@ -75,9 +74,9 @@ public:
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface) = 0;
-  
+
   virtual uint8_t ProcessOptions (Ptr<Packet> packet, uint8_t offset, uint8_t length, MIPv6OptionBundle &bundle);
-  
+
 private:
   /**
    * \brief The node.
@@ -96,24 +95,24 @@ class Ipv6MobilityBindingUpdate : public MIPv6Mobility
 {
 public:
   static const uint8_t MOB_NUMBER = 5;
-  
+
   /**
    * \brief Get the type identificator.
    * \return type identificator
    */
   static TypeId GetTypeId (void);
-  
+
   /**
    * \brief Destructor.
    */
   virtual ~Ipv6MobilityBindingUpdate ();
-  
+
   /**
    * \brief Get the option number.
    * \return option number
    */
   virtual uint8_t GetMobilityNumber () const;
-  
+
   /**
    * \brief Process method
    *
@@ -123,9 +122,8 @@ public:
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface);
-  
-private:
 
+private:
 };
 
 /**
@@ -145,18 +143,18 @@ public:
    * \return type identificator
    */
   static TypeId GetTypeId (void);
-  
+
   /**
    * \brief Destructor.
    */
   virtual ~Ipv6MobilityBindingAck ();
-  
+
   /**
    * \brief Get the option number.
    * \return option number
    */
   virtual uint8_t GetMobilityNumber () const;
-  
+
   /**
    * \brief Process method
    *
@@ -166,9 +164,8 @@ public:
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface);
-  
-private:
 
+private:
 };
 
 class Ipv6MobilityHoTI : public MIPv6Mobility
@@ -181,18 +178,18 @@ public:
    * \return type identificator
    */
   static TypeId GetTypeId (void);
-  
+
   /**
    * \brief Destructor.
    */
   virtual ~Ipv6MobilityHoTI ();
-  
+
   /**
    * \brief Get the option number.
    * \return option number
    */
   virtual uint8_t GetMobilityNumber () const;
-  
+
   /**
    * \brief Process method
    *
@@ -202,9 +199,8 @@ public:
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface);
-  
-private:
 
+private:
 };
 
 class Ipv6MobilityCoTI : public MIPv6Mobility
@@ -217,18 +213,18 @@ public:
    * \return type identificator
    */
   static TypeId GetTypeId (void);
-  
+
   /**
    * \brief Destructor.
    */
   virtual ~Ipv6MobilityCoTI ();
-  
+
   /**
    * \brief Get the option number.
    * \return option number
    */
   virtual uint8_t GetMobilityNumber () const;
-  
+
   /**
    * \brief Process method
    *
@@ -238,9 +234,8 @@ public:
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface);
-  
-private:
 
+private:
 };
 
 class Ipv6MobilityHoT : public MIPv6Mobility
@@ -253,18 +248,18 @@ public:
    * \return type identificator
    */
   static TypeId GetTypeId (void);
-  
+
   /**
    * \brief Destructor.
    */
   virtual ~Ipv6MobilityHoT ();
-  
+
   /**
    * \brief Get the option number.
    * \return option number
    */
   virtual uint8_t GetMobilityNumber () const;
-  
+
   /**
    * \brief Process method
    *
@@ -274,9 +269,8 @@ public:
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface);
-  
-private:
 
+private:
 };
 
 class Ipv6MobilityCoT : public MIPv6Mobility
@@ -289,18 +283,18 @@ public:
    * \return type identificator
    */
   static TypeId GetTypeId (void);
-  
+
   /**
    * \brief Destructor.
    */
   virtual ~Ipv6MobilityCoT ();
-  
+
   /**
    * \brief Get the option number.
    * \return option number
    */
   virtual uint8_t GetMobilityNumber () const;
-  
+
   /**
    * \brief Process method
    *
@@ -310,9 +304,8 @@ public:
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface);
-  
-private:
 
+private:
 };
 
 
@@ -326,20 +319,20 @@ public:
    * \return type identificator
    */
   static TypeId GetTypeId (void);
-  
+
   /**
    * \brief Destructor.
 
    */
   virtual ~Ipv6BindingRefreshRequest ();
-  
+
   /**
 
    * \brief Get the option number.
    * \return option number
    */
   virtual uint8_t GetMobilityNumber () const;
-  
+
   /**
    * \brief Process method
    *
@@ -350,9 +343,8 @@ public:
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface);
-  
-private:
 
+private:
 };
 
 class Ipv6BindingError : public MIPv6Mobility
@@ -365,18 +357,18 @@ public:
    * \return type identificator
    */
   static TypeId GetTypeId (void);
-  
+
   /**
    * \brief Destructor.
    */
   virtual ~Ipv6BindingError ();
-  
+
   /**
    * \brief Get the option number.
    * \return option number
    */
   virtual uint8_t GetMobilityNumber () const;
-  
+
   /**
    * \brief Process method
    *
@@ -386,9 +378,8 @@ public:
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface);
-  
-private:
 
+private:
 };
 
 } /* namespace ns3 */

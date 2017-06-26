@@ -26,56 +26,56 @@
 #include "mipv6-option-header.h"
 
 
-namespace ns3
-{
+namespace ns3 {
 
 //class Identifier;
 
 class MIPv6Header : public Header
 {
 public:
-   enum MhType_e
+  enum MhType_e
   {
-        HOME_TEST_INIT=1,
-        CARE_OF_TEST_INIT=2,
-        HOME_TEST=3,
-        CARE_OF_TEST=4,	
-        IPV6_MOBILITY_BINDING_UPDATE=5,
-	IPV6_MOBILITY_BINDING_ACKNOWLEDGEMENT=6,
-	IPv6_BINDING_REFRESH_REQUEST=7,
-	IPv6_BINDING_ERROR=8
+    HOME_TEST_INIT = 1,
+    CARE_OF_TEST_INIT = 2,
+    HOME_TEST = 3,
+    CARE_OF_TEST = 4,
+    IPV6_MOBILITY_BINDING_UPDATE = 5,
+    IPV6_MOBILITY_BINDING_ACKNOWLEDGEMENT = 6,
+    IPv6_BINDING_REFRESH_REQUEST = 7,
+    IPv6_BINDING_ERROR = 8
 
- };
-  enum BAStatus_e {
-        BA_STATUS_BINDING_UPDATE_ACCEPTED = 0,
-	BA_STATUS_PREFIX_DISCOVERY_NECESSARY,
-	BA_STATUS_REASON_UNSPECIFIED = 128,
-	BA_STATUS_ADMINISTRATIVELY_PROHIBITED,
-	BA_STATUS_INSUFFICIENT_RESOURCES = 130,
-
-
-	BA_STATUS_HOME_REGISTRATION_NOT_SUPPORTED,
-	BA_STATUS_NOT_HOME_SUBNET,
-	BA_STATUS_NOT_HA_FOR_THIS_MN,
-	BA_STATUS_DAD_FAILED,
-	BA_STATUS_SEQUENCE_NUMBER_OUT_OF_WINDOW,
-	BA_STATUS_EXPIRED_HOME_NONCE_INDEX,
-	BA_STATUS_EXPIRED_CARE_OF_NONCE_INDEX,
-	BA_STATUS_EXPIRED_NONCES,
-	BA_STATUS_REGISTRATION_TYPE_CHANGE_DISALLOWED,
-	BA_STATUS_INVALID_COA=174
-	
   };
-    enum OptionType_e
+  enum BAStatus_e
   {
-	IPV6_MOBILITY_OPT_PAD1 = 0,
-	IPV6_MOBILITY_OPT_PADN,
-	IPV6_MOBILITY_OPT_BINDING_REFRESH_ADVICE,
-	IPV6_MOBILITY_OPT_ALTERNATE_CARE_OF_ADDRESS,
-	IPV6_MOBILITY_OPT_NONCE_INDICES,
-	IPV6_MOBILITY_OPT_BINDING_AUTHORIZATION_DATA
-	
-	
+    BA_STATUS_BINDING_UPDATE_ACCEPTED = 0,
+    BA_STATUS_PREFIX_DISCOVERY_NECESSARY,
+    BA_STATUS_REASON_UNSPECIFIED = 128,
+    BA_STATUS_ADMINISTRATIVELY_PROHIBITED,
+    BA_STATUS_INSUFFICIENT_RESOURCES = 130,
+
+
+    BA_STATUS_HOME_REGISTRATION_NOT_SUPPORTED,
+    BA_STATUS_NOT_HOME_SUBNET,
+    BA_STATUS_NOT_HA_FOR_THIS_MN,
+    BA_STATUS_DAD_FAILED,
+    BA_STATUS_SEQUENCE_NUMBER_OUT_OF_WINDOW,
+    BA_STATUS_EXPIRED_HOME_NONCE_INDEX,
+    BA_STATUS_EXPIRED_CARE_OF_NONCE_INDEX,
+    BA_STATUS_EXPIRED_NONCES,
+    BA_STATUS_REGISTRATION_TYPE_CHANGE_DISALLOWED,
+    BA_STATUS_INVALID_COA = 174
+
+  };
+  enum OptionType_e
+  {
+    IPV6_MOBILITY_OPT_PAD1 = 0,
+    IPV6_MOBILITY_OPT_PADN,
+    IPV6_MOBILITY_OPT_BINDING_REFRESH_ADVICE,
+    IPV6_MOBILITY_OPT_ALTERNATE_CARE_OF_ADDRESS,
+    IPV6_MOBILITY_OPT_NONCE_INDICES,
+    IPV6_MOBILITY_OPT_BINDING_AUTHORIZATION_DATA
+
+
   };
 
   static TypeId GetTypeId ();
@@ -95,7 +95,7 @@ public:
    * \brief Destructor.
    */
   virtual ~MIPv6Header ();
-  
+
   /**
    * \brief Get the payload proto field.
    * \return payload proto (MUST BE 59)
@@ -156,10 +156,10 @@ public:
    */
   void SetChecksum (uint16_t checksum);
 
-    /**
-   * \brief Print informations.
-   * \param os output stream
-   */
+  /**
+ * \brief Print informations.
+ * \param os output stream
+ */
   virtual void Print (std::ostream& os) const;
 
   /**
@@ -191,20 +191,20 @@ private:
    * \brief The header length.
    */
   uint8_t m_header_len;
-  
-   /**
-   * \brief The MH type.
-   */
+
+  /**
+  * \brief The MH type.
+  */
   uint8_t m_mh_type;
-  
+
   /**
    * \brief Reserved.
    */
   uint8_t m_reserved;
 
-   /**
-   * \brief The checksum.
-   */
+  /**
+  * \brief The checksum.
+  */
   uint16_t m_checksum;
 
 };
@@ -273,7 +273,6 @@ public:
   Buffer GetOptionBuffer ();
 
 private:
-
   /**
    * \brief Calculate padding.
    * \param alignment alignment
@@ -292,7 +291,8 @@ private:
 };
 
 
-class Ipv6MobilityBindingUpdateHeader : public MIPv6Header, public MIPv6OptionField
+class Ipv6MobilityBindingUpdateHeader : public MIPv6Header,
+                                        public MIPv6OptionField
 {
 public:
   /**
@@ -333,76 +333,76 @@ public:
    * \brief Get the A flag.
    * \return A flag
    */
-  bool GetFlagA() const;
-  
+  bool GetFlagA () const;
+
   /**
    * \brief Set the A flag.
    * \param a value
    */
-  void SetFlagA(bool a);
+  void SetFlagA (bool a);
 
   /**
    * \brief Get the H flag.
    * \return H flag
    */
-  bool GetFlagH() const;
-  
+  bool GetFlagH () const;
+
   /**
    * \brief Set the H flag.
    * \param h value
    */
-  void SetFlagH(bool h);
+  void SetFlagH (bool h);
 
   /**
    * \brief Get the L flag.
    * \return L flag
    */
-  bool GetFlagL() const;
-  
+  bool GetFlagL () const;
+
   /**
    * \brief Set the L flag.
    * \param l value
    */
-  void SetFlagL(bool l);
+  void SetFlagL (bool l);
 
   /**
    * \brief Get the K flag.
    * \return K flag
    */
-  bool GetFlagK() const;
-  
+  bool GetFlagK () const;
+
   /**
    * \brief Set the K flag.
    * \param k value
    */
-  void SetFlagK(bool k);
-  
-  
+  void SetFlagK (bool k);
+
+
 
   /**
    * \brief Get the Reserved value.
    * \return Reserved value
    */
 
-  uint16_t GetReserved2() const;
-  
+  uint16_t GetReserved2 () const;
+
   /**
    * \brief Set the Reserved.
    * \param reserved reserved value
    */
-  void SetReserved2(uint16_t reserved2);
+  void SetReserved2 (uint16_t reserved2);
 
   /**
    * \brief Get the Lifetime value.
    * \return Lifetime
    */
-  uint16_t GetLifetime() const;
-  
+  uint16_t GetLifetime () const;
+
   /**
    * \brief Set the Lifetime.
    * \param lifetime lifetime value
    */
-  void SetLifetime(uint16_t lifetime);
+  void SetLifetime (uint16_t lifetime);
 
   /**
    * \brief Print informations.
@@ -430,7 +430,6 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start);
 
 private:
-
   /**
    * \brief The Sequence field
    */
@@ -474,7 +473,8 @@ private:
  * \class Ipv6MobilityBindingAckHeader
  * \brief Ipv6 Mobility Binding Acknowledgement header.
  */
-class Ipv6MobilityBindingAckHeader : public MIPv6Header, public MIPv6OptionField
+class Ipv6MobilityBindingAckHeader : public MIPv6Header,
+                                     public MIPv6OptionField
 {
 public:
   /**
@@ -510,18 +510,18 @@ public:
    * \param status the status value
    */
   void SetStatus (uint8_t status);
-  
+
   /**
    * \brief Get the K flag.
    * \return K flag
    */
-  bool GetFlagK() const;
-  
+  bool GetFlagK () const;
+
   /**
    * \brief Set the K flag.
    * \param k value
    */
-  void SetFlagK(bool k);
+  void SetFlagK (bool k);
 
   /**
    * \brief Get the P flag.
@@ -535,7 +535,7 @@ public:
    * \param reserved2 the reserved2 value
    */
   void SetReserved2 (uint8_t reserved2);
-  
+
   /**
    * \brief Get the Sequence field.
    * \return sequence value
@@ -552,13 +552,13 @@ public:
    * \brief Get the Lifetime value.
    * \return Lifetime
    */
-  uint16_t GetLifetime() const;
-  
+  uint16_t GetLifetime () const;
+
   /**
    * \brief Set the Lifetime.
    * \param lifetime lifetime value
    */
-  void SetLifetime(uint16_t lifetime);
+  void SetLifetime (uint16_t lifetime);
 
   /**
    * \brief Print informations.
@@ -586,7 +586,6 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start);
 
 private:
-
   /**
    * \brief The status value.
    */
@@ -645,19 +644,19 @@ public:
    */
   virtual ~Ipv6HoTIHeader ();
 
-  uint16_t GetReserved2() const;
-  
+  uint16_t GetReserved2 () const;
+
   /**
    * \brief Set the Reserved.
    * \param reserved reserved value
    */
-  void SetReserved2(uint16_t reserved2);
+  void SetReserved2 (uint16_t reserved2);
 
-  uint64_t GetHomeInitCookie() const;
+  uint64_t GetHomeInitCookie () const;
 
-  void SetHomeInitCookie(uint64_t hicookie);
+  void SetHomeInitCookie (uint64_t hicookie);
 
-  
+
   virtual void Print (std::ostream& os) const;
 
   /**
@@ -681,8 +680,6 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start);
 
 private:
-
-  
   /**
    * \brief The reserved value.
    */
@@ -717,20 +714,20 @@ public:
    */
   virtual ~Ipv6CoTIHeader ();
 
-  uint16_t GetReserved2() const;
-  
+  uint16_t GetReserved2 () const;
+
   /**
    * \brief Set the Reserved.
    * \param reserved reserved value
    */
-  void SetReserved2(uint16_t reserved2);
+  void SetReserved2 (uint16_t reserved2);
 
-  uint64_t GetCareOfInitCookie() const;
+  uint64_t GetCareOfInitCookie () const;
 
-  void SetCareOfInitCookie(uint64_t coaicookie);
+  void SetCareOfInitCookie (uint64_t coaicookie);
 
 
-  
+
   virtual void Print (std::ostream& os) const;
 
   /**
@@ -753,8 +750,6 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start);
 
 private:
-
-  
   /**
    * \brief The reserved value.
    */
@@ -788,23 +783,23 @@ public:
    */
   virtual ~Ipv6HoTHeader ();
 
-  uint16_t GetHomeNonceIndex() const;
-  
+  uint16_t GetHomeNonceIndex () const;
+
   /**
    * \brief Set the Reserved.
    * \param reserved reserved value
    */
-  void SetHomeNonceIndex(uint16_t homenonceind);
+  void SetHomeNonceIndex (uint16_t homenonceind);
 
-  uint64_t GetHomeInitCookie() const;
+  uint64_t GetHomeInitCookie () const;
 
-  void SetHomeInitCookie(uint64_t homeinitcookie);
+  void SetHomeInitCookie (uint64_t homeinitcookie);
 
-  uint64_t GetHomeKeygenToken() const;
+  uint64_t GetHomeKeygenToken () const;
 
-  void SetHomeKeygenToken(uint64_t homekeygentoken);
+  void SetHomeKeygenToken (uint64_t homekeygentoken);
 
-  
+
   virtual void Print (std::ostream& os) const;
 
   /**
@@ -827,8 +822,6 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start);
 
 private:
-
-  
   /**
    * \brief The reserved value.
    */
@@ -863,24 +856,24 @@ public:
    */
   virtual ~Ipv6CoTHeader ();
 
-  uint16_t GetCareOfNonceIndex() const;
-  
+  uint16_t GetCareOfNonceIndex () const;
+
   /**
 
    * \brief Set the Reserved.
    * \param reserved reserved value
    */
-  void SetCareOfNonceIndex(uint16_t careofnonceind);
+  void SetCareOfNonceIndex (uint16_t careofnonceind);
 
-  uint64_t GetCareOfInitCookie() const;
+  uint64_t GetCareOfInitCookie () const;
 
-  void SetCareOfInitCookie(uint64_t careofinitcookie);
+  void SetCareOfInitCookie (uint64_t careofinitcookie);
 
-  uint64_t GetCareOfKeygenToken() const;
+  uint64_t GetCareOfKeygenToken () const;
 
-  void SetCareOfKeygenToken(uint64_t careofkeygentoken);
+  void SetCareOfKeygenToken (uint64_t careofkeygentoken);
 
-  
+
   virtual void Print (std::ostream& os) const;
 
   /**
@@ -903,8 +896,6 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start);
 
 private:
-
-  
   /**
    * \brief The reserved value.
    */
@@ -942,16 +933,16 @@ public:
    */
   virtual ~Ipv6BindingRefreshRequestHeader ();
 
-  uint16_t GetReserved2() const;
-  
+  uint16_t GetReserved2 () const;
+
   /**
    * \brief Set the Reserved.
 
    * \param reserved reserved value
    */
-  void SetReserved2(uint16_t reserved2);
+  void SetReserved2 (uint16_t reserved2);
 
-  
+
   virtual void Print (std::ostream& os) const;
 
   /**
@@ -976,8 +967,6 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start);
 
 private:
-
-  
   /**
    * \brief The reserved value.
    */
@@ -1011,22 +1000,22 @@ public:
   virtual ~Ipv6BindingErrorHeader ();
 
 
-  void SetStatus(uint8_t stat);
-  uint8_t GetStatus() const;
+  void SetStatus (uint8_t stat);
+  uint8_t GetStatus () const;
 
-  uint8_t GetReserved2() const;
-  
+  uint8_t GetReserved2 () const;
+
   /**
    * \brief Set the Reserved.
 
    * \param reserved reserved value
    */
-  void SetReserved2(uint8_t reserved2);
+  void SetReserved2 (uint8_t reserved2);
 
-  Ipv6Address GetHomeAddress() const;
-  void SetHomeAddress(Ipv6Address hoa);
+  Ipv6Address GetHomeAddress () const;
+  void SetHomeAddress (Ipv6Address hoa);
 
-  
+
   virtual void Print (std::ostream& os) const;
 
   /**
@@ -1049,7 +1038,6 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start);
 
 private:
-
   uint8_t m_status;
 
   /**

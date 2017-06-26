@@ -25,8 +25,7 @@
 #include "ns3/ipv6-address.h"
 #include "bcache.h"
 
-namespace ns3
-{
+namespace ns3 {
 
 class Node;
 class Packet;
@@ -54,17 +53,17 @@ public:
    * \param node the node to set
    */
   void SetNode (Ptr<Node> node);
-  
+
   /**
    * \brief Get the node.
    * \return node
    */
   Ptr<Node> GetNode (void);
-  
+
   virtual uint8_t Receive (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface);
-  
-  void SendMessage(Ptr<Packet> packet, Ipv6Address dst, uint32_t ttl);
-  
+
+  void SendMessage (Ptr<Packet> packet, Ipv6Address dst, uint32_t ttl);
+
 protected:
   virtual uint8_t HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface);
   virtual uint8_t HandleBA (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface);
@@ -77,14 +76,13 @@ protected:
    * \brief Dispose this object.
    */
   virtual void DoDispose ();
-  
+
 private:
-  uint8_t count;
   /**
    * \brief The node.
    */
   Ptr<Node> m_node;
-  
+
 };
 
 } /* namespace ns3 */

@@ -35,8 +35,7 @@ using namespace std;
 
 NS_LOG_COMPONENT_DEFINE ("mipv6Agent");
 
-namespace ns3
-{
+namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (mipv6Agent);
 
@@ -45,12 +44,12 @@ TypeId mipv6Agent::GetTypeId ()
   static TypeId tid = TypeId ("ns3::mipv6Agent")
     .SetParent<Object> ()
     .AddConstructor<mipv6Agent> ()
-    ;
+  ;
   return tid;
 }
 
 mipv6Agent::mipv6Agent ()
-  : count(0), m_node (0)
+  : m_node (0)
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
@@ -76,69 +75,69 @@ void mipv6Agent::SetNode (Ptr<Node> node)
 
 Ptr<Node> mipv6Agent::GetNode (void)
 {
-  NS_LOG_FUNCTION_NOARGS();
+  NS_LOG_FUNCTION_NOARGS ();
   return m_node;
 }
 uint8_t mipv6Agent::Receive (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
 {
   //NS_LOG_FUNCTION ( this << packet << src << dst << interface );
-  
+
   Ptr<Packet> p = packet->Copy ();
-  
+
   MIPv6Header mh;
-  
+
   p->PeekHeader (mh);
-  
+
   uint8_t mhType = mh.GetMhType ();
   //NS_LOG_FUNCTION ( this << packet << src << dst << interface << "kela99" );
   if (mhType == MIPv6Header::IPV6_MOBILITY_BINDING_UPDATE)
     {
-	NS_LOG_FUNCTION (this << packet << src<<"BU" << "recieve BU");
-        HandleBU (packet, src, dst, interface);     
-	}
+      NS_LOG_FUNCTION (this << packet << src << "BU" << "recieve BU");
+      HandleBU (packet, src, dst, interface);
+    }
   else if (mhType == MIPv6Header::IPV6_MOBILITY_BINDING_ACKNOWLEDGEMENT)
     {
-        NS_LOG_FUNCTION (this << packet << src<<"receive BACK");	
-        HandleBA (packet, src, dst, interface);     
-	}
+      NS_LOG_FUNCTION (this << packet << src << "receive BACK");
+      HandleBA (packet, src, dst, interface);
+    }
 
 
-else if (mhType == MIPv6Header::HOME_TEST_INIT)
+  else if (mhType == MIPv6Header::HOME_TEST_INIT)
     {
-	NS_LOG_FUNCTION (this << packet << src<<"HoTI" << "recieve HoTI");
-       HandleHoTI (packet, src, dst, interface);
-	}
-else if (mhType == MIPv6Header::HOME_TEST)
+      NS_LOG_FUNCTION (this << packet << src << "HoTI" << "recieve HoTI");
+      HandleHoTI (packet, src, dst, interface);
+    }
+  else if (mhType == MIPv6Header::HOME_TEST)
     {
-	NS_LOG_FUNCTION (this << packet << src<<"HoT" << "recieve HoT");
-       HandleHoT (packet, src, dst, interface);
-	}
-else if (mhType == MIPv6Header::CARE_OF_TEST_INIT)
+      NS_LOG_FUNCTION (this << packet << src << "HoT" << "recieve HoT");
+      HandleHoT (packet, src, dst, interface);
+    }
+  else if (mhType == MIPv6Header::CARE_OF_TEST_INIT)
     {
-	NS_LOG_FUNCTION (this << packet << src<<"CoTI" << "recieve CoTI");
-       HandleCoTI (packet, src, dst, interface);
-	}
-else if (mhType == MIPv6Header::CARE_OF_TEST)
+      NS_LOG_FUNCTION (this << packet << src << "CoTI" << "recieve CoTI");
+      HandleCoTI (packet, src, dst, interface);
+    }
+  else if (mhType == MIPv6Header::CARE_OF_TEST)
     {
-	NS_LOG_FUNCTION (this << packet << src<<"CoT" << "recieve CoT");
-       HandleCoT (packet, src, dst, interface);
-	}
+      NS_LOG_FUNCTION (this << packet << src << "CoT" << "recieve CoT");
+      HandleCoT (packet, src, dst, interface);
+    }
   else
     {
-	  NS_LOG_ERROR ("Unknown MHType (" << (uint32_t)mhType << ")");
-	}
-	
+      NS_LOG_ERROR ("Unknown MHType (" << (uint32_t)mhType << ")");
+    }
+
   return 0;
 }
 
 void mipv6Agent::SendMessage (Ptr<Packet> packet, Ipv6Address dst, uint32_t ttl)
 {
-  NS_LOG_FUNCTION (this << packet << dst << (uint32_t)ttl<< "send");
-  
+  NS_LOG_FUNCTION (this << packet << dst << (uint32_t)ttl << "send");
+
   Ptr<Ipv6L3Protocol> ipv6 = m_node->GetObject<Ipv6L3Protocol> ();
-  
+
   NS_ASSERT (ipv6 != 0 && ipv6->GetRoutingProtocol () != 0);
-  
+
   Ipv6Header header;
   SocketIpTtlTag tag;
   Socket::SocketErrno err;
@@ -153,7 +152,7 @@ void mipv6Agent::SendMessage (Ptr<Packet> packet, Ipv6Address dst, uint32_t ttl)
       tag.SetTtl (ttl);
       packet->AddPacketTag (tag);
       Ipv6Address src = route->GetSource ();
-NS_LOG_FUNCTION ("Lura1" << src << "    " << dst);
+      NS_LOG_FUNCTION ("Lura1" << src << "    " << dst);
 /*
 if (src==Ipv6Address("fe80::200:ff:fe00:2") || src==Ipv6Address("fe80::200:ff:fe00:4"))
 src=Ipv6Address("3001:db80::200:ff:fe00:5");
@@ -173,7 +172,7 @@ packet->RemovePacketTag(tag);
 */
 
       ipv6->Send (packet, src, dst, 135, route);
-NS_LOG_LOGIC ("route found and send hmipv6 message");
+      NS_LOG_LOGIC ("route found and send hmipv6 message");
     }
   else
     {
@@ -184,7 +183,7 @@ NS_LOG_LOGIC ("route found and send hmipv6 message");
 uint8_t mipv6Agent::HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
 {
   NS_LOG_FUNCTION ( this << src << dst );
-  
+
   NS_LOG_WARN ("No handler for BU message");
 
   return 0;
@@ -193,9 +192,9 @@ uint8_t mipv6Agent::HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const 
 uint8_t mipv6Agent::HandleBA (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
 {
   NS_LOG_FUNCTION ( this << src << dst );
-  
+
   NS_LOG_WARN ("No handler for BA message");
-  
+
   return 0;
 }
 
@@ -204,7 +203,7 @@ uint8_t mipv6Agent::HandleBA (Ptr<Packet> packet, const Ipv6Address &src, const 
 uint8_t mipv6Agent::HandleHoTI (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
 {
   NS_LOG_FUNCTION ( this << src << dst );
-  
+
   NS_LOG_WARN ("No handler for HoTI message");
 
   return 0;
@@ -213,15 +212,15 @@ uint8_t mipv6Agent::HandleHoTI (Ptr<Packet> packet, const Ipv6Address &src, cons
 uint8_t mipv6Agent::HandleCoTI (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
 {
   NS_LOG_FUNCTION ( this << src << dst );
-  
+
   NS_LOG_WARN ("No handler for CoTI message");
-  
+
   return 0;
 }
 uint8_t mipv6Agent::HandleHoT (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
 {
   NS_LOG_FUNCTION ( this << src << dst );
-  
+
   NS_LOG_WARN ("No handler for HoT message");
 
   return 0;
@@ -230,9 +229,9 @@ uint8_t mipv6Agent::HandleHoT (Ptr<Packet> packet, const Ipv6Address &src, const
 uint8_t mipv6Agent::HandleCoT (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
 {
   NS_LOG_FUNCTION ( this << src << dst );
-  
+
   NS_LOG_WARN ("No handler for CoT message");
-  
+
   return 0;
 }
 

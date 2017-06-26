@@ -27,8 +27,7 @@
 #include "ns3/object.h"
 #include "ns3/ptr.h"
 
-namespace ns3
-{
+namespace ns3 {
 
 class MIPv6Option;
 class Node;
@@ -85,7 +84,7 @@ protected:
   /**
    * \brief Dispose this object.
    */
-  virtual void DoDispose();
+  virtual void DoDispose ();
 
 private:
   typedef std::list<Ptr<MIPv6Option> > Ipv6MobilityOptionList_t;

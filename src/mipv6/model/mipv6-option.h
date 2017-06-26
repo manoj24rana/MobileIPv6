@@ -19,7 +19,7 @@
  */
 
 #ifndef MIPv6_OPTION_H
-#define MIPV6_OPTION_H
+#define MIPv6_OPTION_H
 
 #include <list>
 
@@ -31,8 +31,7 @@
 #include "ns3/nstime.h"
 //#include "ns3/identifier.h"
 
-namespace ns3
-{
+namespace ns3 {
 
 class MIPv6OptionBundle;
 
@@ -51,24 +50,24 @@ public:
    * \return type identificator
    */
   static TypeId GetTypeId (void);
-  
+
   /**
    * \brief Destructor.
    */
   virtual ~MIPv6Option ();
-  
+
   /**
    * \brief Set the node.
    * \param node the node to set
    */
   void SetNode (Ptr<Node> node);
-  
+
   /**
    * \brief Get the option number.
    * \return option number
    */
   virtual uint8_t GetMobilityOptionNumber () const = 0;
-  
+
   /**
    * \brief Process method
    *
@@ -78,7 +77,7 @@ public:
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, MIPv6OptionBundle& bundle) = 0;
-  
+
 private:
   /**
    * \brief The node.
@@ -89,26 +88,26 @@ private:
 class MIPv6OptionBundle
 {
 public:
-  MIPv6OptionBundle();
-  
-  Ipv6Address GetHomeAddress() const;
-  void SetHomeAddress(Ipv6Address hoa);
-  
-  Ipv6Address GetCareofAddress() const;
-  void SetCareofAddress(Ipv6Address coa);
-  
-  uint16_t GetHomeNonceIndex() const;
-  void SetHomeNonceIndex(uint16_t hi);
-  
-  uint16_t GetCareofNonceIndex() const;
-  void SetCareofNonceIndex(uint16_t coi);
-  
-  uint64_t GetAuthenticator() const;
-  void SetAuthenticator(uint64_t auth);
-  
-  uint16_t GetRefreshInterval() const;
-  void SetRefreshInterval(uint16_t intvl);
-  
+  MIPv6OptionBundle ();
+
+  Ipv6Address GetHomeAddress () const;
+  void SetHomeAddress (Ipv6Address hoa);
+
+  Ipv6Address GetCareofAddress () const;
+  void SetCareofAddress (Ipv6Address coa);
+
+  uint16_t GetHomeNonceIndex () const;
+  void SetHomeNonceIndex (uint16_t hi);
+
+  uint16_t GetCareofNonceIndex () const;
+  void SetCareofNonceIndex (uint16_t coi);
+
+  uint64_t GetAuthenticator () const;
+  void SetAuthenticator (uint64_t auth);
+
+  uint16_t GetRefreshInterval () const;
+  void SetRefreshInterval (uint16_t intvl);
+
 protected:
 private:
   //for MIPv6
@@ -122,30 +121,30 @@ private:
 
 /**
  * \class Ipv6MobilityOptionPad1
- * \brief Ipv6 Mobility Option 
+ * \brief Ipv6 Mobility Option
  */
 class Ipv6MobilityOptionPad1 : public MIPv6Option
 {
 public:
   static const uint8_t OPT_NUMBER = 0;
-  
+
   /**
    * \brief Get the type identificator.
    * \return type identificator
    */
   static TypeId GetTypeId (void);
-  
+
   /**
    * \brief Destructor.
    */
   virtual ~Ipv6MobilityOptionPad1 ();
-  
+
   /**
    * \brief Get the option number.
    * \return option number
    */
   virtual uint8_t GetMobilityOptionNumber () const;
-  
+
   /**
    * \brief Process method
    *
@@ -155,36 +154,36 @@ public:
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, MIPv6OptionBundle& bundle);
-  
+
 private:
 };
 
 /**
  * \class Ipv6MobilityOptionPadn
- * \brief Ipv6 Mobility Option 
+ * \brief Ipv6 Mobility Option
  */
 class Ipv6MobilityOptionPadn : public MIPv6Option
 {
 public:
   static const uint8_t OPT_NUMBER = 1;
-  
+
   /**
    * \brief Get the type identificator.
    * \return type identificator
    */
   static TypeId GetTypeId (void);
-  
+
   /**
    * \brief Destructor.
    */
   virtual ~Ipv6MobilityOptionPadn ();
-  
+
   /**
    * \brief Get the option number.
    * \return option number
    */
   virtual uint8_t GetMobilityOptionNumber () const;
-  
+
   /**
    * \brief Process method
    *
@@ -194,36 +193,36 @@ public:
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, MIPv6OptionBundle& bundle);
-  
+
 private:
 };
 
 /**
  * \class Ipv6MobilityOptionMobileNodeIdentifier
- * \brief Ipv6 Mobility Option 
+ * \brief Ipv6 Mobility Option
  */
 class Ipv6MobilityOptionBindingRefreshAdvice : public MIPv6Option
 {
 public:
   static const uint8_t OPT_NUMBER = 2;
-  
+
   /**
    * \brief Get the type identificator.
    * \return type identificator
    */
   static TypeId GetTypeId (void);
-  
+
   /**
    * \brief Destructor.
    */
   virtual ~Ipv6MobilityOptionBindingRefreshAdvice ();
-  
+
   /**
    * \brief Get the option number.
    * \return option number
    */
   virtual uint8_t GetMobilityOptionNumber () const;
-  
+
   /**
    * \brief Process method
    *
@@ -233,36 +232,36 @@ public:
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, MIPv6OptionBundle& bundle);
-  
+
 private:
 };
 
 /**
  * \class Ipv6MobilityOptionHomeNetworkPrefix
- * \brief Ipv6 Mobility Option 
+ * \brief Ipv6 Mobility Option
  */
 class Ipv6MobilityOptionAlternateCareofAddress : public MIPv6Option
 {
 public:
   static const uint8_t OPT_NUMBER = 3;
-  
+
   /**
    * \brief Get the type identificator.
    * \return type identificator
    */
   static TypeId GetTypeId (void);
-  
+
   /**
    * \brief Destructor.
    */
   virtual ~Ipv6MobilityOptionAlternateCareofAddress ();
-  
+
   /**
    * \brief Get the option number.
    * \return option number
    */
   virtual uint8_t GetMobilityOptionNumber () const;
-  
+
   /**
    * \brief Process method
    *
@@ -272,36 +271,36 @@ public:
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, MIPv6OptionBundle& bundle);
-  
+
 private:
 };
 
 /**
  * \class Ipv6MobilityOptionHandoffIndicator
- * \brief Ipv6 Mobility Option 
+ * \brief Ipv6 Mobility Option
  */
 class Ipv6MobilityOptionNonceIndices : public MIPv6Option
 {
 public:
   static const uint8_t OPT_NUMBER = 4;
-  
+
   /**
    * \brief Get the type identificator.
    * \return type identificator
    */
   static TypeId GetTypeId (void);
-  
+
   /**
    * \brief Destructor.
    */
   virtual ~Ipv6MobilityOptionNonceIndices ();
-  
+
   /**
    * \brief Get the option number.
    * \return option number
    */
   virtual uint8_t GetMobilityOptionNumber () const;
-  
+
   /**
    * \brief Process method
    *
@@ -311,36 +310,36 @@ public:
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, MIPv6OptionBundle& bundle);
-  
+
 private:
 };
 
 /**
  * \class Ipv6MobilityOptionAccessTechnologyType
- * \brief Ipv6 Mobility Option 
+ * \brief Ipv6 Mobility Option
  */
 class Ipv6MobilityOptionBindingAuthorizationData : public MIPv6Option
 {
 public:
   static const uint8_t OPT_NUMBER = 5;
-  
+
   /**
    * \brief Get the type identificator.
    * \return type identificator
    */
   static TypeId GetTypeId (void);
-  
+
   /**
    * \brief Destructor.
    */
   virtual ~Ipv6MobilityOptionBindingAuthorizationData ();
-  
+
   /**
    * \brief Get the option number.
    * \return option number
    */
   virtual uint8_t GetMobilityOptionNumber () const;
-  
+
   /**
    * \brief Process method
    *
@@ -350,7 +349,7 @@ public:
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, MIPv6OptionBundle& bundle);
-  
+
 private:
 };
 
