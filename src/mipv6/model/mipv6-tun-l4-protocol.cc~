@@ -195,7 +195,7 @@ return IpL4Protocol::RX_OK;
       destination.IsLinkLocal() ||
       destination.IsAllNodesMulticast() ||
       destination.IsAllRoutersMulticast() ||
-//      destination.IsAllHostsMulticast() ||
+      destination.IsAllHostsMulticast() ||
       destination.IsSolicitedMulticast())
 	{
 	  return IpL4Protocol::RX_OK;
