@@ -46,7 +46,7 @@
 
 
 using namespace ns3;
-NS_LOG_COMPONENT_DEFINE ("mip6Wifi");
+NS_LOG_COMPONENT_DEFINE ("mip6Wifi-wimax");
 
 void
 ReceivePacket(Ptr<const Packet> p, const Address & addr)
@@ -197,7 +197,7 @@ Ssid ssid = Ssid("ns-3-ssid");
 YansWifiPhyHelper wifiPhy = YansWifiPhyHelper::Default ();
 wifiPhy.SetPcapDataLinkType (YansWifiPhyHelper::DLT_IEEE802_11_RADIO);
 
-WifiHelper wifi = WifiHelper::Default ();
+WifiHelper wifi;
 NqosWifiMacHelper wifiMac = NqosWifiMacHelper::Default ();
 YansWifiChannelHelper wifiChannel = YansWifiChannelHelper::Default ();
 wifiPhy.SetChannel (wifiChannel.Create ());

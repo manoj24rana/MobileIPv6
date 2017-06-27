@@ -402,8 +402,8 @@ routingHelper.PrintRoutingTableAt (Seconds (883.6), sta.Get(0), routingStream);
 
 Ptr<Ipv6L3Protocol> ip = sta.Get(0)->GetObject<Ipv6L3Protocol> ();  
 ip->GetInterface(2)->SetDown();
-Simulator::Schedule (Seconds (5.2), &Ipv6Interface::SetDown, ip->GetInterface(1),void);
-Simulator::Schedule (Seconds (5.2), &Ipv6Interface::SetUp, ip->GetInterface(2),void);
+Simulator::Schedule (Seconds (5.2), &Ipv6Interface::SetDown, ip->GetInterface(1));
+Simulator::Schedule (Seconds (5.2), &Ipv6Interface::SetUp, ip->GetInterface(2));
 
 
   
