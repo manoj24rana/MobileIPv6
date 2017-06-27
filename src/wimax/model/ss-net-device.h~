@@ -288,12 +288,6 @@ public:
    */
   void SetServiceFlowManager (Ptr<SsServiceFlowManager> );
 
-  //Newly Added
-  void SetLinkUpCallback (Callback<void> linkUp);
-  void SetLinkDownCallback (Callback<void> linkDown);
-  Callback<void> m_linkUp; //!< Callback when a link is up
-  Callback<void> m_linkDown; //!< Callback when a link is down   // +++++++  For MIPv6 support
-
 private:
   static Time GetDefaultLostDlMapInterval ();
 

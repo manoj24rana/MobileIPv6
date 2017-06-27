@@ -1288,7 +1288,7 @@ SubscriberStationNetDevice::SetTimer (EventId eventId, EventId &event)
 }
 
 //Newly Added
-  // +++++++  For MIPv6 support
+
 void
 SubscriberStationNetDevice::SetLinkUpCallback (Callback<void> linkUp)
 {

@@ -256,10 +256,6 @@ public:
   bool IsPromisc (void);
   void NotifyPromiscTrace (Ptr<Packet> p);
 
-//Newly Added
-void LinkUp (void);
-void LinkDown (void); // +++++++  For MIPv6 support
-
 private:
   WimaxNetDevice (const WimaxNetDevice &);
   WimaxNetDevice & operator= (const WimaxNetDevice &);

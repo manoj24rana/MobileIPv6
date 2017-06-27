@@ -225,9 +225,6 @@ public:
 
   Ptr<BsServiceFlowManager> GetServiceFlowManager (void) const;
   void SetServiceFlowManager (Ptr<BsServiceFlowManager> );
-//Newly Added  
-  void SetLinkUpCallback (Callback<void> linkUp);  // +++++++  For MIPv6 support
-  Callback<void> m_linkUp;  // +++++++  For MIPv6 support
 private:
   void DoDispose (void);
   void StartFrame (void);
