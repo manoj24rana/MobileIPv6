@@ -20,7 +20,6 @@
 #include "ns3/point-to-point-module.h"
 #include "ns3/bridge-module.h"
 #include "ns3/ipv6-static-routing.h"
-#include "ns3/ipv6-static-source-routing.h"
 #include "ns3/ipv6-list-routing-helper.h"
 #include "ns3/ipv6-routing-table-entry.h"
 #include "ns3/mipv6-module.h"

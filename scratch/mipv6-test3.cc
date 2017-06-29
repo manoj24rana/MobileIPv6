@@ -20,7 +20,6 @@
 #include "ns3/point-to-point-module.h"
 #include "ns3/bridge-module.h"
 #include "ns3/ipv6-static-routing.h"
-// #include "ns3/ipv6-static-source-routing.h"
 #include "ns3/ipv6-list-routing-helper.h"
 #include "ns3/ipv6-routing-table-entry.h"
 #include "ns3/mipv6-module.h"
@@ -190,7 +189,7 @@ Ssid ssid = Ssid("ns-3-ssid");
 YansWifiPhyHelper wifiPhy = YansWifiPhyHelper::Default ();
 wifiPhy.SetPcapDataLinkType (YansWifiPhyHelper::DLT_IEEE802_11_RADIO);
 
-WifiHelper wifi;
+WifiHelper wifi = WifiHelper::Default ();
 NqosWifiMacHelper wifiMac = NqosWifiMacHelper::Default ();
 YansWifiChannelHelper wifiChannel = YansWifiChannelHelper::Default ();
 wifiPhy.SetChannel (wifiChannel.Create ());
@@ -288,6 +287,7 @@ rttop->AddNetworkRouteTo(Ipv6Address("9999:db80::"),Ipv6Prefix(64),Ipv6Address("
 ipv692 = ars.Get(0)->GetObject<Ipv6> ();
 rttop = routingHelper.GetStaticRouting(ipv692);
 rttop->AddNetworkRouteTo(Ipv6Address("5001:db80::"),Ipv6Prefix(64),Ipv6Address("2001:db80::200:ff:fe00:1"),1,0);
+
 ipv692 = ars.Get(1)->GetObject<Ipv6> ();
 rttop = routingHelper.GetStaticRouting(ipv692);
 rttop->AddNetworkRouteTo(Ipv6Address("5001:db80::"),Ipv6Prefix(64),Ipv6Address("2001:db80::200:ff:fe00:1"),1,0);
@@ -296,6 +296,8 @@ ipv692 = cn.Get(0)->GetObject<Ipv6> ();
 rttop = routingHelper.GetStaticRouting(ipv692);
 rttop->AddNetworkRouteTo(Ipv6Address("8888:56ac::"),Ipv6Prefix(64),Ipv6Address("5001:db80::200:ff:fe00:5"),1,0);
 rttop->AddNetworkRouteTo(Ipv6Address("9999:db80::"),Ipv6Prefix(64),Ipv6Address("5001:db80::200:ff:fe00:5"),1,0);
+rttop->AddNetworkRouteTo(Ipv6Address("2001:db80::"),Ipv6Prefix(64),Ipv6Address("5001:db80::200:ff:fe00:5"),1,0);
+
 
 
 mipv6HAHelper hahelper;
@@ -305,10 +307,10 @@ mnhelper1.Install(sta.Get(0));
 //mnhelper1.Install(sta.Get(1));
 
 //LogComponentEnable("BList", LOG_LEVEL_ALL);
-//LogComponentEnable("mipv6MN", LOG_LEVEL_ALL);
-//LogComponentEnable("mipv6HA", LOG_LEVEL_ALL);
-//LogComponentEnable("UdpSocketImpl", LOG_LEVEL_ALL);
-//LogComponentEnable("Ipv6TunnelL4Protocol", LOG_LEVEL_ALL);
+LogComponentEnable("mipv6MN", LOG_LEVEL_ALL);
+LogComponentEnable("mipv6HA", LOG_LEVEL_ALL);
+//LogComponentEnable("TunnelNetDevice", LOG_LEVEL_ALL);
+LogComponentEnable("Icmpv6L4Protocol", LOG_LEVEL_ALL);
 
 
 UdpEchoServerHelper echoServer (9);
@@ -319,8 +321,8 @@ UdpEchoServerHelper echoServer (9);
   serverApps.Stop (Seconds (700.0));
 
   UdpEchoClientHelper echoClient (Ipv6Address("5001:db80::200:ff:fe00:4"), 9);
-  echoClient.SetAttribute ("MaxPackets", UintegerValue (100));
-  echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.)));
+  echoClient.SetAttribute ("MaxPackets", UintegerValue (10000));
+  echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
   echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
 
   ApplicationContainer clientApps = echoClient.Install (sta.Get (0));
@@ -332,14 +334,18 @@ UdpEchoServerHelper echoServer (9);
   LogComponentEnable("UdpEchoServerApplication", LOG_LEVEL_ALL);
 
 internet.EnablePcapIpv6 ("prefix1", sta.Get(0));
-internet.EnablePcapIpv6 ("prefix2", ha.Get(0));
-internet.EnablePcapIpv6 ("prefix3", cn.Get(0));
-internet.EnablePcapIpv6 ("prefix4", mid.Get(0));
+internet.EnablePcapIpv6 ("prefix2", ars.Get(1));
+internet.EnablePcapIpv6 ("prefix3", mid.Get(0));
+internet.EnablePcapIpv6 ("prefix4", ars.Get(0));
 
 
 Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
-routingHelper.PrintRoutingTableAt (Seconds (1.5), cn.Get(0), routingStream);
-routingHelper.PrintRoutingTableAt (Seconds (5.9), cn.Get(0), routingStream);
+routingHelper.PrintRoutingTableAt (Seconds (1.1), sta.Get(0), routingStream);
+routingHelper.PrintRoutingTableAt (Seconds (5.1), sta.Get(0), routingStream);
+routingHelper.PrintRoutingTableAt (Seconds (11.547), sta.Get(0), routingStream);
+routingHelper.PrintRoutingTableAt (Seconds (13.2), sta.Get(0), routingStream);
+routingHelper.PrintRoutingTableAt (Seconds (44.6), sta.Get(0), routingStream);
+routingHelper.PrintRoutingTableAt (Seconds (883.6), sta.Get(0), routingStream);
 
 
 
