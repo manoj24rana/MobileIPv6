@@ -50,24 +50,29 @@ TunnelNetDevice::GetTypeId (void)
                    MakeUintegerChecker<uint16_t> ())
     .AddTraceSource ("MacTx",
                      "Trace source indicating a packet has arrived for transmission by this device",
-                     MakeTraceSourceAccessor (&TunnelNetDevice::m_macTxTrace))
+                     MakeTraceSourceAccessor (&TunnelNetDevice::m_macTxTrace),
+                     "ns3::Packet::TracedCallback")
     .AddTraceSource ("MacPromiscRx",
                      "A packet has been received by this device, has been passed up from the physical layer "
                      "and is being forwarded up the local protocol stack.  This is a promiscuous trace,",
-                     MakeTraceSourceAccessor (&TunnelNetDevice::m_macPromiscRxTrace))
+                     MakeTraceSourceAccessor (&TunnelNetDevice::m_macPromiscRxTrace),
+                     "ns3::Packet::TracedCallback")
     .AddTraceSource ("MacRx",
                      "A packet has been received by this device, has been passed up from the physical layer "
                      "and is being forwarded up the local protocol stack.  This is a non-promiscuous trace,",
-                     MakeTraceSourceAccessor (&TunnelNetDevice::m_macRxTrace))
+                     MakeTraceSourceAccessor (&TunnelNetDevice::m_macRxTrace),
+                     "ns3::Packet::TracedCallback")
     //
     // Trace sources designed to simulate a packet sniffer facility (tcpdump).
     //
     .AddTraceSource ("Sniffer",
                      "Trace source simulating a non-promiscuous packet sniffer attached to the device",
-                     MakeTraceSourceAccessor (&TunnelNetDevice::m_snifferTrace))
+                     MakeTraceSourceAccessor (&TunnelNetDevice::m_snifferTrace),
+                     "ns3::Packet::TracedCallback")
     .AddTraceSource ("PromiscSniffer",
                      "Trace source simulating a promiscuous packet sniffer attached to the device",
-                     MakeTraceSourceAccessor (&TunnelNetDevice::m_promiscSnifferTrace))
+                     MakeTraceSourceAccessor (&TunnelNetDevice::m_promiscSnifferTrace),
+                     "ns3::Packet::TracedCallback")
   ;
   return tid;
 }
@@ -320,7 +325,6 @@ TunnelNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protoco
       || b.IsLinkLocal ()
       || b.IsAllNodesMulticast ()
       || b.IsAllRoutersMulticast ()
-      || b.IsAllHostsMulticast ()
       || b.IsSolicitedMulticast ())
     {
 
