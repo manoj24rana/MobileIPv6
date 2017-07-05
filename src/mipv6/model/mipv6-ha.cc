@@ -129,7 +129,7 @@ uint8_t mipv6HA::HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
   for (uint32_t s = 0; s < r; s++)
     {
       Ipv6Address addr = (interface->GetAddress (s)).GetAddress ();
-      NS_LOG_FUNCTION ("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII" << addr);
+      NS_LOG_FUNCTION ("Interface" << s << addr);
     }
 
   Ptr<Packet> p = packet->Copy ();
@@ -160,8 +160,6 @@ uint8_t mipv6HA::HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
   uint8_t errStatus = 0;
   BCache::Entry *bce = 0;
   BCache::Entry *bce2 = 0;
-
-  //bool delayedRegister = false;
 
   bce2 = new BCache::Entry (m_bCache);
   bce2->SetCoa (src);
@@ -435,16 +433,6 @@ void mipv6HA::HandleNS (Ptr<Packet> packet, Ptr<Ipv6Interface> interface, Ipv6Ad
   ipHeader.SetNextHeader (Icmpv6L4Protocol::PROT_NUMBER);
   ipHeader.SetPayloadLength (p->GetSize ());
   ipHeader.SetHopLimit (255);
-
-
-
-
-
-
-
-
-
-
   NdiscCache::Ipv6PayloadHeaderPair pi (p, ipHeader);
   interface->Send (pi.first, pi.second, src.IsAny () ? Ipv6Address::GetAllNodesMulticast () : src);
 

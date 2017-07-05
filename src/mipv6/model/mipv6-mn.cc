@@ -365,14 +365,10 @@ uint8_t mipv6MN::HandleBA (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
 
             if (ba.GetLifetime () > 0)
               {
-                //if (m_buinf->IsHomeUpdating ())
-                //{
-                //create tunnel & setup routing
                 if (!(m_buinf->GetHoa ()).IsEqual (m_buinf->GetCoa ()))
                   {
                     SetupTunnelAndRouting ();
                   }
-                //}
 
                 m_buinf->MarkHomeReachable ();
 
@@ -626,7 +622,6 @@ bool mipv6MN::SetupTunnelAndRouting ()
   staticRouting->AddHostRouteTo (m_buinf->GetHA (), addr, m_IfIndex, Ipv6Address ("::"), 0);
   m_OldinterfaceIndex = m_IfIndex;
   staticRouting->AddNetworkRouteTo (routeentry.GetDest (), routeentry.GetDestNetworkPrefix (), m_defaultrouteraddress, m_buinf->GetTunnelIfIndex (), routeentry.GetPrefixToUse (), 0);
-//  staticRouting->SetDefaultRoute(Ipv6Address("::"),m_buinf->GetTunnelIfIndex());
   staticRouting->RemoveRoute (Ipv6Address ("fe80::"), Ipv6Prefix (64), m_buinf->GetTunnelIfIndex (), Ipv6Address ("fe80::"));
 
 
@@ -645,22 +640,10 @@ void mipv6MN::ClearTunnelAndRouting ()
 
 
   Ptr<Ipv6StaticRouting> staticRouting = staticRoutingHelper.GetStaticRouting (ipv6);
-  //Ipv6RoutingTableEntry routeentry(staticRouting->GetDefaultRoute ());
 
-  //std::cout<< "Printing Deafult Route in Clear:" << routeentry.GetDest () << ",\t" << routeentry.GetDestNetworkPrefix () << ",\t" << routeentry.GetInterface () << ",\t" << routeentry.GetPrefixToUse () << "\n";
-
-//  staticRouting->RemoveRoute (routeentry.GetDest (), routeentry.GetDestNetworkPrefix (), routeentry.GetInterface (), routeentry.GetPrefixToUse ());
   staticRouting->RemoveRoute (Ipv6Address ("::"), Ipv6Prefix::GetZero (), m_buinf->GetTunnelIfIndex (), m_OldPrefixToUse);
   staticRouting->RemoveRoute (m_buinf->GetHA (), Ipv6Prefix (128), m_OldinterfaceIndex, Ipv6Address ("::"));
 
-//staticRouting->AddNetworkRouteTo (routeentry.GetDest (), routeentry.GetDestNetworkPrefix (), Ipv6Address("fe80::200:ff:fe00:7"), 1, routeentry.GetPrefixToUse (), 0);
-//staticRouting->SetDefaultRoute(Ipv6Address("fe80::200:ff:fe00:7"),1);
-
-
-
-
-
-  NS_LOG_FUNCTION ("Inside Clear tunnel routing....................");
   //clear tunnel
   Ptr<Ipv6TunnelL4Protocol> th = GetNode ()->GetObject<Ipv6TunnelL4Protocol> ();
   NS_ASSERT (th);
@@ -690,7 +673,6 @@ void mipv6MN::SetDefaultRouterAddress (Ipv6Address addr,  uint32_t index)
 
 bool mipv6MN::CheckAddresses (Ipv6Address ha, Ipv6Address hoa)
 {
-  std::cout << "uuuuuuuuuuuuuuuuuuuuuttttttttttttttttttttttttttttteeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
   if (ha.IsEqual (m_buinf->GetHA ()) && hoa.IsEqual (m_buinf->GetHoa ()))
     {
       return true;

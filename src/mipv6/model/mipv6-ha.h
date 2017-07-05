@@ -56,10 +56,6 @@ protected:
 
 private:
   Ptr<BCache> m_bCache;
-//std::list<Ipv6Address> HaaList;
-//typedef sgi::hash_map<Ipv6Address, uint16_t> ::iterator HaaListI;
-//HaaList m_HaaList;
-
 };
 
 } /* namespace ns3 */

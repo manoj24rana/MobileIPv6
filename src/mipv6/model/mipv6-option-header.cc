@@ -90,13 +90,11 @@ uint32_t MIPv6OptionHeader::GetSerializedSize () const
 
 uint32_t MIPv6OptionHeader::Deserialize (Buffer::Iterator start)
 {
-  //Buffer::Iterator i = start;
   return GetSerializedSize ();
 }
 
 void MIPv6OptionHeader::Serialize (Buffer::Iterator start) const
 {
-  //Buffer::Iterator i = start;
 }
 
 MIPv6OptionHeader::Alignment MIPv6OptionHeader::GetAlignment () const

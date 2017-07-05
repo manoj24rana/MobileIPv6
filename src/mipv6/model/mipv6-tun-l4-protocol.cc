@@ -50,23 +50,13 @@ TypeId Ipv6TunnelL4Protocol::GetTypeId ()
 Ipv6TunnelL4Protocol::Ipv6TunnelL4Protocol ()
   : m_node (0), counter(202)
 {
-  //myfile.open ("example.txt");
- // double d;
- // for(d=2.0;d<=14.0; d=d+0.01){
- // Simulator::Schedule(Seconds (d), &Ipv6TunnelL4Protocol::filewriter, this, counter-202, sctime-2.0);
- // }
   SetHomeAddress("::");
   NS_LOG_FUNCTION_NOARGS ();
 }
-/*
-void Ipv6TunnelL4Protocol::filewriter(uint64_t u, Time t){
-myfile << u <<"\t" << t << "\n";
-}
-*/
+
 Ipv6TunnelL4Protocol::~Ipv6TunnelL4Protocol ()
 {
   NS_LOG_FUNCTION_NOARGS ();
-  //myfile.close();
 }
 
 void Ipv6TunnelL4Protocol::DoDispose ()
@@ -81,7 +71,6 @@ void Ipv6TunnelL4Protocol::DoDispose ()
 	}
 	
   m_tunnelMap.clear();
-  //myfile.close();
   IpL4Protocol::DoDispose ();
 }
 
@@ -137,9 +126,6 @@ void Ipv6TunnelL4Protocol::SendMessage (Ptr<Packet> packet, Ipv6Address src, Ipv
 
 enum IpL4Protocol::RxStatus Ipv6TunnelL4Protocol::Receive(Ptr<Packet> p, Ipv6Header const &header, Ptr<Ipv6Interface> incomingInterface)
 {
-
-  NS_LOG_FUNCTION ("Bong!!!");
-  
   Ptr<Ipv6L3Protocol> ipv6 = GetNode()->GetObject<Ipv6L3Protocol>();
   NS_ASSERT (ipv6 != 0);
   Ipv6Address src=header.GetSourceAddress ();
@@ -155,28 +141,12 @@ enum IpL4Protocol::RxStatus Ipv6TunnelL4Protocol::Receive(Ptr<Packet> p, Ipv6Hea
       tdev = GetTunnelDevice (GetHA());
   }
 
-
-/*  if(tdev == 0)
-   {
-     Ptr<mipv6Agent> agent = GetNode()->GetObject<mipv6Agent>();
-     std::list<Ipv6Address> lista;
-     lista = agent->GetAddressCache();
-     if(lista.size() && agent->IsHomeMatch(src))
-      {
-        for(std::list<Ipv6Address>::iterator iter=lista.begin(); iter!=lista.end(); iter++)
-         {
-          tdev = GetTunnelDevice (iter.first());
-          if (tdev)
-           break;
-         }    
-      }
-   }  */
   if (tdev == 0 && src!="::")
     {
       NS_LOG_DEBUG ("The packet does not associate any tunnel device");
       return IpL4Protocol::RX_OK;
     }
-  NS_LOG_FUNCTION (src << "Receive in ipv6tunnell4protocol ........................................");
+  NS_LOG_FUNCTION (src << "Received in ipv6tunnell4protocol");
   Ptr<Packet> packet = p->Copy();
   
   Ipv6Header innerHeader;
@@ -184,29 +154,17 @@ enum IpL4Protocol::RxStatus Ipv6TunnelL4Protocol::Receive(Ptr<Packet> p, Ipv6Hea
   
   Ipv6Address source = innerHeader.GetSourceAddress();
   Ipv6Address destination = innerHeader.GetDestinationAddress();
-/*
-if (destination==Ipv6Address("1001:db80::200:ff:fe00:b"))
-{
-//p->RemoveHeader(innerHeader);
-return IpL4Protocol::RX_OK;
-}
-*/
+
   if (source.IsLinkLocal() ||
       destination.IsLinkLocal() ||
       destination.IsAllNodesMulticast() ||
       destination.IsAllRoutersMulticast() ||
-//      destination.IsAllHostsMulticast() ||
       destination.IsSolicitedMulticast())
 	{
 	  return IpL4Protocol::RX_OK;
 	}
   
-  //SocketIpTtlTag tag;
-NS_LOG_FUNCTION (source << destination << "TIMBER1 ........................................!!!!");
-  //tag.SetTtl (innerHeader.GetHopLimit() - 1);
-NS_LOG_FUNCTION ("TIMBER1.1 ........................................!!!!");  
-//packet->AddPacketTag (tag);
-  NS_LOG_FUNCTION ("TIMBER2 ........................................!!!!");
+NS_LOG_FUNCTION (source << destination);
   //Prevent infinite loop
   Ptr<Ipv6Route> route;
   Socket::SocketErrno err;
@@ -219,7 +177,7 @@ NS_LOG_FUNCTION ("TIMBER1.1 ........................................!!!!");
   NS_ASSERT (routing);
   
   route = routing->RouteOutput (packet, innerHeader, oif, err);
-  NS_LOG_FUNCTION (source << destination << "TIMBER3 ........................................!!!!");
+  NS_LOG_FUNCTION (source << destination);
 
 if (destination.IsEqual(GetHomeAddress()))
 
@@ -229,21 +187,10 @@ if (destination.IsEqual(GetHomeAddress()))
   protocol = ipv6->GetProtocol (nextHeader);
   if (protocol)
     return protocol->Receive (packet,innerHeader,incomingInterface);
-//  Ptr<UdpL4Protocol> udpv6 = GetNode()->GetObject<UdpL4Protocol>();
-  //udpv6->Receive(packet,innerHeader,incomingInterface);   
-//NS_LOG_FUNCTION ("TIMBER4 .......................................................!!!!");
-//NS_LOG_FUNCTION (counter);
-//sctime=(Simulator::Now());
-//myfile << counter << "\t" << sctime.GetMicroSeconds()/1000000.0 << "\n";
-//counter++;
-//NS_LOG_FUNCTION (sctime);
-//return IpL4Protocol::RX_OK;
-
 }
 
 
 ipv6->Send(packet, source, destination, innerHeader.GetNextHeader(), route);
-NS_LOG_FUNCTION ("TIMBER5 .......................................................!!!!");
   return IpL4Protocol::RX_OK;
 }
 
@@ -256,13 +203,10 @@ uint16_t Ipv6TunnelL4Protocol::AddTunnel(Ipv6Address remote, Ipv6Address local)
   //Search existing tunnel device
   TunnelMapI it = m_tunnelMap.find (remote);
   Ptr<TunnelNetDevice> dev = m_node->GetObject<TunnelNetDevice> ();
-  //NS_LOG_FUNCTION ("BARA1");
   if (it == m_tunnelMap.end ())
     {
-    //    NS_LOG_FUNCTION ("BARA2");
 if(dev==0)
 {
-    // NS_LOG_FUNCTION ("BARA3" << dev); 
      dev = CreateObject<TunnelNetDevice> ();
       
       dev->SetAddress (Mac48Address::Allocate ());
@@ -271,7 +215,6 @@ if(dev==0)
  }     
 	  dev->SetRemoteAddress(remote);
 	  dev->SetLocalAddress(local);
-//NS_LOG_FUNCTION ("BARA4");
     }
 
   else
@@ -280,46 +223,38 @@ if(dev==0)
     }
     
   dev->IncreaseRefCount ();
-  NS_LOG_FUNCTION("Yukjjbscma ..........................." << dev->GetRefCount());	
   Ptr<Ipv6> ipv6 = m_node->GetObject<Ipv6> ();
   int32_t ifIndex = -1;
-  //NS_LOG_FUNCTION ("BARA5");
   ifIndex = ipv6->GetInterfaceForDevice (dev);
   
   if (ifIndex == -1)
     {
 	  ifIndex = ipv6->AddInterface (dev);
-	//   NS_LOG_FUNCTION ("BARA6");
 	  NS_ASSERT_MSG (ifIndex >= 0, "Cannot add an IPv6 interface");
 	  
 	  ipv6->SetMetric (ifIndex, 1);
 	  ipv6->SetUp (ifIndex);
 	}
-	 //NS_LOG_FUNCTION ("BARA7");
   return ifIndex;
 }
 
 void Ipv6TunnelL4Protocol::RemoveTunnel(Ipv6Address remote)
 {
-  NS_LOG_FUNCTION ( "Remove tunnel............................." << remote);
+  NS_LOG_FUNCTION ( "Remove tunnel" << remote);
   
   Ptr<TunnelNetDevice> dev = GetTunnelDevice(remote);
 
   if (dev)
     {
-
-NS_LOG_FUNCTION("Line 1 ...........................");
 	  dev->DecreaseRefCount ();
 	  
 	  if (dev->GetRefCount() == 0)
 	    {
 		  TunnelMapI it = m_tunnelMap.find (remote);
-          NS_LOG_FUNCTION("Line 2 ..........................."  << "...." << dev->GetRefCount());
           it->second = 0;
           
           m_tunnelMap.erase (it);
 		}
-NS_LOG_FUNCTION("Line 3 ..........................." << dev->GetRefCount());
 	}    
 }
 

@@ -80,7 +80,7 @@ Ptr<Node> mipv6Agent::GetNode (void)
 }
 uint8_t mipv6Agent::Receive (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
 {
-  //NS_LOG_FUNCTION ( this << packet << src << dst << interface );
+  NS_LOG_FUNCTION ( this << packet << src << dst << interface );
 
   Ptr<Packet> p = packet->Copy ();
 
@@ -89,7 +89,7 @@ uint8_t mipv6Agent::Receive (Ptr<Packet> packet, const Ipv6Address &src, const I
   p->PeekHeader (mh);
 
   uint8_t mhType = mh.GetMhType ();
-  //NS_LOG_FUNCTION ( this << packet << src << dst << interface << "kela99" );
+
   if (mhType == MIPv6Header::IPV6_MOBILITY_BINDING_UPDATE)
     {
       NS_LOG_FUNCTION (this << packet << src << "BU" << "recieve BU");
@@ -153,23 +153,7 @@ void mipv6Agent::SendMessage (Ptr<Packet> packet, Ipv6Address dst, uint32_t ttl)
       packet->AddPacketTag (tag);
       Ipv6Address src = route->GetSource ();
       NS_LOG_FUNCTION ("Lura1" << src << "    " << dst);
-/*
-if (src==Ipv6Address("fe80::200:ff:fe00:2") || src==Ipv6Address("fe80::200:ff:fe00:4"))
-src=Ipv6Address("3001:db80::200:ff:fe00:5");
 
-else if(src==Ipv6Address("::") && (count==0||count==1)){
-src=Ipv6Address("8888:56ac::200:ff:fe00:9");
-packet->RemovePacketTag(tag);
-count++;
-}
-
-else if(src==Ipv6Address("::") && count==2){
-src=Ipv6Address("9999:db80::200:ff:fe00:9");
-packet->RemovePacketTag(tag);
-}
-
-
-*/
 
       ipv6->Send (packet, src, dst, 135, route);
       NS_LOG_LOGIC ("route found and send hmipv6 message");

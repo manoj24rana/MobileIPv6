@@ -312,14 +312,13 @@ TunnelNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protoco
 {
 
   NS_LOG_FUNCTION ( this << packet << dest << protocolNumber );
-  NS_LOG_FUNCTION ("SENDING............................................................................");
   Ipv6Header iph;
   packet->PeekHeader (iph);
 
   Ipv6Address a,b;
   a = iph.GetSourceAddress ();
   b = iph.GetDestinationAddress ();
-  NS_LOG_FUNCTION ("Source and Destination Address::" << a << b);
+  NS_LOG_FUNCTION ("Source and Destination Address:" << a << b);
 
   if (a.IsLinkLocal ()
       || b.IsLinkLocal ()
@@ -339,18 +338,14 @@ TunnelNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protoco
   Ipv6Address dst = m_remoteAddress;
   SocketIpTtlTag tag;
   uint8_t ttl = 64;
-  NS_LOG_FUNCTION ("ECHO SENDING............................................................................");
   m_macTxTrace (packet);
-  NS_LOG_FUNCTION ("Line1...........");
   if ( m_localAddress.IsAny () )
     {
-      NS_LOG_FUNCTION ("Line2...........");
       Ipv6Header header;
 
       Socket::SocketErrno err;
       Ptr<Ipv6Route> route;
       Ptr<NetDevice> oif (0);     //specify non-zero if bound to a source address
-      NS_LOG_FUNCTION ("Line3...........");
       header.SetDestinationAddress (dst);
       route = ipv6->GetRoutingProtocol ()->RouteOutput (packet, header, oif, err);
 

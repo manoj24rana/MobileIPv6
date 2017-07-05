@@ -60,8 +60,6 @@ protected:
   virtual uint8_t HandleBA (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface);
   virtual uint8_t HandleHoT (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface);
   virtual uint8_t HandleCoT (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface);
-//  virtual std::list<Ipv6Address> GetAddressCache();
-//  virtual void SetAddressCache(std::list<Ipv6Address> acac);
 
 private:
   Ptr<BList> m_buinf;

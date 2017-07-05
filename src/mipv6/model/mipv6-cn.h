@@ -34,8 +34,7 @@ public:
   mipv6CN ();
 
   virtual ~mipv6CN ();
-  //Ipv6Address tempadds;
-  //uint16_t temptunnelIf;
+
 protected:
   virtual void NotifyNewAggregate ();
 

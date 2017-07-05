@@ -176,8 +176,6 @@ uint8_t mipv6CN::HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
   BCache::Entry *bce = 0;
   BCache::Entry *bce2 = 0;
 
-  //bool delayedRegister = false;
-
 
   bce = m_bCache->Lookup (homeaddr);
   if (bce)
@@ -247,9 +245,6 @@ uint8_t mipv6CN::HandleHoTI (Ptr<Packet> packet, const Ipv6Address &src, const I
   BCache::Entry *bce = 0;
 
 
-  //bool delayedRegister = false;
-
-
   bce = m_bCache->Lookup (homeaddr);
 
 
@@ -305,9 +300,6 @@ uint8_t mipv6CN::HandleCoTI (Ptr<Packet> packet, const Ipv6Address &src, const I
 
 
   BCache::Entry *bce = 0;
-
-
-  //bool delayedRegister = false;
 
 
   bce = m_bCache->Lookup (homeaddr);

@@ -165,7 +165,6 @@ void BList::FunctionHomeReachableTimeout ()
 
 void BList::FunctionHomeRetransTimeout ()
 {
-  //StopHomeRetransTimer();
   NS_LOG_FUNCTION_NOARGS ();
   Ptr<mipv6MN> mn = GetNode ()->GetObject<mipv6MN>();
 
