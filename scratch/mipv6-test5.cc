@@ -1,13 +1,21 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
+ * Copyright (c) 2017 Jadavpur University, India
  *
- * Mobile IPv6 (RFC3775) Implementation in NS3 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation;
  *
- * Jadavpur Univerity (JU)
- * School of Mobile Computing and Communucation (SMCC)
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Author: M. K. Rana <manoj24.rana@gmail.com>
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
+ * Author: Manoj Kumar Rana <manoj24.rana@gmail.com>
  */
 
 #include "ns3/core-module.h"
@@ -35,13 +43,6 @@
 #include <fstream>
 #include <vector>
 #include <string>
-
-//
-
-
-
-
-//
 
 
 using namespace ns3;
@@ -104,10 +105,6 @@ Ipv6InterfaceContainer midIfs;
 Ipv6InterfaceContainer backbone1Ifs;
 Ipv6InterfaceContainer backbone2Ifs;
 Ipv6InterfaceContainer wimaxstaIfs;
-
-
-
-//SeedManager::SetSeed (123456);
 
 
 InternetStackHelper internet;
@@ -207,7 +204,6 @@ wifiMac.SetType ("ns3::ApWifiMac",
 		           "BeaconInterval", TimeValue (MilliSeconds(100)));
 
 ar1Devs = wifi.Install (wifiPhy, wifiMac, ars.Get(0));
-//ar2Devs = wifi.Install (wifiPhy, wifiMac, ars.Get(1));
 
   WimaxHelper::SchedulerType scheduler = WimaxHelper::SCHED_TYPE_SIMPLE;
   WimaxHelper wimax;
@@ -233,7 +229,6 @@ ar2Ifs.SetDefaultRouteInAllNodes (0);
 
 
 positionAlloc = CreateObject<ListPositionAllocator> ();
-//positionAlloc->Add (Vector (-50.0, 50.0, 0.0)); //STA1
 positionAlloc->Add (Vector (0.0, 50.0, 0.0)); //STA2
 mobility.SetPositionAllocator (positionAlloc);
 mobility.SetMobilityModel ("ns3::ConstantVelocityMobilityModel");  
@@ -354,13 +349,8 @@ mipv6HAHelper hahelper;
 hahelper.Install(ha.Get(0));
 mipv6MNHelper mnhelper1(hahelper.GetHomeAgentAddressList(),false); 
 mnhelper1.Install(sta.Get(0));
-//mnhelper1.Install(sta.Get(1));
-
-//LogComponentEnable("BList", LOG_LEVEL_ALL);
 LogComponentEnable("mipv6MN", LOG_LEVEL_ALL);
 LogComponentEnable("mipv6HA", LOG_LEVEL_ALL);
-//LogComponentEnable("TunnelNetDevice", LOG_LEVEL_ALL);
-//LogComponentEnable("Icmpv6L4Protocol", LOG_LEVEL_ALL);
 
 
 UdpEchoServerHelper echoServer (9);
@@ -414,4 +404,3 @@ Simulator::Schedule (Seconds (5.2), &Ipv6Interface::SetUp, ip->GetInterface(2));
 
   return 0;
 }
-

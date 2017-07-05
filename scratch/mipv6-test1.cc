@@ -1,13 +1,21 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
+ * Copyright (c) 2017 Jadavpur University, India
  *
- * Mobile IPv6 (RFC3775) Implementation in NS3 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation;
  *
- * Jadavpur Univerity (JU)
- * School of Mobile Computing and Communucation (SMCC)
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Author: M. K. Rana <manoj24.rana@gmail.com>
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
+ * Author: Manoj Kumar Rana <manoj24.rana@gmail.com>
  */
 
 #include "ns3/core-module.h"
@@ -33,13 +41,6 @@
 #include <fstream>
 #include <vector>
 #include <string>
-
-//
-
-
-
-
-//
 
 
 using namespace ns3;
@@ -94,10 +95,6 @@ Ipv6InterfaceContainer ar2Ifs;
 Ipv6InterfaceContainer midIfs;
 Ipv6InterfaceContainer backbone1Ifs;
 Ipv6InterfaceContainer backbone2Ifs;
-
-
-
-//SeedManager::SetSeed (123456);
 
 
 InternetStackHelper internet;
@@ -286,22 +283,6 @@ LogComponentEnable("BList", LOG_LEVEL_ALL);
 LogComponentEnable("mipv6MN", LOG_LEVEL_ALL);
 LogComponentEnable("mipv6HA", LOG_LEVEL_ALL);
 
-/*
-UdpEchoServerHelper echoServer (9);
-
-  ApplicationContainer serverApps = echoServer.Install (sta.Get (0));
-  serverApps.Start (Seconds (1.0));
-  serverApps.Stop (Seconds (100.0));
-
-  UdpEchoClientHelper echoClient (Ipv6Address("1001:db80::200:ff:fe00:b"), 9);
-  echoClient.SetAttribute ("MaxPackets", UintegerValue (100000));
-  echoClient.SetAttribute ("Interval", TimeValue (Seconds (0.01)));
-  echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
-
-  ApplicationContainer clientApps = echoClient.Install (mid.Get (0));
-  clientApps.Start (Seconds (4.1));
-  clientApps.Stop (Seconds (100.0));  
-*/
 internet.EnablePcapIpv6 ("prefix1", sta.Get(0));
 internet.EnablePcapIpv6 ("prefix2", ha.Get(0));
 internet.EnablePcapIpv6 ("prefix3", mid.Get(0));

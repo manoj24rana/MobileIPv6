@@ -1,13 +1,21 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
+ * Copyright (c) 2017 Jadavpur University, India
  *
- * Mobile IPv6 (RFC3775) Implementation in NS3 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation;
  *
- * Jadavpur Univerity (JU)
- * School of Mobile Computing and Communucation (SMCC)
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Author: M. K. Rana <manoj24.rana@gmail.com>
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
+ * Author: Manoj Kumar Rana <manoj24.rana@gmail.com>
  */
 
 #include "ns3/core-module.h"
@@ -35,12 +43,6 @@
 #include <vector>
 #include <string>
 
-//
-
-
-
-
-//
 
 
 using namespace ns3;
@@ -98,9 +100,6 @@ Ipv6InterfaceContainer backbone2Ifs;
 
 
 
-//SeedManager::SetSeed (123456);
-
-
 InternetStackHelper internet;
 
 internet.Install (ars);
@@ -109,16 +108,6 @@ internet.Install (ha);
 internet.Install (cn);
 internet.Install (sta);
 
-/*
-Ipv6ListRoutingHelper list;
-Ipv6StaticSourceRoutingHelper sourcer;
-Ipv6StaticRoutingHelper staticr;
-list.Add (sourcer, 10);
-list.Add (staticr, 0);
-internet.SetRoutingHelper (list);
-
-internet.Install (sta);
-*/
 
 backbone1.Add(mid.Get(0));
 backbone1.Add(ars.Get(0));
@@ -237,8 +226,6 @@ wifiMac.SetType ("ns3::StaWifiMac",
 staDevs.Add( wifi.Install (wifiPhy, wifiMac, sta));
 iifc = ipv6.AssignWithoutAddress (staDevs);
 staIfs.Add(iifc);
-//staIfs.SetRouter(0, true);
-
 
 
 
@@ -298,12 +285,8 @@ mipv6MNHelper mnhelper1(hahelper.GetHomeAgentAddressList(),false);
 mnhelper1.Install(sta.Get(0));
 mnhelper1.Install(sta.Get(1));
 
-//LogComponentEnable("BList", LOG_LEVEL_ALL);
 LogComponentEnable("mipv6MN", LOG_LEVEL_ALL);
 LogComponentEnable("mipv6HA", LOG_LEVEL_ALL);
-//LogComponentEnable("Ipv6L3Protocol", LOG_LEVEL_ALL);
-//LogComponentEnable("Ipv6TunnelL4Protocol", LOG_LEVEL_ALL);
-
 
 UdpEchoServerHelper echoServer1 (9);
 UdpEchoServerHelper echoServer2 (10);
@@ -356,4 +339,3 @@ routingHelper.PrintRoutingTableAt (Seconds (1.9), sta.Get(0), routingStream);
 
   return 0;
 }
-
