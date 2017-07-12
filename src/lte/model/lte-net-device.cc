@@ -285,7 +285,6 @@ void
 LteNetDevice::Receive (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p);
-//IPv6 Extension Manoj
   uint8_t ipType;
   Ptr<Packet> pCopy = p->Copy ();
   pCopy->CopyData (&ipType, 1);

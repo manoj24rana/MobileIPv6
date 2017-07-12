@@ -75,7 +75,6 @@ public:
    */
   EpcEnbApplication (Ptr<Socket> lteSocket, Ptr<Socket> s1uSocket, Ipv4Address enbS1uAddress, Ipv4Address sgwS1uAddress, uint16_t cellId);
 
-//IPv6 Extension Manoj
   void SetLTESocket6(Ptr<Socket> lteSocket6);
   Ptr<Socket> GetLTESocket6(); 
   /**
@@ -194,7 +193,6 @@ private:
    */
   Ptr<Socket> m_lteSocket;
 
-//IPv6Extension Manoj
   /**
    * raw packet socket to send and receive the packets to and from the LTE radio interface
    */

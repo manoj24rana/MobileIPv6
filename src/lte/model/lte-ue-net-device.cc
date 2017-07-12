@@ -250,14 +250,14 @@ LteUeNetDevice::DoInitialize (void)
   m_mac->Initialize ();
   m_rrc->Initialize ();
 }
-//IPv6 Extension Manoj
+
 bool
 LteUeNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
   NS_LOG_FUNCTION (this << dest << protocolNumber);
   if (protocolNumber != Ipv4L3Protocol::PROT_NUMBER && protocolNumber != Ipv6L3Protocol::PROT_NUMBER)
     {
-      NS_LOG_INFO("unsupported protocol " << protocolNumber << ", only IPv4 and IPv6 is supported");
+      NS_LOG_INFO("unsupported protocol " << protocolNumber << ", only IPv4 and IPv6 are supported");
       return true;
     }  
   return m_nas->Send (packet);

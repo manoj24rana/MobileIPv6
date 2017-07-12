@@ -93,7 +93,6 @@ EpcSgwPgwApplication::UeInfo::SetUeAddr (Ipv4Address ueAddr)
   m_ueAddr = ueAddr;
 }
 
-//IPv6 Extension Manoj
 Ipv6Address 
 EpcSgwPgwApplication::UeInfo::GetUeAddr6 ()
 {
@@ -130,7 +129,6 @@ EpcSgwPgwApplication::DoDispose ()
 }
 
   
-//IPv6 Extension Manoj
 EpcSgwPgwApplication::EpcSgwPgwApplication (const Ptr<VirtualNetDevice> tunDevice, const Ptr<VirtualNetDevice> tunDevice6, const Ptr<Socket> s1uSocket)
   : m_s1uSocket (s1uSocket),
     m_tunDevice (tunDevice),
@@ -156,13 +154,11 @@ EpcSgwPgwApplication::RecvFromTunDevice (Ptr<Packet> packet, const Address& sour
 {
   NS_LOG_FUNCTION (this << source << dest << packet << packet->GetSize ());
 
-//IPv6 Extension Manoj
-
   uint8_t ipType;
   // get IP address of UE
   Ptr<Packet> pCopy = packet->Copy ();
   pCopy->CopyData (&ipType, 1);
-  ipType=(ipType>>4) & 0x0f;
+  ipType = (ipType>>4) & 0x0f;
   if (ipType == 0x04)
     {
       Ipv4Header ipv4Header;
@@ -245,12 +241,12 @@ EpcSgwPgwApplication::SendToTunDevice (Ptr<Packet> packet, uint32_t teid)
 {
   NS_LOG_FUNCTION (this << packet << teid);
   NS_LOG_LOGIC (" packet size: " << packet->GetSize () << " bytes");
-//IPv6 Extension Manoj
+
   uint8_t ipType;
   // get IP address of UE
   Ptr<Packet> pCopy = packet->Copy ();
   pCopy->CopyData (&ipType, 1);
-  ipType=(ipType>>4) & 0x0f;
+  ipType = (ipType>>4) & 0x0f;
   if (ipType == 0x04)
     {
       m_tunDevice->Receive (packet, 0x0800, m_tunDevice->GetAddress (), m_tunDevice->GetAddress (), NetDevice::PACKET_HOST);
@@ -317,7 +313,6 @@ EpcSgwPgwApplication::SetUeAddress (uint64_t imsi, Ipv4Address ueAddr)
   ueit->second->SetUeAddr (ueAddr);
 }
 
-//IPv6 Extension Manoj
 void 
 EpcSgwPgwApplication::SetUeAddress6 (uint64_t imsi, Ipv6Address ueAddr)
 {

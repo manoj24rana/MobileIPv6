@@ -62,9 +62,6 @@ PointToPointEpcHelper::PointToPointEpcHelper ()
 
   // we use a /8 net for all UEs
   m_ueAddressHelper.SetBase ("7.0.0.0", "255.0.0.0");
-
-//IPv6 Extension Manoj
-
   m_ueAddressHelper6.SetBase (Ipv6Address ("7777:db80::"), Ipv6Prefix (64));
   
   
@@ -81,31 +78,23 @@ PointToPointEpcHelper::PointToPointEpcHelper ()
   // create TUN device implementing tunneling of user data over GTP-U/UDP/IP 
   m_tunDevice = CreateObject<VirtualNetDevice> ();
 
-//IPv6 Extension Manoj
   // create TUN device containing IPv6 address and implementing tunneling of user data over GTP-U/UDP/IP 
   m_tunDevice6 = CreateObject<VirtualNetDevice> ();
 
   // allow jumbo packets
   m_tunDevice->SetAttribute ("Mtu", UintegerValue (30000));
-
-//IPv6 Extension Manoj
   m_tunDevice6->SetAttribute ("Mtu", UintegerValue (30000));
 
   // yes we need this
   m_tunDevice->SetAddress (Mac48Address::Allocate ()); 
-
-//IPv6 Extension Manoj
-  // yes we need this
   m_tunDevice6->SetAddress (Mac48Address::Allocate ()); 
 
 
 
   m_sgwPgw->AddDevice (m_tunDevice);
-//IPv6 Extension Manoj
   m_sgwPgw->AddDevice (m_tunDevice6);
   NetDeviceContainer tunDeviceContainer;
   tunDeviceContainer.Add (m_tunDevice);
-//IPv6 Extension Manoj
   NetDeviceContainer tunDeviceContainer6;
   tunDeviceContainer6.Add (m_tunDevice6);
   
@@ -114,13 +103,11 @@ PointToPointEpcHelper::PointToPointEpcHelper ()
   // the PGW it will be forwarded to the TUN device. 
   Ipv4InterfaceContainer tunDeviceIpv4IfContainer = m_ueAddressHelper.Assign (tunDeviceContainer);  
 
-//IPv6 Extension Manoj
   // the TUN device is on the same subnet as the UEs, so when a packet
   // addressed to an UE IPv6 address arrives at the intenet to the WAN interface of
   // the PGW it will be forwarded to the TUN device. 
   Ipv6InterfaceContainer tunDeviceIpv4IfContainer6 = m_ueAddressHelper6.Assign (tunDeviceContainer6);
 
-//IPv6 Extension Manoj, the constructor is changed
   // create EpcSgwPgwApplication
   m_sgwPgwApp = CreateObject<EpcSgwPgwApplication> (m_tunDevice, m_tunDevice6, sgwPgwS1uSocket);
   m_sgwPgw->AddApplication (m_sgwPgwApp);
@@ -128,7 +115,6 @@ PointToPointEpcHelper::PointToPointEpcHelper ()
   // connect SgwPgwApplication and virtual net device for tunneling
   m_tunDevice->SetSendCallback (MakeCallback (&EpcSgwPgwApplication::RecvFromTunDevice, m_sgwPgwApp));
 
-//IPv6 Extension Manoj
   // connect SgwPgwApplication and virtual net device 6 for tunneling
   m_tunDevice6->SetSendCallback (MakeCallback (&EpcSgwPgwApplication::RecvFromTunDevice, m_sgwPgwApp));
 
@@ -190,7 +176,6 @@ PointToPointEpcHelper::DoDispose ()
   NS_LOG_FUNCTION (this);
   m_tunDevice->SetSendCallback (MakeNullCallback<bool, Ptr<Packet>, const Address&, const Address&, uint16_t> ());
   m_tunDevice = 0;
-//IPv6 Extension Manoj
   m_tunDevice6->SetSendCallback (MakeNullCallback<bool, Ptr<Packet>, const Address&, const Address&, uint16_t> ());
   m_tunDevice6 = 0;
   m_sgwPgwApp = 0;  
@@ -254,7 +239,6 @@ PointToPointEpcHelper::AddEnb (Ptr<Node> enb, Ptr<NetDevice> lteEnbNetDevice, ui
   retval = enbLteSocket->Connect (enbLteSocketConnectAddress);
   NS_ASSERT (retval == 0);  
 
-//IPv6 Extension Manoj
   // create LTE socket for the ENB 
   Ptr<Socket> enbLteSocket6 = Socket::CreateSocket (enb, TypeId::LookupByName ("ns3::PacketSocketFactory"));
   PacketSocketAddress enbLteSocketBindAddress6;
@@ -347,7 +331,6 @@ PointToPointEpcHelper::AddUe (Ptr<NetDevice> ueDevice, uint64_t imsi)
 
 }
 
-//IPv6 Extension Manoj
 uint8_t
 PointToPointEpcHelper::ActivateEpsBearer (Ptr<NetDevice> ueDevice, uint64_t imsi, Ptr<EpcTft> tft, EpsBearer bearer)
 {
@@ -398,12 +381,10 @@ PointToPointEpcHelper::AssignUeIpv4Address (NetDeviceContainer ueDevices)
   return m_ueAddressHelper.Assign (ueDevices);
 }
 
-//IPv6 Extension Manoj
 
 Ipv6InterfaceContainer 
 PointToPointEpcHelper::AssignUeIpv6Address (NetDeviceContainer ueDevices)
 {
-std::cout<<"\nppppppppppppppppppppppppppppppppppppppp\n";
   return m_ueAddressHelper6.Assign (ueDevices);
 }
 
@@ -413,8 +394,6 @@ PointToPointEpcHelper::GetUeDefaultGatewayAddress ()
   // return the address of the tun device
   return m_sgwPgw->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();
 }
-
-//IPv6 Extension Manoj
 
 Ipv6Address
 PointToPointEpcHelper::GetUeDefaultGatewayAddress6 ()

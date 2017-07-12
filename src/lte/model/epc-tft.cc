@@ -52,11 +52,9 @@ std::ostream& operator<< (std::ostream& os, EpcTft::PacketFilter& f)
 {
   os << " direction: " << f.direction
      << " remoteAddress: "  << f.remoteAddress
-//IPv6 Extension Manoj
      << " remoteAddress6: "  << f.remoteAddress6
      << " remoteMask: "  << f.remoteMask 
      << " localAddress: "  << f.localAddress
-//IPv6 Extension Manoj
      << " localAddress6: "  << f.localAddress6 
      << " localMask: "  << f.localMask 
      << " remotePortStart: "   << f.remotePortStart
@@ -139,8 +137,6 @@ EpcTft::PacketFilter::Matches (Direction d,
     }
   return false;      
 }
-
-//IPv6 Extension Manoj
 
 bool 
 EpcTft::PacketFilter::Matches (Direction d,
@@ -248,7 +244,6 @@ EpcTft::Matches (Direction direction,
   return false;
 }
 
-//IPv6 Extension manoj
 bool 
 EpcTft::Matches (Direction direction,
 		 Ipv6Address remoteAddress, 

@@ -94,7 +94,6 @@ public:
 		  uint16_t lp,
 		  uint8_t tos);
 
-//IPv6 Extension Manoj
     /** 
      * 
      * \param d the direction 
@@ -126,11 +125,9 @@ public:
 			    to uplink / downlink only, or in both cases*/
 
     Ipv4Address remoteAddress;     /**< IPv4 address of the remote host  */
-//IPv6 Extension Manoj
     Ipv6Address remoteAddress6;     /**< IPv6 address of the remote host  */
     Ipv4Mask remoteMask;            /**< IPv4 address mask of the remote host */
     Ipv4Address localAddress;       /**< IPv4 address of the UE */
-//IPv6 Extension Manoj
     Ipv6Address localAddress6;      /**< IPv6 address of the UE */
     Ipv4Mask localMask;  /**< IPv4 address mask of the UE */
   
@@ -175,7 +172,6 @@ public:
 		  uint16_t localPort,
 		  uint8_t typeOfService);
 
-//IPv6 Extension Manoj
     /** 
      * 
      * \param direction 

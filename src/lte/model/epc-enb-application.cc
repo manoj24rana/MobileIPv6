@@ -73,7 +73,6 @@ EpcEnbApplication::DoDispose (void)
 {
   NS_LOG_FUNCTION (this);
   m_lteSocket = 0;
-//IPv6 Extension Manoj
   m_lteSocket6 = 0;
   m_s1uSocket = 0;
   delete m_s1SapProvider;
@@ -243,7 +242,7 @@ void
 EpcEnbApplication::RecvFromLteSocket (Ptr<Socket> socket)
 {
   NS_LOG_FUNCTION (this);  
-//IPv6 Extension Manoj
+
   if(m_lteSocket6)
     {
       NS_ASSERT (socket == m_lteSocket || socket == m_lteSocket6);
@@ -252,7 +251,7 @@ EpcEnbApplication::RecvFromLteSocket (Ptr<Socket> socket)
     {
       NS_ASSERT (socket == m_lteSocket);
     }
-Ptr<Packet> packet = socket->Recv ();
+  Ptr<Packet> packet = socket->Recv ();
 
   /// \internal
   /// Workaround for \bugid{231}
@@ -305,11 +304,10 @@ EpcEnbApplication::SendToLteSocket (Ptr<Packet> packet, uint16_t rnti, uint8_t b
   NS_LOG_FUNCTION (this << packet << rnti << (uint16_t) bid << packet->GetSize ());  
   EpsBearerTag tag (rnti, bid);
   packet->AddPacketTag (tag);
-//IPv6 Extension Manoj
   uint8_t ipType;
   Ptr<Packet> pCopy = packet->Copy ();
   pCopy->CopyData (&ipType, 1);
-  ipType=(ipType>>4) & 0x0f;
+  ipType = (ipType>>4) & 0x0f;
   int sentBytes;
   if (ipType == 0x04)
     {
@@ -350,14 +348,13 @@ EpcEnbApplication::DoReleaseIndication (uint64_t imsi, uint16_t rnti, uint8_t be
   m_s1apSapMme->ErabReleaseIndication (imsi, rnti, erabToBeReleaseIndication);
 }
 
-//IPv6 Extension Manoj
-void EpcEnbApplication::SetLTESocket6(Ptr<Socket> lteSocket6)
+void EpcEnbApplication::SetLTESocket6 (Ptr<Socket> lteSocket6)
 {
   m_lteSocket6 = lteSocket6;
   m_lteSocket6->SetRecvCallback (MakeCallback (&EpcEnbApplication::RecvFromLteSocket, this));
 }
 
-Ptr<Socket> EpcEnbApplication::GetLTESocket6()
+Ptr<Socket> EpcEnbApplication::GetLTESocket6 ()
 {
   return m_lteSocket6;
 }

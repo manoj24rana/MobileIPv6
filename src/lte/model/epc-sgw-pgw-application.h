@@ -63,7 +63,6 @@ public:
    * internet over GTP-U/UDP/IP on the S1-U interface
    * \param s1uSocket socket used to send GTP-U packets to the eNBs
    */
-//IPv6 Extension Manoj
   EpcSgwPgwApplication (const Ptr<VirtualNetDevice> tunDevice, const Ptr<VirtualNetDevice> tunDevice6, const Ptr<Socket> s1uSocket);
 
   /** 
@@ -151,7 +150,6 @@ public:
    */
   void SetUeAddress (uint64_t imsi, Ipv4Address ueAddr);
 
-//IPv6 Extension Manoj
   /** 
    * set the address of a previously added UE
    * 
@@ -216,25 +214,24 @@ public:
     void SetEnbAddr (Ipv4Address addr);
 
     /** 
-     * \return the address of the UE
+     * \return the IPv4 address of the UE
      */
     Ipv4Address GetUeAddr ();
 
     /** 
-     * set the address of the UE
+     * set the IPv4 address of the UE
      * 
      * \param addr the address of the UE
      */
     void SetUeAddr (Ipv4Address addr);
 
-//IPv6 Extension Manoj
     /** 
-     * \return the address of the UE
+     * \return the IPv6 address of the UE
      */
     Ipv6Address GetUeAddr6 ();
 
     /** 
-     * set the address of the UE
+     * set the IPv6 address of the UE
      * 
      * \param addr the address of the UE
      */
@@ -244,7 +241,6 @@ public:
     EpcTftClassifier m_tftClassifier;
     Ipv4Address m_enbAddr;
     Ipv4Address m_ueAddr;
-//IPv6 Extension Manoj
     Ipv6Address m_ueAddr6;
     std::map<uint8_t, uint32_t> m_teidByBearerIdMap;
   };
@@ -261,7 +257,6 @@ public:
    */
   Ptr<VirtualNetDevice> m_tunDevice;
 
-//IPv6 Extension Manoj
   /**
    * TUN VirtualNetDevice used for tunneling/detunneling IP packets
    * from/to the internet over GTP-U/UDP/IP on the S1 interface 
@@ -273,7 +268,6 @@ public:
    */
   std::map<Ipv4Address, Ptr<UeInfo> > m_ueInfoByAddrMap;
 
-//IPv6 Extension Manoj
   /**
    * Map telling for each UE IPv6 address the corresponding UE info 
    */
