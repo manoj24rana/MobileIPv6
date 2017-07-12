@@ -63,7 +63,8 @@ public:
    * internet over GTP-U/UDP/IP on the S1-U interface
    * \param s1uSocket socket used to send GTP-U packets to the eNBs
    */
-  EpcSgwPgwApplication (const Ptr<VirtualNetDevice> tunDevice, const Ptr<Socket> s1uSocket);
+//IPv6 Extension Manoj
+  EpcSgwPgwApplication (const Ptr<VirtualNetDevice> tunDevice, const Ptr<VirtualNetDevice> tunDevice6, const Ptr<Socket> s1uSocket);
 
   /** 
    * Destructor
@@ -150,6 +151,15 @@ public:
    */
   void SetUeAddress (uint64_t imsi, Ipv4Address ueAddr);
 
+//IPv6 Extension Manoj
+  /** 
+   * set the address of a previously added UE
+   * 
+   * \param imsi the unique identifier of the UE
+   * \param ueAddr the IPv4 address of the UE
+   */
+  void SetUeAddress6 (uint64_t imsi, Ipv6Address ueAddr);
+
 private:
 
   // S11 SAP SGW methods
@@ -217,11 +227,25 @@ public:
      */
     void SetUeAddr (Ipv4Address addr);
 
+//IPv6 Extension Manoj
+    /** 
+     * \return the address of the UE
+     */
+    Ipv6Address GetUeAddr6 ();
+
+    /** 
+     * set the address of the UE
+     * 
+     * \param addr the address of the UE
+     */
+    void SetUeAddr6 (Ipv6Address addr);
 
   private:
     EpcTftClassifier m_tftClassifier;
     Ipv4Address m_enbAddr;
     Ipv4Address m_ueAddr;
+//IPv6 Extension Manoj
+    Ipv6Address m_ueAddr6;
     std::map<uint8_t, uint32_t> m_teidByBearerIdMap;
   };
 
@@ -237,10 +261,23 @@ public:
    */
   Ptr<VirtualNetDevice> m_tunDevice;
 
+//IPv6 Extension Manoj
   /**
-   * Map telling for each UE address the corresponding UE info 
+   * TUN VirtualNetDevice used for tunneling/detunneling IP packets
+   * from/to the internet over GTP-U/UDP/IP on the S1 interface 
+   */
+  Ptr<VirtualNetDevice> m_tunDevice6;
+
+  /**
+   * Map telling for each UE IPv4 address the corresponding UE info 
    */
   std::map<Ipv4Address, Ptr<UeInfo> > m_ueInfoByAddrMap;
+
+//IPv6 Extension Manoj
+  /**
+   * Map telling for each UE IPv6 address the corresponding UE info 
+   */
+  std::map<Ipv6Address, Ptr<UeInfo> > m_ueInfoByAddrMap6;
 
   /**
    * Map telling for each IMSI the corresponding UE info 

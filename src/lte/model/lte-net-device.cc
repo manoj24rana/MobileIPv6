@@ -32,8 +32,10 @@
 #include "ns3/enum.h"
 #include "lte-amc.h"
 #include "ns3/ipv4-header.h"
+#include "ns3/ipv6-header.h"
 #include <ns3/lte-radio-bearer-tag.h>
 #include <ns3/ipv4-l3-protocol.h>
+#include <ns3/ipv6-l3-protocol.h>
 #include <ns3/log.h>
 
 namespace ns3 {
@@ -283,7 +285,15 @@ void
 LteNetDevice::Receive (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p);
-  m_rxCallback (this, p, Ipv4L3Protocol::PROT_NUMBER, Address ());
+//IPv6 Extension Manoj
+  uint8_t ipType;
+  Ptr<Packet> pCopy = p->Copy ();
+  pCopy->CopyData (&ipType, 1);
+  ipType=(ipType>>4) & 0x0f;
+  if (ipType == 0x04)
+    m_rxCallback (this, p, Ipv4L3Protocol::PROT_NUMBER, Address ());
+  else
+    m_rxCallback (this, p, Ipv6L3Protocol::PROT_NUMBER, Address ());
 }
 
 

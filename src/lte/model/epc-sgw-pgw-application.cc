@@ -24,6 +24,8 @@
 #include "ns3/log.h"
 #include "ns3/mac48-address.h"
 #include "ns3/ipv4.h"
+#include "ns3/ipv6.h"
+#include "ns3/ipv6-header.h"
 #include "ns3/inet-socket-address.h"
 #include "ns3/epc-gtpu-header.h"
 #include "ns3/abort.h"
@@ -91,6 +93,19 @@ EpcSgwPgwApplication::UeInfo::SetUeAddr (Ipv4Address ueAddr)
   m_ueAddr = ueAddr;
 }
 
+//IPv6 Extension Manoj
+Ipv6Address 
+EpcSgwPgwApplication::UeInfo::GetUeAddr6 ()
+{
+  return m_ueAddr6;
+}
+
+void
+EpcSgwPgwApplication::UeInfo::SetUeAddr6 (Ipv6Address ueAddr)
+{
+  m_ueAddr6 = ueAddr;
+}
+
 /////////////////////////
 // EpcSgwPgwApplication
 /////////////////////////
@@ -115,15 +130,16 @@ EpcSgwPgwApplication::DoDispose ()
 }
 
   
-
-EpcSgwPgwApplication::EpcSgwPgwApplication (const Ptr<VirtualNetDevice> tunDevice, const Ptr<Socket> s1uSocket)
+//IPv6 Extension Manoj
+EpcSgwPgwApplication::EpcSgwPgwApplication (const Ptr<VirtualNetDevice> tunDevice, const Ptr<VirtualNetDevice> tunDevice6, const Ptr<Socket> s1uSocket)
   : m_s1uSocket (s1uSocket),
     m_tunDevice (tunDevice),
+    m_tunDevice6 (tunDevice6),
     m_gtpuUdpPort (2152), // fixed by the standard
     m_teidCount (0),
     m_s11SapMme (0)
 {
-  NS_LOG_FUNCTION (this << tunDevice << s1uSocket);
+  NS_LOG_FUNCTION (this << tunDevice << tunDevice6 << s1uSocket);
   m_s1uSocket->SetRecvCallback (MakeCallback (&EpcSgwPgwApplication::RecvFromS1uSocket, this));
   m_s11SapSgw = new MemberEpcS11SapSgw<EpcSgwPgwApplication> (this);
 }
@@ -140,30 +156,63 @@ EpcSgwPgwApplication::RecvFromTunDevice (Ptr<Packet> packet, const Address& sour
 {
   NS_LOG_FUNCTION (this << source << dest << packet << packet->GetSize ());
 
+//IPv6 Extension Manoj
+
+  uint8_t ipType;
   // get IP address of UE
   Ptr<Packet> pCopy = packet->Copy ();
-  Ipv4Header ipv4Header;
-  pCopy->RemoveHeader (ipv4Header);
-  Ipv4Address ueAddr =  ipv4Header.GetDestination ();
-  NS_LOG_LOGIC ("packet addressed to UE " << ueAddr);
-
-  // find corresponding UeInfo address
-  std::map<Ipv4Address, Ptr<UeInfo> >::iterator it = m_ueInfoByAddrMap.find (ueAddr);
-  if (it == m_ueInfoByAddrMap.end ())
-    {        
-      NS_LOG_WARN ("unknown UE address " << ueAddr);
-    }
-  else
+  pCopy->CopyData (&ipType, 1);
+  ipType=(ipType>>4) & 0x0f;
+  if (ipType == 0x04)
     {
-      Ipv4Address enbAddr = it->second->GetEnbAddr ();      
-      uint32_t teid = it->second->Classify (packet);   
-      if (teid == 0)
-        {
-          NS_LOG_WARN ("no matching bearer for this packet");                   
+      Ipv4Header ipv4Header;
+      pCopy->RemoveHeader (ipv4Header);
+      Ipv4Address ueAddr =  ipv4Header.GetDestination ();
+      NS_LOG_LOGIC ("packet addressed to UE " << ueAddr);
+      // find corresponding UeInfo address
+      std::map<Ipv4Address, Ptr<UeInfo> >::iterator it = m_ueInfoByAddrMap.find (ueAddr);
+      if (it == m_ueInfoByAddrMap.end ())
+        {        
+          NS_LOG_WARN ("unknown UE address " << ueAddr);
         }
       else
         {
-          SendToS1uSocket (packet, enbAddr, teid);
+          Ipv4Address enbAddr = it->second->GetEnbAddr ();      
+          uint32_t teid = it->second->Classify (packet);   
+          if (teid == 0)
+            {
+              NS_LOG_WARN ("no matching bearer for this packet");                   
+            }
+          else
+            {
+              SendToS1uSocket (packet, enbAddr, teid);
+            }
+        }
+    }
+  else
+    {
+      Ipv6Header ipv6Header;
+      pCopy->RemoveHeader (ipv6Header);
+      Ipv6Address ueAddr =  ipv6Header.GetDestinationAddress ();
+      NS_LOG_LOGIC ("packet addressed to UE " << ueAddr);
+      // find corresponding UeInfo address
+      std::map<Ipv6Address, Ptr<UeInfo> >::iterator it = m_ueInfoByAddrMap6.find (ueAddr);
+      if (it == m_ueInfoByAddrMap6.end ())
+        {        
+          NS_LOG_WARN ("unknown UE address " << ueAddr);
+        }
+      else
+        {
+          Ipv4Address enbAddr = it->second->GetEnbAddr ();      
+          uint32_t teid = it->second->Classify (packet);   
+          if (teid == 0)
+            {
+              NS_LOG_WARN ("no matching bearer for this packet");                   
+            }
+          else
+            {
+              SendToS1uSocket (packet, enbAddr, teid);
+            }
         }
     }
   // there is no reason why we should notify the TUN
@@ -196,7 +245,20 @@ EpcSgwPgwApplication::SendToTunDevice (Ptr<Packet> packet, uint32_t teid)
 {
   NS_LOG_FUNCTION (this << packet << teid);
   NS_LOG_LOGIC (" packet size: " << packet->GetSize () << " bytes");
-  m_tunDevice->Receive (packet, 0x0800, m_tunDevice->GetAddress (), m_tunDevice->GetAddress (), NetDevice::PACKET_HOST);
+//IPv6 Extension Manoj
+  uint8_t ipType;
+  // get IP address of UE
+  Ptr<Packet> pCopy = packet->Copy ();
+  pCopy->CopyData (&ipType, 1);
+  ipType=(ipType>>4) & 0x0f;
+  if (ipType == 0x04)
+    {
+      m_tunDevice->Receive (packet, 0x0800, m_tunDevice->GetAddress (), m_tunDevice->GetAddress (), NetDevice::PACKET_HOST);
+    }
+  else
+    {
+      m_tunDevice6->Receive (packet, 0x86DD, m_tunDevice6->GetAddress (), m_tunDevice6->GetAddress (), NetDevice::PACKET_HOST);
+    }
 }
 
 void 
@@ -253,6 +315,17 @@ EpcSgwPgwApplication::SetUeAddress (uint64_t imsi, Ipv4Address ueAddr)
   NS_ASSERT_MSG (ueit != m_ueInfoByImsiMap.end (), "unknown IMSI " << imsi); 
   m_ueInfoByAddrMap[ueAddr] = ueit->second;
   ueit->second->SetUeAddr (ueAddr);
+}
+
+//IPv6 Extension Manoj
+void 
+EpcSgwPgwApplication::SetUeAddress6 (uint64_t imsi, Ipv6Address ueAddr)
+{
+  NS_LOG_FUNCTION (this << imsi << ueAddr);
+  std::map<uint64_t, Ptr<UeInfo> >::iterator ueit = m_ueInfoByImsiMap.find (imsi);
+  NS_ASSERT_MSG (ueit != m_ueInfoByImsiMap.end (), "unknown IMSI " << imsi); 
+  m_ueInfoByAddrMap6[ueAddr] = ueit->second;
+  ueit->second->SetUeAddr6 (ueAddr);
 }
 
 void 

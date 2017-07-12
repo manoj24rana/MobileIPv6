@@ -24,6 +24,7 @@
 #include "ns3/log.h"
 #include "ns3/mac48-address.h"
 #include "ns3/ipv4.h"
+#include "ns3/ipv6.h"
 #include "ns3/inet-socket-address.h"
 #include "ns3/uinteger.h"
 
@@ -72,14 +73,16 @@ EpcEnbApplication::DoDispose (void)
 {
   NS_LOG_FUNCTION (this);
   m_lteSocket = 0;
+//IPv6 Extension Manoj
+  m_lteSocket6 = 0;
   m_s1uSocket = 0;
   delete m_s1SapProvider;
   delete m_s1apSapEnb;
 }
 
-
 EpcEnbApplication::EpcEnbApplication (Ptr<Socket> lteSocket, Ptr<Socket> s1uSocket, Ipv4Address enbS1uAddress, Ipv4Address sgwS1uAddress, uint16_t cellId)
   : m_lteSocket (lteSocket),
+    m_lteSocket6 (0),
     m_s1uSocket (s1uSocket),    
     m_enbS1uAddress (enbS1uAddress),
     m_sgwS1uAddress (sgwS1uAddress),
@@ -240,8 +243,16 @@ void
 EpcEnbApplication::RecvFromLteSocket (Ptr<Socket> socket)
 {
   NS_LOG_FUNCTION (this);  
-  NS_ASSERT (socket == m_lteSocket);
-  Ptr<Packet> packet = socket->Recv ();
+//IPv6 Extension Manoj
+  if(m_lteSocket6)
+    {
+      NS_ASSERT (socket == m_lteSocket || socket == m_lteSocket6);
+    }
+  else
+    {
+      NS_ASSERT (socket == m_lteSocket);
+    }
+Ptr<Packet> packet = socket->Recv ();
 
   /// \internal
   /// Workaround for \bugid{231}
@@ -294,7 +305,21 @@ EpcEnbApplication::SendToLteSocket (Ptr<Packet> packet, uint16_t rnti, uint8_t b
   NS_LOG_FUNCTION (this << packet << rnti << (uint16_t) bid << packet->GetSize ());  
   EpsBearerTag tag (rnti, bid);
   packet->AddPacketTag (tag);
-  int sentBytes = m_lteSocket->Send (packet);
+//IPv6 Extension Manoj
+  uint8_t ipType;
+  Ptr<Packet> pCopy = packet->Copy ();
+  pCopy->CopyData (&ipType, 1);
+  ipType=(ipType>>4) & 0x0f;
+  int sentBytes;
+  if (ipType == 0x04)
+    {
+      sentBytes = m_lteSocket->Send (packet);
+    }
+  else
+    {
+      sentBytes = m_lteSocket6->Send (packet);
+    }
+
   NS_ASSERT (sentBytes > 0);
 }
 
@@ -324,4 +349,17 @@ EpcEnbApplication::DoReleaseIndication (uint64_t imsi, uint16_t rnti, uint8_t be
   //From 3GPP TS 23401-950 Section 5.4.4.2, enB sends EPS bearer Identity in Bearer Release Indication message to MME
   m_s1apSapMme->ErabReleaseIndication (imsi, rnti, erabToBeReleaseIndication);
 }
+
+//IPv6 Extension Manoj
+void EpcEnbApplication::SetLTESocket6(Ptr<Socket> lteSocket6)
+{
+  m_lteSocket6 = lteSocket6;
+  m_lteSocket6->SetRecvCallback (MakeCallback (&EpcEnbApplication::RecvFromLteSocket, this));
+}
+
+Ptr<Socket> EpcEnbApplication::GetLTESocket6()
+{
+  return m_lteSocket6;
+}
+
 }  // namespace ns3

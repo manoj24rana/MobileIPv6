@@ -51,9 +51,13 @@ std::ostream& operator<< (std::ostream& os, EpcTft::Direction& d)
 std::ostream& operator<< (std::ostream& os, EpcTft::PacketFilter& f)
 {
   os << " direction: " << f.direction
-     << " remoteAddress: "  << f.remoteAddress 
+     << " remoteAddress: "  << f.remoteAddress
+//IPv6 Extension Manoj
+     << " remoteAddress6: "  << f.remoteAddress6
      << " remoteMask: "  << f.remoteMask 
-     << " localAddress: "  << f.localAddress 
+     << " localAddress: "  << f.localAddress
+//IPv6 Extension Manoj
+     << " localAddress6: "  << f.localAddress6 
      << " localMask: "  << f.localMask 
      << " remotePortStart: "   << f.remotePortStart
      << " remotePortEnd: "   << f.remotePortEnd 
@@ -136,6 +140,59 @@ EpcTft::PacketFilter::Matches (Direction d,
   return false;      
 }
 
+//IPv6 Extension Manoj
+
+bool 
+EpcTft::PacketFilter::Matches (Direction d,
+			       Ipv6Address ra, 
+			       Ipv6Address la, 
+			       uint16_t rp,
+			       uint16_t lp,
+			       uint8_t tos)
+{
+  NS_LOG_FUNCTION (this << d << ra << la << rp << lp << (uint16_t) tos);
+  if (d & direction)
+    {
+      NS_LOG_LOGIC ("d matches");
+	      if (rp >= remotePortStart)
+		{
+		  NS_LOG_LOGIC ("rps matches");
+		  if (rp <= remotePortEnd)
+		    {
+		      NS_LOG_LOGIC ("rpe matches");
+		      if (lp >= localPortStart)
+			{
+			  NS_LOG_LOGIC ("lps matches");
+			  if (lp <= localPortEnd)
+			    {
+			      NS_LOG_LOGIC ("lpe matches");
+			      if ((tos & typeOfServiceMask) == (typeOfService & typeOfServiceMask))
+				{
+				  NS_LOG_LOGIC ("tos matches --> have match!");
+				  return true;
+				}
+			    }
+			}
+		    }
+		
+	    
+	  else
+	    {
+	      NS_LOG_LOGIC ("la doesn't match: la=" << la << " f.la=" << localAddress << " f.lmask=" << localMask);
+	    }
+	}
+      else
+	{
+	  NS_LOG_LOGIC ("ra doesn't match: ra=" << ra << " f.ra=" << remoteAddress << " f.rmask=" << remoteMask);
+	}
+    }
+  else
+    {
+      NS_LOG_LOGIC ("d doesn't match: d=0x" << std::hex << d << " f.d=0x" << std::hex << direction << std::dec);
+    }
+  return false;      
+}
+
 
 Ptr<EpcTft> 
 EpcTft::Default ()
@@ -174,6 +231,28 @@ bool
 EpcTft::Matches (Direction direction,
 		 Ipv4Address remoteAddress, 
 		 Ipv4Address localAddress, 
+		 uint16_t remotePort,
+		 uint16_t localPort,
+		 uint8_t typeOfService)
+{
+  NS_LOG_FUNCTION (this << direction << remoteAddress << localAddress << std::dec << remotePort << localPort << (uint16_t) typeOfService);
+  for (std::list<PacketFilter>::iterator it = m_filters.begin ();
+       it != m_filters.end ();
+       ++it)
+    {
+      if (it->Matches (direction, remoteAddress, localAddress, remotePort, localPort, typeOfService))
+	{
+	  return true;
+	}
+    }  
+  return false;
+}
+
+//IPv6 Extension manoj
+bool 
+EpcTft::Matches (Direction direction,
+		 Ipv6Address remoteAddress, 
+		 Ipv6Address localAddress, 
 		 uint16_t remotePort,
 		 uint16_t localPort,
 		 uint8_t typeOfService)
