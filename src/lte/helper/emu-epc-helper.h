@@ -25,6 +25,7 @@
 
 #include <ns3/object.h>
 #include <ns3/ipv4-address-helper.h>
+#include <ns3/ipv6-address-helper.h>
 #include <ns3/data-rate.h>
 #include <ns3/epc-tft.h>
 #include <ns3/eps-bearer.h>
@@ -80,16 +81,26 @@ public:
   virtual uint8_t ActivateEpsBearer (Ptr<NetDevice> ueLteDevice, uint64_t imsi, Ptr<EpcTft> tft, EpsBearer bearer);
   virtual Ptr<Node> GetPgwNode ();
   virtual Ipv4InterfaceContainer AssignUeIpv4Address (NetDeviceContainer ueDevices);
+//IPv6 Extension Manoj
+  Ipv6InterfaceContainer AssignUeIpv6Address (NetDeviceContainer ueDevices);
   virtual Ipv4Address GetUeDefaultGatewayAddress ();
+//IPv6 Extension Manoj
+  Ipv6Address GetUeDefaultGatewayAddress6 ();
 
 
 
 private:
 
   /** 
-   * helper to assign addresses to UE devices as well as to the TUN device of the SGW/PGW
+   * helper to assign IPv4 addresses to UE devices as well as to the TUN device of the SGW/PGW
    */
   Ipv4AddressHelper m_ueAddressHelper; 
+
+// IPv6 Extension Manoj
+  /** 
+   * helper to assign IPv6 addresses to UE devices as well as to the TUN device of the SGW/PGW
+   */
+  Ipv6AddressHelper m_ueAddressHelper6; 
 
   /**
    * SGW-PGW network element
@@ -102,9 +113,15 @@ private:
   Ptr<EpcSgwPgwApplication> m_sgwPgwApp;
 
   /**
-   * TUN device implementing tunneling of user data over GTP-U/UDP/IP
+   * TUN device containg IPv4 address and implementing tunneling of user data over GTP-U/UDP/IP
    */
   Ptr<VirtualNetDevice> m_tunDevice;
+
+//IPv6 Extension Manoj
+  /**
+   * TUN device containing IPv6 address and implementing tunneling of user data over GTP-U/UDP/IP
+   */
+  Ptr<VirtualNetDevice> m_tunDevice6;
 
   /**
    * MME network element

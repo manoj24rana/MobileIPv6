@@ -26,6 +26,7 @@
 #include <ns3/mac48-address.h>
 #include <ns3/eps-bearer.h>
 #include <ns3/ipv4-address.h>
+#include <ns3/ipv6-address.h>
 #include <ns3/internet-stack-helper.h>
 #include <ns3/packet-socket-helper.h>
 #include <ns3/packet-socket-address.h>
@@ -104,12 +105,14 @@ EmuEpcHelper::DoInitialize ()
   // we use a /8 net for all UEs
   m_ueAddressHelper.SetBase ("7.0.0.0", "255.0.0.0");
 
-  
+//IPv6 Extension Manoj
+
+  m_ueAddressHelper6.SetBase (Ipv6Address ("7777:db80::"), Ipv6Prefix (64));  
  
   // create SgwPgwNode
   m_sgwPgw = CreateObject<Node> ();
   InternetStackHelper internet;
-  internet.SetIpv4StackInstall (true);
+//  internet.SetIpv4StackInstall (true);
   internet.Install (m_sgwPgw);
   
   // create S1-U socket
@@ -117,29 +120,53 @@ EmuEpcHelper::DoInitialize ()
   int retval = sgwPgwS1uSocket->Bind (InetSocketAddress (Ipv4Address::GetAny (), m_gtpuUdpPort));
   NS_ASSERT (retval == 0);
 
-  // create TUN device implementing tunneling of user data over GTP-U/UDP/IP 
+  // create TUN device containg IPv4 address and implementing tunneling of user data over GTP-U/UDP/IP 
   m_tunDevice = CreateObject<VirtualNetDevice> ();
+
+//IPv6 Extension Manoj
+  // create TUN device containing IPv6 address and implementing tunneling of user data over GTP-U/UDP/IP 
+  m_tunDevice6 = CreateObject<VirtualNetDevice> ();
+
   // allow jumbo packets
   m_tunDevice->SetAttribute ("Mtu", UintegerValue (30000));
+//IPv6 Extension Manoj
+  m_tunDevice6->SetAttribute ("Mtu", UintegerValue (30000));
 
   // yes we need this
   m_tunDevice->SetAddress (Mac48Address::Allocate ()); 
+  m_tunDevice6->SetAddress (Mac48Address::Allocate ()); 
 
   m_sgwPgw->AddDevice (m_tunDevice);
+//IPv6 Extension Manoj
+  m_sgwPgw->AddDevice (m_tunDevice6);
   NetDeviceContainer tunDeviceContainer;
   tunDeviceContainer.Add (m_tunDevice);
+//IPv6 Extension Manoj
+  NetDeviceContainer tunDeviceContainer6;
+  tunDeviceContainer6.Add (m_tunDevice6);
   
   // the TUN device is on the same subnet as the UEs, so when a packet
-  // addressed to an UE arrives at the intenet to the WAN interface of
+  // addressed to an UE IPv4 address arrives at the intenet to the WAN interface of
   // the PGW it will be forwarded to the TUN device. 
-  Ipv4InterfaceContainer tunDeviceIpv4IfContainer = m_ueAddressHelper.Assign (tunDeviceContainer);  
+  Ipv4InterfaceContainer tunDeviceIpv4IfContainer = m_ueAddressHelper.Assign (tunDeviceContainer); 
 
+//IPv6 Extension Manoj
+  // the TUN device is on the same subnet as the UEs, so when a packet
+  // addressed to an UE IPv6 address arrives at the intenet to the WAN interface of
+  // the PGW it will be forwarded to the TUN device. 
+  Ipv6InterfaceContainer tunDeviceIpv4IfContainer6 = m_ueAddressHelper6.Assign (tunDeviceContainer6); 
+
+//IPv6 Extension Manoj, the constructor is changed
   // create EpcSgwPgwApplication
-  m_sgwPgwApp = CreateObject<EpcSgwPgwApplication> (m_tunDevice, sgwPgwS1uSocket);
+  m_sgwPgwApp = CreateObject<EpcSgwPgwApplication> (m_tunDevice, m_tunDevice6, sgwPgwS1uSocket);
   m_sgwPgw->AddApplication (m_sgwPgwApp);
   
   // connect SgwPgwApplication and virtual net device for tunneling
   m_tunDevice->SetSendCallback (MakeCallback (&EpcSgwPgwApplication::RecvFromTunDevice, m_sgwPgwApp));
+
+//IPv6 Extension Manoj
+  // connect SgwPgwApplication and virtual net device 6 for tunneling
+  m_tunDevice6->SetSendCallback (MakeCallback (&EpcSgwPgwApplication::RecvFromTunDevice, m_sgwPgwApp));
 
   // Create MME and connect with SGW via S11 interface
   m_mme = CreateObject<EpcMme> ();
@@ -170,6 +197,9 @@ EmuEpcHelper::DoDispose ()
   NS_LOG_FUNCTION (this);
   m_tunDevice->SetSendCallback (MakeNullCallback<bool, Ptr<Packet>, const Address&, const Address&, uint16_t> ());
   m_tunDevice = 0;
+//IPv6 Extension Manoj
+  m_tunDevice6->SetSendCallback (MakeNullCallback<bool, Ptr<Packet>, const Address&, const Address&, uint16_t> ());
+  m_tunDevice6 = 0;
   m_sgwPgwApp = 0;  
   m_sgwPgw->Dispose ();
 }
@@ -184,7 +214,7 @@ EmuEpcHelper::AddEnb (Ptr<Node> enb, Ptr<NetDevice> lteEnbNetDevice, uint16_t ce
 
   NS_ASSERT (enb == lteEnbNetDevice->GetNode ());  
 
-  // add an IPv4 stack to the previously created eNB
+  // add an Internet stack to the previously created eNB
   InternetStackHelper internet;
   internet.Install (enb);
   NS_LOG_LOGIC ("number of Ipv4 ifaces of the eNB after node creation: " << enb->GetObject<Ipv4> ()->GetNInterfaces ());
@@ -231,10 +261,26 @@ EmuEpcHelper::AddEnb (Ptr<Node> enb, Ptr<NetDevice> lteEnbNetDevice, uint16_t ce
   enbLteSocketConnectAddress.SetProtocol (Ipv4L3Protocol::PROT_NUMBER);
   retval = enbLteSocket->Connect (enbLteSocketConnectAddress);
   NS_ASSERT (retval == 0);  
-  
 
+//IPv6 Extension Manoj
+  // create LTE socket for the ENB 
+  Ptr<Socket> enbLteSocket6 = Socket::CreateSocket (enb, TypeId::LookupByName ("ns3::PacketSocketFactory"));
+  PacketSocketAddress enbLteSocketBindAddress6;
+  enbLteSocketBindAddress6.SetSingleDevice (lteEnbNetDevice->GetIfIndex ());
+  enbLteSocketBindAddress6.SetProtocol (Ipv6L3Protocol::PROT_NUMBER);
+  retval = enbLteSocket6->Bind (enbLteSocketBindAddress6);
+  NS_ASSERT (retval == 0);  
+  PacketSocketAddress enbLteSocketConnectAddress6;
+  enbLteSocketConnectAddress6.SetPhysicalAddress (Mac48Address::GetBroadcast ());
+  enbLteSocketConnectAddress6.SetSingleDevice (lteEnbNetDevice->GetIfIndex ());
+  enbLteSocketConnectAddress6.SetProtocol (Ipv6L3Protocol::PROT_NUMBER);
+  retval = enbLteSocket6->Connect (enbLteSocketConnectAddress6);
+  NS_ASSERT (retval == 0);
+  
+//IPv6 Extension Manoj
   NS_LOG_INFO ("create EpcEnbApplication");
   Ptr<EpcEnbApplication> enbApp = CreateObject<EpcEnbApplication> (enbLteSocket, enbS1uSocket, enbAddress, sgwAddress, cellId);
+  enbApp->SetLTESocket6(enbLteSocket6);
   enb->AddApplication (enbApp);
   NS_ASSERT (enb->GetNApplications () == 1);
   NS_ASSERT_MSG (enb->GetApplication (0)->GetObject<EpcEnbApplication> () != 0, "cannot retrieve EpcEnbApplication");
@@ -312,23 +358,35 @@ EmuEpcHelper::AddUe (Ptr<NetDevice> ueDevice, uint64_t imsi)
   
 }
 
+
+//IPv6 Extension Manoj
 uint8_t
 EmuEpcHelper::ActivateEpsBearer (Ptr<NetDevice> ueDevice, uint64_t imsi, Ptr<EpcTft> tft, EpsBearer bearer)
 {
   NS_LOG_FUNCTION (this << ueDevice << imsi);
 
-  // we now retrieve the IPv4 address of the UE and notify it to the SGW;
+  // we now retrieve the IPv4/IPv6 address of the UE and notify it to the SGW;
   // we couldn't do it before since address assignment is triggered by
   // the user simulation program, rather than done by the EPC   
   Ptr<Node> ueNode = ueDevice->GetNode (); 
   Ptr<Ipv4> ueIpv4 = ueNode->GetObject<Ipv4> ();
-  NS_ASSERT_MSG (ueIpv4 != 0, "UEs need to have IPv4 installed before EPS bearers can be activated");
+  Ptr<Ipv6> ueIpv6 = ueNode->GetObject<Ipv6> ();
+  NS_ASSERT_MSG (ueIpv4 != 0 || ueIpv6 != 0, "UEs need to have IPv4/IPv6 installed before EPS bearers can be activated");
   int32_t interface =  ueIpv4->GetInterfaceForDevice (ueDevice);
-  NS_ASSERT (interface >= 0);
-  NS_ASSERT (ueIpv4->GetNAddresses (interface) == 1);
-  Ipv4Address ueAddr = ueIpv4->GetAddress (interface, 0).GetLocal ();
-  NS_LOG_LOGIC (" UE IP address: " << ueAddr);  m_sgwPgwApp->SetUeAddress (imsi, ueAddr);
-  
+  int32_t interface6 =  ueIpv6->GetInterfaceForDevice (ueDevice);
+  NS_ASSERT (interface >= 0 || interface6 >= 0);
+  NS_ASSERT (ueIpv4->GetNAddresses (interface) == 1 || ueIpv6->GetNAddresses (interface6) == 1);
+
+  if(interface >= 0 && ueIpv4->GetNAddresses (interface) == 1)
+   {
+    Ipv4Address ueAddr = ueIpv4->GetAddress (interface, 0).GetLocal ();
+    NS_LOG_LOGIC (" UE IPv4 address: " << ueAddr);  m_sgwPgwApp->SetUeAddress (imsi, ueAddr);
+   }
+  else
+   {
+    Ipv6Address ueAddr6 = ueIpv6->GetAddress (interface6, 0).GetAddress ();
+    NS_LOG_LOGIC (" UE IPv6 address: " << ueAddr6);  m_sgwPgwApp->SetUeAddress6 (imsi, ueAddr6);
+   }
   uint8_t bearerId = m_mme->AddBearer (imsi, tft, bearer);
   Ptr<LteUeNetDevice> ueLteDevice = ueDevice->GetObject<LteUeNetDevice> ();
   if (ueLteDevice)
@@ -352,13 +410,28 @@ EmuEpcHelper::AssignUeIpv4Address (NetDeviceContainer ueDevices)
   return m_ueAddressHelper.Assign (ueDevices);
 }
 
+//IPv6 Extension Manoj
 
+Ipv6InterfaceContainer 
+EmuEpcHelper::AssignUeIpv6Address (NetDeviceContainer ueDevices)
+{
+  return m_ueAddressHelper6.Assign (ueDevices);
+}
 
 Ipv4Address
 EmuEpcHelper::GetUeDefaultGatewayAddress ()
 {
   // return the address of the tun device
   return m_sgwPgw->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();
+}
+
+//IPv6 Extension Manoj
+
+Ipv6Address
+EmuEpcHelper::GetUeDefaultGatewayAddress6 ()
+{
+  // return the address of the tun device
+  return m_sgwPgw->GetObject<Ipv6> ()->GetAddress (1, 1).GetAddress ();
 }
 
 
