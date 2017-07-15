@@ -30,7 +30,6 @@
 #include "ns3/applications-module.h"
 #include "ns3/point-to-point-helper.h"
 #include "ns3/config-store.h"
-//#include "ns3/gtk-config-store.h"
 
 using namespace ns3;
 
@@ -84,16 +83,10 @@ main (int argc, char *argv[])
   p2ph.SetDeviceAttribute ("Mtu", UintegerValue (1500));
   p2ph.SetChannelAttribute ("Delay", TimeValue (Seconds (0.010)));
   NetDeviceContainer internetDevices = p2ph.Install (pgw, remoteHost);
-  Ipv6AddressHelper ipv6h;
-  ipv6h.SetBase (Ipv6Address ("5001:3:a:b::"), Ipv6Prefix (64));
-  Ipv6InterfaceContainer internetIpIfaces = ipv6h.Assign (internetDevices);
 
-  // interface 0 is localhost, 1 is the p2p device
-  Ipv6Address remoteHostAddr = internetIpIfaces.GetAddress (1,1);
-  std::cout<<remoteHostAddr <<"LL"<<internetIpIfaces.GetAddress (0,1);
   Ipv6StaticRoutingHelper ipv6RoutingHelper;
-//  Ptr<Ipv6StaticRouting> remoteHostStaticRouting = ipv6RoutingHelper.GetStaticRouting (remoteHost->GetObject<Ipv6> ());
-//  remoteHostStaticRouting->AddNetworkRouteTo (Ipv6Address("7777:db80::"),Ipv6Prefix(64),Ipv6Address("2001:db80::200:ff:fe00:7"),1,0);
+  Ptr<Ipv6StaticRouting> remoteHostStaticRouting = ipv6RoutingHelper.GetStaticRouting (remoteHost->GetObject<Ipv6> ());
+  remoteHostStaticRouting->AddNetworkRouteTo (Ipv6Address("7777:db80::"),Ipv6Prefix(64),Ipv6Address("6001:db80::200:ff:fe00:3"),1,0);
 
   NodeContainer ueNodes;
   NodeContainer enbNodes;
@@ -114,22 +107,22 @@ main (int argc, char *argv[])
 
   // Install LTE Devices to the nodes
   NetDeviceContainer enbLteDevs = lteHelper->InstallEnbDevice (enbNodes);
-std::cout<<"rrrrrrrrrrrrrrrrrrrrrrrrrrrrr";
   NetDeviceContainer ueLteDevs = lteHelper->InstallUeDevice (ueNodes);
   // Install the IP stack on the UEs
   internet.Install (ueNodes);
-std::cout<<"ttttttttttttttttttttttttttttttt";
   Ipv6InterfaceContainer ueIpIface;
-std::cout<<"\n"<< epcHelper->GetUeDefaultGatewayAddress6 ()<<"\n";
+
+ for (NetDeviceContainer::Iterator it = ueLteDevs.Begin (); it != ueLteDevs.End (); ++it)
+   (*it)->SetAddress (Mac48Address::Allocate ());
+
   ueIpIface = epcHelper->AssignUeIpv6Address (NetDeviceContainer (ueLteDevs));
-std::cout<<"iiiiiiiiiiiiiiiiiiiiiiiiii";
   // Assign IP address to UEs, and install applications
   for (uint32_t u = 0; u < ueNodes.GetN (); ++u)
     {
       Ptr<Node> ueNode = ueNodes.Get (u);
       // Set the default gateway for the UE
       Ptr<Ipv6StaticRouting> ueStaticRouting = ipv6RoutingHelper.GetStaticRouting (ueNode->GetObject<Ipv6> ());
-      ueStaticRouting->SetDefaultRoute (epcHelper->GetUeDefaultGatewayAddress6 (), 1);
+      ueStaticRouting->SetDefaultRoute (epcHelper->GetUeDefaultGatewayAddress6 (), 0);
     }
 
   // Attach one UE per eNodeB
@@ -138,6 +131,13 @@ std::cout<<"iiiiiiiiiiiiiiiiiiiiiiiiii";
         lteHelper->Attach (ueLteDevs.Get(i), enbLteDevs.Get(i));
         // side effect: the default EPS bearer will be activated
       }
+
+  Ipv6AddressHelper ipv6h;
+  ipv6h.SetBase (Ipv6Address ("6001:db80::"), Ipv6Prefix (64));
+  Ipv6InterfaceContainer internetIpIfaces = ipv6h.Assign (internetDevices);
+
+  // interface 0 is localhost, 1 is the p2p device
+  Ipv6Address remoteHostAddr = internetIpIfaces.GetAddress (1,1);
 
 
   // Install and start applications on UEs and remote host
@@ -157,11 +157,10 @@ std::cout<<"iiiiiiiiiiiiiiiiiiiiiiiiii";
       serverApps.Add (dlPacketSinkHelper.Install (ueNodes.Get(u)));
       serverApps.Add (ulPacketSinkHelper.Install (remoteHost));
       serverApps.Add (packetSinkHelper.Install (ueNodes.Get(u)));
-
+      
       UdpClientHelper dlClient (ueIpIface.GetAddress (u, 1), dlPort);
       dlClient.SetAttribute ("Interval", TimeValue (MilliSeconds(interPacketInterval)));
       dlClient.SetAttribute ("MaxPackets", UintegerValue(1000000));
-
       UdpClientHelper ulClient (remoteHostAddr, ulPort);
       ulClient.SetAttribute ("Interval", TimeValue (MilliSeconds(interPacketInterval)));
       ulClient.SetAttribute ("MaxPackets", UintegerValue(1000000));
@@ -182,12 +181,20 @@ std::cout<<"iiiiiiiiiiiiiiiiiiiiiiiiii";
         }
     }
 
-  serverApps.Start (Seconds (0.01));
-  clientApps.Start (Seconds (0.01));
+  serverApps.Start (Seconds (2.01));
+  clientApps.Start (Seconds (2.01));
   lteHelper->EnableTraces ();
 
   // Uncomment to enable PCAP tracing
   //p2ph.EnablePcapAll("lena-epc-first");
+
+  LogComponentEnable("EpcSgwPgwApplication", LOG_LEVEL_ALL);
+  LogComponentEnable("EpcEnbApplication", LOG_LEVEL_ALL);
+
+  internet.EnablePcapIpv6 ("lena1", ueNodes.Get(0));
+  internet.EnablePcapIpv6 ("lena2", ueNodes.Get(1));
+  internet.EnablePcapIpv6 ("lena3", remoteHostContainer.Get(0));
+  internet.EnablePcapIpv6 ("lena4", pgw);
 
   Simulator::Stop(Seconds(simTime));
   Simulator::Run();
