@@ -62,6 +62,7 @@ PointToPointEpcHelper::PointToPointEpcHelper ()
 
   // we use a /8 net for all UEs
   m_ueAddressHelper.SetBase ("7.0.0.0", "255.0.0.0");
+
   m_ueAddressHelper6.SetBase (Ipv6Address ("7777:db80::"), Ipv6Prefix (64));
   
   
@@ -83,10 +84,12 @@ PointToPointEpcHelper::PointToPointEpcHelper ()
 
   // allow jumbo packets
   m_tunDevice->SetAttribute ("Mtu", UintegerValue (30000));
+
   m_tunDevice6->SetAttribute ("Mtu", UintegerValue (30000));
 
   // yes we need this
   m_tunDevice->SetAddress (Mac48Address::Allocate ()); 
+
   m_tunDevice6->SetAddress (Mac48Address::Allocate ()); 
 
 
@@ -108,6 +111,7 @@ PointToPointEpcHelper::PointToPointEpcHelper ()
   // the PGW it will be forwarded to the TUN device. 
   Ipv6InterfaceContainer tunDeviceIpv4IfContainer6 = m_ueAddressHelper6.Assign (tunDeviceContainer6);
 
+  //the constructor is changed for passing m_tunDevice6
   // create EpcSgwPgwApplication
   m_sgwPgwApp = CreateObject<EpcSgwPgwApplication> (m_tunDevice, m_tunDevice6, sgwPgwS1uSocket);
   m_sgwPgw->AddApplication (m_sgwPgwApp);
@@ -342,11 +346,11 @@ PointToPointEpcHelper::ActivateEpsBearer (Ptr<NetDevice> ueDevice, uint64_t imsi
   Ptr<Node> ueNode = ueDevice->GetNode (); 
   Ptr<Ipv4> ueIpv4 = ueNode->GetObject<Ipv4> ();
   Ptr<Ipv6> ueIpv6 = ueNode->GetObject<Ipv6> ();
-  NS_ASSERT_MSG (ueIpv4 != 0 || ueIpv6 != 0, "UEs need to have IPv4/IPv6 installed before EPS bearers can be activated");
+  //NS_ASSERT_MSG (ueIpv4 != 0 && ueIpv6 != 0, "UEs need to have IPv4/IPv6 installed before EPS bearers can be activated");
   int32_t interface =  ueIpv4->GetInterfaceForDevice (ueDevice);
   int32_t interface6 =  ueIpv6->GetInterfaceForDevice (ueDevice);
-  NS_ASSERT (interface >= 0 || interface6 >= 0);
-  NS_ASSERT (ueIpv4->GetNAddresses (interface) == 1 || ueIpv6->GetNAddresses (interface6) == 1);
+  //NS_ASSERT (interface >= 0 || interface6 >= 0);
+  //NS_ASSERT (ueIpv4->GetNAddresses (interface) == 1 || ueIpv6->GetNAddresses (interface6) == 1);
   if(interface >= 0 && ueIpv4->GetNAddresses (interface) == 1)
    {
     Ipv4Address ueAddr = ueIpv4->GetAddress (interface, 0).GetLocal ();
@@ -354,9 +358,8 @@ PointToPointEpcHelper::ActivateEpsBearer (Ptr<NetDevice> ueDevice, uint64_t imsi
    }
   else
    {
-    Ipv6Address ueAddr6 = ueIpv6->GetAddress (interface6, 0).GetAddress ();
+    Ipv6Address ueAddr6 = ueIpv6->GetAddress (interface6, 1).GetAddress ();
     NS_LOG_LOGIC (" UE IPv6 address: " << ueAddr6);  m_sgwPgwApp->SetUeAddress6 (imsi, ueAddr6);
-std::cout<<"\n HHHHHHJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ"<<ueAddr6<<"\n";
    }
   uint8_t bearerId = m_mme->AddBearer (imsi, tft, bearer);
   Ptr<LteUeNetDevice> ueLteDevice = ueDevice->GetObject<LteUeNetDevice> ();
@@ -367,20 +370,17 @@ std::cout<<"\n HHHHHHJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ"<<ueAddr6<<"\n";
   return bearerId;
 }
 
-
 Ptr<Node>
 PointToPointEpcHelper::GetPgwNode ()
 {
   return m_sgwPgw;
 }
 
-
 Ipv4InterfaceContainer 
 PointToPointEpcHelper::AssignUeIpv4Address (NetDeviceContainer ueDevices)
 {
   return m_ueAddressHelper.Assign (ueDevices);
 }
-
 
 Ipv6InterfaceContainer 
 PointToPointEpcHelper::AssignUeIpv6Address (NetDeviceContainer ueDevices)

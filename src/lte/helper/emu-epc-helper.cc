@@ -110,7 +110,6 @@ EmuEpcHelper::DoInitialize ()
   // create SgwPgwNode
   m_sgwPgw = CreateObject<Node> ();
   InternetStackHelper internet;
-//  internet.SetIpv4StackInstall (true);
   internet.Install (m_sgwPgw);
   
   // create S1-U socket
@@ -358,16 +357,17 @@ EmuEpcHelper::ActivateEpsBearer (Ptr<NetDevice> ueDevice, uint64_t imsi, Ptr<Epc
   Ptr<Node> ueNode = ueDevice->GetNode (); 
   Ptr<Ipv4> ueIpv4 = ueNode->GetObject<Ipv4> ();
   Ptr<Ipv6> ueIpv6 = ueNode->GetObject<Ipv6> ();
-  NS_ASSERT_MSG (ueIpv4 != 0 || ueIpv6 != 0, "UEs need to have IPv4/IPv6 installed before EPS bearers can be activated");
+  //NS_ASSERT_MSG (ueIpv4 != 0 || ueIpv6 != 0, "UEs need to have IPv4/IPv6 installed before EPS bearers can be activated");
   int32_t interface =  ueIpv4->GetInterfaceForDevice (ueDevice);
   int32_t interface6 =  ueIpv6->GetInterfaceForDevice (ueDevice);
-  NS_ASSERT (interface >= 0 || interface6 >= 0);
-  NS_ASSERT (ueIpv4->GetNAddresses (interface) == 1 || ueIpv6->GetNAddresses (interface6) == 1);
+  //NS_ASSERT (interface >= 0 || interface6 >= 0);
+  //NS_ASSERT (ueIpv4->GetNAddresses (interface) == 1 || ueIpv6->GetNAddresses (interface6) == 1);
 
   if(interface >= 0 && ueIpv4->GetNAddresses (interface) == 1)
     {
       Ipv4Address ueAddr = ueIpv4->GetAddress (interface, 0).GetLocal ();
-      NS_LOG_LOGIC (" UE IPv4 address: " << ueAddr);  m_sgwPgwApp->SetUeAddress (imsi, ueAddr);
+      NS_LOG_LOGIC (" UE IPv4 address: " << ueAddr); 
+      m_sgwPgwApp->SetUeAddress (imsi, ueAddr);
     }
   else
     {
@@ -413,9 +413,8 @@ EmuEpcHelper::GetUeDefaultGatewayAddress ()
 Ipv6Address
 EmuEpcHelper::GetUeDefaultGatewayAddress6 ()
 {
-  // return the address of the tun device
+  // return the address of the tun device 6
   return m_sgwPgw->GetObject<Ipv6> ()->GetAddress (1, 1).GetAddress ();
 }
-
 
 } // namespace ns3
