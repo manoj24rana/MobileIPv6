@@ -30,6 +30,9 @@
 #include "mipv6-header.h"
 #include "mipv6-agent.h"
 #include "mipv6-l4-protocol.h"
+#include "ns3/trace-source-accessor.h"
+#include "ns3/traced-value.h"
+#include "ns3/uinteger.h"
 
 using namespace std;
 
@@ -44,6 +47,18 @@ TypeId mipv6Agent::GetTypeId ()
   static TypeId tid = TypeId ("ns3::mipv6Agent")
     .SetParent<Object> ()
     .AddConstructor<mipv6Agent> ()
+    .AddTraceSource ("AgentTx",
+                     "Trace source indicating a transmitted mobility handling packets by this agent",
+                     MakeTraceSourceAccessor (&mipv6Agent::m_agentTxTrace),
+                     "ns3::Packet::TracedCallback")
+    .AddTraceSource ("AgentPromiscRx",
+                     "Trace source indicating a received mobility handling packets by this agent. This is a promiscuous trace",
+                     MakeTraceSourceAccessor (&mipv6Agent::m_agentPromiscRxTrace),
+                     "ns3::Packet::TracedCallback")
+    .AddTraceSource ("AgentRx",
+                     "Trace source indicating a received mobility handling packets by this agent. This is a non-promiscuous trace",
+                     MakeTraceSourceAccessor (&mipv6Agent::m_agentRxTrace),
+                     "ns3::Packet::TracedCallback")
   ;
   return tid;
 }
@@ -82,6 +97,8 @@ uint8_t mipv6Agent::Receive (Ptr<Packet> packet, const Ipv6Address &src, const I
 {
   NS_LOG_FUNCTION ( this << packet << src << dst << interface );
 
+  m_agentPromiscRxTrace (packet);
+
   Ptr<Packet> p = packet->Copy ();
 
   MIPv6Header mh;
@@ -93,11 +110,13 @@ uint8_t mipv6Agent::Receive (Ptr<Packet> packet, const Ipv6Address &src, const I
   if (mhType == MIPv6Header::IPV6_MOBILITY_BINDING_UPDATE)
     {
       NS_LOG_FUNCTION (this << packet << src << "BU" << "recieve BU");
+      m_agentRxTrace (packet);
       HandleBU (packet, src, dst, interface);
     }
   else if (mhType == MIPv6Header::IPV6_MOBILITY_BINDING_ACKNOWLEDGEMENT)
     {
       NS_LOG_FUNCTION (this << packet << src << "receive BACK");
+      m_agentRxTrace (packet);
       HandleBA (packet, src, dst, interface);
     }
 
@@ -105,21 +124,25 @@ uint8_t mipv6Agent::Receive (Ptr<Packet> packet, const Ipv6Address &src, const I
   else if (mhType == MIPv6Header::HOME_TEST_INIT)
     {
       NS_LOG_FUNCTION (this << packet << src << "HoTI" << "recieve HoTI");
+      m_agentRxTrace (packet);
       HandleHoTI (packet, src, dst, interface);
     }
   else if (mhType == MIPv6Header::HOME_TEST)
     {
       NS_LOG_FUNCTION (this << packet << src << "HoT" << "recieve HoT");
+      m_agentRxTrace (packet);
       HandleHoT (packet, src, dst, interface);
     }
   else if (mhType == MIPv6Header::CARE_OF_TEST_INIT)
     {
       NS_LOG_FUNCTION (this << packet << src << "CoTI" << "recieve CoTI");
+      m_agentRxTrace (packet);
       HandleCoTI (packet, src, dst, interface);
     }
   else if (mhType == MIPv6Header::CARE_OF_TEST)
     {
       NS_LOG_FUNCTION (this << packet << src << "CoT" << "recieve CoT");
+      m_agentRxTrace (packet);
       HandleCoT (packet, src, dst, interface);
     }
   else
@@ -154,7 +177,7 @@ void mipv6Agent::SendMessage (Ptr<Packet> packet, Ipv6Address dst, uint32_t ttl)
       Ipv6Address src = route->GetSource ();
       NS_LOG_FUNCTION ("Lura1" << src << "    " << dst);
 
-
+      m_agentTxTrace (packet);
       ipv6->Send (packet, src, dst, 135, route);
       NS_LOG_LOGIC ("route found and send hmipv6 message");
     }

@@ -24,6 +24,7 @@
 #include "ns3/object.h"
 #include "ns3/ipv6-address.h"
 #include "bcache.h"
+#include "ns3/traced-value.h"
 
 namespace ns3 {
 
@@ -82,6 +83,10 @@ private:
    * \brief The node.
    */
   Ptr<Node> m_node;
+
+  TracedCallback<Ptr<const Packet> > m_agentTxTrace;
+  TracedCallback<Ptr<const Packet> > m_agentRxTrace;
+  TracedCallback<Ptr<const Packet> > m_agentPromiscRxTrace;
 
 };
 

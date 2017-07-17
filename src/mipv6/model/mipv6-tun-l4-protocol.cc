@@ -43,6 +43,14 @@ TypeId Ipv6TunnelL4Protocol::GetTypeId ()
   static TypeId tid = TypeId ("ns3::Ipv6TunnelL4Protocol")
     .SetParent<IpL4Protocol> ()
     .AddConstructor<Ipv6TunnelL4Protocol> ()
+    .AddTraceSource ("RxHa",
+                     "Receive tunneled data packets from MN",
+                     MakeTraceSourceAccessor (&Ipv6TunnelL4Protocol::m_rxHaPktTrace),
+                     "ns3::Ipv6TunnelL4Protocol::RxTracedCallback")
+    .AddTraceSource ("RxMn",
+                     "Receive tunneled data packets from HA",
+                     MakeTraceSourceAccessor (&Ipv6TunnelL4Protocol::m_rxMnPktTrace),
+                     "ns3::Ipv6TunnelL4Protocol::RxTracedCallback")
     ;
   return tid;
 }
@@ -164,7 +172,7 @@ enum IpL4Protocol::RxStatus Ipv6TunnelL4Protocol::Receive(Ptr<Packet> p, Ipv6Hea
 	  return IpL4Protocol::RX_OK;
 	}
   
-NS_LOG_FUNCTION (source << destination);
+  NS_LOG_FUNCTION (source << destination);
   //Prevent infinite loop
   Ptr<Ipv6Route> route;
   Socket::SocketErrno err;
@@ -179,18 +187,21 @@ NS_LOG_FUNCTION (source << destination);
   route = routing->RouteOutput (packet, innerHeader, oif, err);
   NS_LOG_FUNCTION (source << destination);
 
-if (destination.IsEqual(GetHomeAddress()))
+  if (destination.IsEqual(GetHomeAddress()))
 
-{
-  uint8_t nextHeader = innerHeader.GetNextHeader ();
-  Ptr<IpL4Protocol> protocol = 0;
-  protocol = ipv6->GetProtocol (nextHeader);
-  if (protocol)
-    return protocol->Receive (packet,innerHeader,incomingInterface);
-}
+  {
+    uint8_t nextHeader = innerHeader.GetNextHeader ();
+    Ptr<IpL4Protocol> protocol = 0;
+    protocol = ipv6->GetProtocol (nextHeader);
+    if (protocol)
+      {
+        m_rxMnPktTrace (packet, innerHeader, incomingInterface);
+        return protocol->Receive (packet, innerHeader, incomingInterface);
+      }
+  }
 
-
-ipv6->Send(packet, source, destination, innerHeader.GetNextHeader(), route);
+  m_rxHaPktTrace (packet, innerHeader, incomingInterface);
+  ipv6->Send (packet, source, destination, innerHeader.GetNextHeader(), route);
   return IpL4Protocol::RX_OK;
 }
 

@@ -29,6 +29,7 @@
 namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("BCache");
+NS_OBJECT_ENSURE_REGISTERED (BCache);
 
 TypeId BCache::GetTypeId ()
 {
@@ -136,7 +137,7 @@ void BCache::SetHomePrefixes (std::list<Ipv6Address> halist)
         }
       Ipv6Address addr (buf2);
       m_HomePrefixList.push_back (addr);
-      std::cout << addr << "OPPOPOPOPOPOPOPOPOPOPOPOPOPOPOPOPOPOPOPOPOPOPOPOPOP\n";
+      std::cout << "Home Address: " << addr;
       hlist.pop_front ();
     }
 }
@@ -354,16 +355,22 @@ Ipv6Address BCache::Entry::GetOldCoa () const
 
 uint64_t BCache::Entry::GetHomeInitCookie () const
 {
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_homeinitcookie;
 }
 
 void BCache::Entry::SetHomeInitCookie (uint64_t hcookie)
 {
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_homeinitcookie = hcookie;
 }
 
 uint64_t BCache::Entry::GetCareOfInitCookie () const
 {
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_careofinitcookie;
 }
 
@@ -374,51 +381,71 @@ void BCache::Entry::SetCareOfInitCookie (uint64_t ccookie)
 
 uint64_t BCache::Entry::GetHomeKeygenToken () const
 {
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_homekeygentoken;
 }
 
 void BCache::Entry::SetHomeKeygenToken (uint64_t htoken)
 {
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_homekeygentoken = htoken;
 }
 
 uint64_t BCache::Entry::GetCareOfKeygenToken () const
 {
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_careofkeygentoken;
 }
 
 void BCache::Entry::SetCareOfKeygenToken (uint64_t ctoken)
 {
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_careofkeygentoken = ctoken;
 }
 
 uint16_t BCache::Entry::GetHomeNonceIndex () const
 {
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_homenonceindex;
 }
 
 void BCache::Entry::SetHomeNonceIndex (uint16_t hnonce)
 {
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_homenonceindex = hnonce;
 }
 
 uint16_t BCache::Entry::GetCareOfNonceIndex () const
 {
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_careofnonceindex;
 }
 
 void BCache::Entry::SetCareOfNonceIndex (uint16_t cnonce)
 {
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_careofnonceindex = cnonce;
 }
 
 void BCache::Entry::SetState (BCache::Entry::State_e state)
 {
+  NS_LOG_FUNCTION_NOARGS ();
+
   m_addrstate = state;
 }
 
 BCache::Entry::State_e BCache::Entry::GetState ()
 {
+  NS_LOG_FUNCTION_NOARGS ();
+
   return m_addrstate;
 }
 

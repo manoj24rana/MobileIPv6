@@ -29,6 +29,9 @@ namespace ns3 {
 class mipv6MN : public mipv6Agent
 {
 public:
+
+  static TypeId GetTypeId (void);
+
   mipv6MN (std::list<Ipv6Address> haalist);
 
   virtual ~mipv6MN ();
@@ -49,6 +52,16 @@ public:
   void SetDefaultRouterAddress (Ipv6Address addr, uint32_t index);
   bool CheckAddresses (Ipv6Address ha, Ipv6Address hoa);
 
+  /**
+   * TracedCallback signature for BU reception event.
+   *
+   * \param [in] packet The bu packet.
+   * \param [in] src The source address
+   * \param [in] dst The destination address
+   * \param [in] interface the interface in which the bu received
+   */
+  typedef void (* RxBaTracedCallback)
+    (Ptr<Packet> packet, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface);
 
 
 
@@ -72,6 +85,10 @@ private:
   uint32_t m_OldinterfaceIndex;
   uint32_t m_IfIndex;
 
+  /**
+   * \brief Callback to trace RX (reception) bu packets.
+   */ 
+  TracedCallback<Ptr<Packet>, Ipv6Address, Ipv6Address, Ptr<Ipv6Interface> > m_rxbaTrace;
 
 };
 

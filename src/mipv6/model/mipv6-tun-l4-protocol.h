@@ -131,6 +131,16 @@ public:
   void SetHA (Ipv6Address ha);
   Ipv6Address GetHA ();
 
+  /**
+   * TracedCallback signature for BU reception event.
+   *
+   * \param [in] packet The data packet originally sent.
+   * \param [in] header IPv6 inner header
+   * \param [in] interface the IPv6 interface in which the data packet received
+   */
+  typedef void (* RxTracedCallback)
+    (Ptr<Packet> packet, Ipv6Header header, Ptr<Ipv6Interface> interface);
+
 protected:
   /**
    * \brief Dispose this object.
@@ -152,6 +162,15 @@ private:
   Ipv6Address m_hoa;
   std::list<Ipv6Address> m_Cachelist;
   Ipv6Address m_ha;
+  /**
+   * \brief Callback to trace RX (reception) data packets at HA.
+   */ 
+  TracedCallback<Ptr<Packet>, Ipv6Header, Ptr<Ipv6Interface> > m_rxHaPktTrace;
+  /**
+   * \brief Callback to trace RX (reception) data packets at MN.
+   */ 
+  TracedCallback<Ptr<Packet>, Ipv6Header, Ptr<Ipv6Interface> > m_rxMnPktTrace;
+
 };
 
 } /* namespace ns3 */

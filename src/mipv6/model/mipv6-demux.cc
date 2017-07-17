@@ -32,6 +32,7 @@ TypeId MIPv6Demux::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::MIPv6Demux")
     .SetParent<Object> ()
+    .AddConstructor<MIPv6Demux> ()
     .AddAttribute ("Mobilities", "The set of IPv6 Mobilities registered with this demux.",
                    ObjectVectorValue (),
                    MakeObjectVectorAccessor (&MIPv6Demux::m_mobilities),

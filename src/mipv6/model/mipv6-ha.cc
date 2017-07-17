@@ -37,6 +37,7 @@
 #include "mipv6-l4-protocol.h"
 #include "mipv6-tun-l4-protocol.h"
 #include "mipv6-ha.h"
+#include "ns3/pointer.h"
 
 using namespace std;
 
@@ -45,6 +46,25 @@ NS_LOG_COMPONENT_DEFINE ("mipv6HA");
 namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (mipv6HA);
+
+TypeId
+mipv6HA::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::mipv6HA")
+    .SetParent<mipv6Agent> ()
+    .AddConstructor<mipv6HA> ()
+    .AddAttribute ("BCache", "The binding cache associated with this agent.",
+                   PointerValue (),
+                   MakePointerAccessor (&mipv6HA::m_bCache),
+                   MakePointerChecker<BCache> ())
+    .AddTraceSource ("RxBU",
+                     "Receive BU packet from MN",
+                     MakeTraceSourceAccessor (&mipv6HA::m_rxbuTrace),
+                     "ns3::mipv6HA::RxBuTracedCallback")
+
+    ;
+  return tid;
+}
 
 mipv6HA::mipv6HA ()
   : m_bCache (0)
@@ -133,6 +153,7 @@ uint8_t mipv6HA::HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
     }
 
   Ptr<Packet> p = packet->Copy ();
+  m_rxbuTrace (p, src, dst, interface);
 
   Ipv6MobilityBindingUpdateHeader bu;
   p->RemoveHeader (bu);

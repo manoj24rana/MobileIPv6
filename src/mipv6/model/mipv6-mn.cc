@@ -41,6 +41,7 @@
 #include "mipv6-tun-l4-protocol.h"
 #include "ns3/udp-l4-protocol.h"
 #include "ns3/tcp-l4-protocol.h"
+#include "ns3/pointer.h"
 
 
 using namespace std;
@@ -50,6 +51,24 @@ NS_LOG_COMPONENT_DEFINE ("mipv6MN");
 namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (mipv6MN);
+
+TypeId
+mipv6MN::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::mipv6MN")
+    .SetParent<mipv6Agent> ()
+    .AddAttribute ("BList", "The binding list associated with this MN.",
+                   PointerValue (),
+                   MakePointerAccessor (&mipv6MN::m_buinf),
+                   MakePointerChecker<BList> ())
+    .AddTraceSource ("RxBA",
+                     "Receive BA packet from MN",
+                     MakeTraceSourceAccessor (&mipv6MN::m_rxbaTrace),
+                     "ns3::mipv6MN::RxBaTracedCallback")
+
+    ;
+  return tid;
+}
 
 mipv6MN::mipv6MN (std::list<Ipv6Address> haalist)
 {
@@ -321,11 +340,12 @@ void mipv6MN::HandleNewAttachment (Ipv6Address ipr)
 uint8_t mipv6MN::HandleBA (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
 {
 
-// Options are not implemented yet!!
+  // Options are not implemented yet!!
 
   NS_LOG_FUNCTION (this << packet << src << dst << interface << "HANDLE BACK");
 
   Ptr<Packet> p = packet->Copy ();
+  m_rxbaTrace (p, src, dst, interface);
 
   Ipv6MobilityBindingAckHeader ba;
   Ipv6ExtensionType2RoutingHeader exttype2;

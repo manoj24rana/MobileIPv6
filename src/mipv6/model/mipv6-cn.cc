@@ -29,6 +29,8 @@
 #include "mipv6-demux.h"
 #include "mipv6-l4-protocol.h"
 #include "mipv6-cn.h"
+#include "ns3/object.h"
+#include "ns3/pointer.h"
 
 using namespace std;
 
@@ -37,6 +39,27 @@ NS_LOG_COMPONENT_DEFINE ("mipv6CN");
 namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (mipv6CN);
+
+TypeId
+mipv6CN::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::mipv6CN")
+    .SetParent<mipv6Agent> ()
+    .AddConstructor<mipv6CN> ()
+    .AddAttribute ("BCache", "The binding cache associated with this agent.",
+                   PointerValue (),
+                   MakePointerAccessor (&mipv6CN::m_bCache),
+                   MakePointerChecker<BCache> ())
+    .AddTraceSource ("RxBU",
+                     "Receive BU packet from MN",
+                     MakeTraceSourceAccessor (&mipv6CN::m_rxbuTrace),
+                     "ns3::mipv6CN::RxBuTracedCallback")
+
+
+    ;
+  return tid;
+}
+
 
 mipv6CN::mipv6CN ()
   : m_bCache (0)
@@ -148,6 +171,7 @@ uint8_t mipv6CN::HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
   NS_LOG_FUNCTION (this << packet << src << dst << interface);
 
   Ptr<Packet> p = packet->Copy ();
+  m_rxbuTrace (p, src, dst, interface);
 
   Ipv6MobilityBindingUpdateHeader bu;
   p->RemoveHeader (bu);

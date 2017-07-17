@@ -31,6 +31,7 @@ class Packet;
 class mipv6HA : public mipv6Agent
 {
 public:
+  static TypeId GetTypeId (void);
   mipv6HA ();
 
   virtual ~mipv6HA ();
@@ -44,6 +45,17 @@ public:
 
   void HandleNS (Ptr<Packet> packet, Ptr<Ipv6Interface> interface, Ipv6Address src, Ipv6Address target);
 
+  /**
+   * TracedCallback signature for BU reception event.
+   *
+   * \param [in] packet The bu packet.
+   * \param [in] src The source address
+   * \param [in] dst The destination address
+   * \param [in] interface the interface in which the bu received
+   */
+  typedef void (* RxBuTracedCallback)
+    (Ptr<Packet> packet, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface);
+
 protected:
   virtual void NotifyNewAggregate ();
 
@@ -56,6 +68,11 @@ protected:
 
 private:
   Ptr<BCache> m_bCache;
+
+  /**
+   * \brief Callback to trace RX (reception) bu packets.
+   */ 
+  TracedCallback<Ptr<Packet>, Ipv6Address, Ipv6Address, Ptr<Ipv6Interface> > m_rxbuTrace;
 };
 
 } /* namespace ns3 */
