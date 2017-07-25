@@ -42,6 +42,7 @@
 #include "ns3/udp-l4-protocol.h"
 #include "ns3/tcp-l4-protocol.h"
 #include "ns3/pointer.h"
+#include "ns3/trace-source-accessor.h"
 
 
 using namespace std;
@@ -62,9 +63,14 @@ mipv6MN::GetTypeId (void)
                    MakePointerAccessor (&mipv6MN::m_buinf),
                    MakePointerChecker<BList> ())
     .AddTraceSource ("RxBA",
-                     "Receive BA packet from MN",
+                     "Received BA packet from HA",
                      MakeTraceSourceAccessor (&mipv6MN::m_rxbaTrace),
                      "ns3::mipv6MN::RxBaTracedCallback")
+    .AddTraceSource ("TxBU",
+                     "Sent BU packet from MN",
+                     MakeTraceSourceAccessor (&mipv6MN::m_txbuTrace),
+                     "ns3::mipv6MN::TxBuTracedCallback")
+
 
     ;
   return tid;
@@ -320,8 +326,13 @@ void mipv6MN::HandleNewAttachment (Ipv6Address ipr)
 
       //send BU
       NS_LOG_FUNCTION (this << p->GetSize ());
+      
 
+
+      
       SendMessage (p->Copy (), m_buinf->GetHA (), 64);
+      Ptr<Packet> pkt = p->Copy ();
+      m_txbuTrace (pkt, m_buinf->GetCoa (), m_buinf->GetHA ());
 
 
       m_buinf->StartHomeRetransTimer ();
@@ -345,7 +356,8 @@ uint8_t mipv6MN::HandleBA (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
   NS_LOG_FUNCTION (this << packet << src << dst << interface << "HANDLE BACK");
 
   Ptr<Packet> p = packet->Copy ();
-  m_rxbaTrace (p, src, dst, interface);
+  Ptr<Packet> pkt = packet->Copy ();
+  m_rxbaTrace (pkt, src, dst, interface);
 
   Ipv6MobilityBindingAckHeader ba;
   Ipv6ExtensionType2RoutingHeader exttype2;
@@ -488,6 +500,11 @@ bool mipv6MN::IsHomeMatch (Ipv6Address addr)
     {
       return true;
     }
+}
+
+Ipv6Address mipv6MN::GetCoA ()
+{
+return m_buinf->GetCoa ();
 }
 
 
@@ -698,6 +715,11 @@ bool mipv6MN::CheckAddresses (Ipv6Address ha, Ipv6Address hoa)
       return true;
     }
   return false;
+}
+
+Ipv6Address mipv6MN::GetHomeAddress ()
+{
+return m_buinf->GetHoa ();
 }
 
 } /* namespace ns3 */

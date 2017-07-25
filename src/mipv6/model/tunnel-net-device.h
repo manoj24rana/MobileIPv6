@@ -124,6 +124,9 @@ public:
   virtual void SetPromiscReceiveCallback (NetDevice::PromiscReceiveCallback cb);
   virtual bool SupportsSendFrom () const;
   virtual bool IsBridge (void) const;
+  typedef void (* TracedCallback2)
+    (Ptr<Packet> packet, Ipv6Header ih, Ipv6Header oh);
+
 
 protected:
   virtual void DoDispose (void);
@@ -135,6 +138,8 @@ private:
   TracedCallback<Ptr<const Packet> > m_macPromiscRxTrace;
   TracedCallback<Ptr<const Packet> > m_snifferTrace;
   TracedCallback<Ptr<const Packet> > m_promiscSnifferTrace;
+  TracedCallback<Ptr<Packet>, Ipv6Header, Ipv6Header> m_macTxTrace2;
+
   Ptr<Node> m_node;
   ReceiveCallback m_rxCallback;
   PromiscReceiveCallback m_promiscRxCallback;

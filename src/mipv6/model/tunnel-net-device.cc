@@ -52,6 +52,10 @@ TunnelNetDevice::GetTypeId (void)
                      "Trace source indicating a packet has arrived for transmission by this device",
                      MakeTraceSourceAccessor (&TunnelNetDevice::m_macTxTrace),
                      "ns3::Packet::TracedCallback")
+    .AddTraceSource ("MacTx2",
+                     "Trace source indicating a packet has arrived for transmission by this device",
+                     MakeTraceSourceAccessor (&TunnelNetDevice::m_macTxTrace2),
+                     "ns3::TunnelNetDevice::TracedCallback2")
     .AddTraceSource ("MacPromiscRx",
                      "A packet has been received by this device, has been passed up from the physical layer "
                      "and is being forwarded up the local protocol stack.  This is a promiscuous trace,",
@@ -357,7 +361,6 @@ TunnelNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protoco
         }
 
       src = route->GetSource ();
-      NS_LOG_FUNCTION ("Source Address=" << src << "Destination Address=" << dst);
       tag.SetTtl (ttl);
       ipv6->Send (packet, src, dst, 41 /* IPv6-in-IPv6 */, route);
     }
@@ -368,7 +371,10 @@ TunnelNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protoco
 
       ipv6->Send (packet, src, dst, 41 /* IPv6-in-IPv6 */, 0);
     }
-
+  Ipv6Header oph;
+  oph.SetSourceAddress (src);
+  oph.SetDestinationAddress (dst);
+  m_macTxTrace2 (packet, iph, oph);
   return true;
 }
 

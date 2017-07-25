@@ -23,6 +23,7 @@
 
 #include "mipv6-agent.h"
 #include "blist.h"
+#include "ns3/traced-callback.h"
 
 namespace ns3 {
 
@@ -52,16 +53,30 @@ public:
   void SetDefaultRouterAddress (Ipv6Address addr, uint32_t index);
   bool CheckAddresses (Ipv6Address ha, Ipv6Address hoa);
 
+  Ipv6Address GetHomeAddress ();
+  Ipv6Address GetCoA ();
+
   /**
-   * TracedCallback signature for BU reception event.
+   * TracedCallback signature for BA reception event.
    *
-   * \param [in] packet The bu packet.
+   * \param [in] packet The ba packet.
    * \param [in] src The source address
    * \param [in] dst The destination address
    * \param [in] interface the interface in which the bu received
    */
   typedef void (* RxBaTracedCallback)
     (Ptr<Packet> packet, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface);
+
+
+  /**
+   * TracedCallback signature for BU sent event.
+   *
+   * \param [in] packet The bu packet.
+   * \param [in] src The source address
+   * \param [in] dst The destination address
+   */
+  typedef void (* TxBuTracedCallback)
+    (Ptr<Packet> packet, Ipv6Address src, Ipv6Address dst);
 
 
 
@@ -86,9 +101,13 @@ private:
   uint32_t m_IfIndex;
 
   /**
-   * \brief Callback to trace RX (reception) bu packets.
+   * \brief Callback to trace RX (reception) ba packets.
    */ 
   TracedCallback<Ptr<Packet>, Ipv6Address, Ipv6Address, Ptr<Ipv6Interface> > m_rxbaTrace;
+  /**
+   * \brief Callback to trace TX (transmission) bu packets.
+   */ 
+  TracedCallback<Ptr<Packet>, Ipv6Address, Ipv6Address> m_txbuTrace;
 
 };
 

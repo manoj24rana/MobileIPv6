@@ -24,6 +24,7 @@
 #include "ns3/ipv6-address.h"
 #include "ns3/ip-l4-protocol.h"
 #include "ns3/tunnel-net-device.h"
+#include "ns3/traced-callback.h"
 
 namespace ns3 {
 
@@ -132,14 +133,24 @@ public:
   Ipv6Address GetHA ();
 
   /**
-   * TracedCallback signature for BU reception event.
+   * TracedCallback signature for data Packet sending event.
    *
    * \param [in] packet The data packet originally sent.
-   * \param [in] header IPv6 inner header
+  */
+
+  Callback<void, Ptr <Packet>, Ipv6Header, Ipv6Header> TxTracedCallback;
+  void SetTxCallback (Callback<void, Ptr <Packet>, Ipv6Header, Ipv6Header> cb);
+
+  /**
+   * TracedCallback signature for data Packet reception event.
+   *
+   * \param [in] packet The data packet originally sent.
+   * \param [in] ih IPv6 inner header
+   * \param [in] oh IPv6 outer header
    * \param [in] interface the IPv6 interface in which the data packet received
    */
   typedef void (* RxTracedCallback)
-    (Ptr<Packet> packet, Ipv6Header header, Ptr<Ipv6Interface> interface);
+    (Ptr<Packet> packet, Ipv6Header ih, Ipv6Header oh, Ptr<Ipv6Interface> interface);
 
 protected:
   /**
@@ -150,7 +161,6 @@ protected:
 private:
   typedef std::map<Ipv6Address, Ptr<TunnelNetDevice> > TunnelMap;
   typedef std::map<Ipv6Address, Ptr<TunnelNetDevice> >::iterator TunnelMapI;
-
   /**
    * \brief The node.
    */
@@ -165,12 +175,11 @@ private:
   /**
    * \brief Callback to trace RX (reception) data packets at HA.
    */ 
-  TracedCallback<Ptr<Packet>, Ipv6Header, Ptr<Ipv6Interface> > m_rxHaPktTrace;
+  TracedCallback<Ptr<Packet>, Ipv6Header, Ipv6Header, Ptr<Ipv6Interface> > m_rxHaPktTrace;
   /**
    * \brief Callback to trace RX (reception) data packets at MN.
    */ 
-  TracedCallback<Ptr<Packet>, Ipv6Header, Ptr<Ipv6Interface> > m_rxMnPktTrace;
-
+  TracedCallback<Ptr<Packet>, Ipv6Header, Ipv6Header, Ptr<Ipv6Interface> > m_rxMnPktTrace;
 };
 
 } /* namespace ns3 */

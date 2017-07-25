@@ -25,6 +25,8 @@
 #include "mipv6-agent.h"
 #include "ns3/internet-module.h"
 #include "mipv6-tun-l4-protocol.h"
+#include "ns3/callback.h"
+#include "ns3/trace-source-accessor.h"
 
 
 using namespace std;
@@ -140,6 +142,8 @@ enum IpL4Protocol::RxStatus Ipv6TunnelL4Protocol::Receive(Ptr<Packet> p, Ipv6Hea
   /**
    * Check whether the packet belongs to one of tunnels
    */
+
+
   Ptr<TunnelNetDevice> tdev = GetTunnelDevice (src);
 
   if (tdev == 0 && GetCacheAddressList().size())
@@ -195,12 +199,12 @@ enum IpL4Protocol::RxStatus Ipv6TunnelL4Protocol::Receive(Ptr<Packet> p, Ipv6Hea
     protocol = ipv6->GetProtocol (nextHeader);
     if (protocol)
       {
-        m_rxMnPktTrace (packet, innerHeader, incomingInterface);
+        m_rxMnPktTrace (packet, innerHeader, header, incomingInterface);
         return protocol->Receive (packet, innerHeader, incomingInterface);
       }
   }
 
-  m_rxHaPktTrace (packet, innerHeader, incomingInterface);
+  m_rxHaPktTrace (packet, innerHeader, header, incomingInterface);
   ipv6->Send (packet, source, destination, innerHeader.GetNextHeader(), route);
   return IpL4Protocol::RX_OK;
 }
@@ -216,10 +220,15 @@ uint16_t Ipv6TunnelL4Protocol::AddTunnel(Ipv6Address remote, Ipv6Address local)
   Ptr<TunnelNetDevice> dev = m_node->GetObject<TunnelNetDevice> ();
   if (it == m_tunnelMap.end ())
     {
-if(dev==0)
-{
+  if(dev==0)
+  {
      dev = CreateObject<TunnelNetDevice> ();
-      
+     
+     if (!TxTracedCallback.IsNull())
+       {
+         dev->TraceConnectWithoutContext ("MacTx2", TxTracedCallback);
+       }
+
       dev->SetAddress (Mac48Address::Allocate ());
       m_node->AddDevice (dev);
       m_tunnelMap.insert (std::pair<Ipv6Address, Ptr<TunnelNetDevice> > (remote, dev));
@@ -337,6 +346,12 @@ m_ha=ha;
 Ipv6Address Ipv6TunnelL4Protocol::GetHA()
 {
 return m_ha;
+}
+
+void Ipv6TunnelL4Protocol::SetTxCallback (Callback<void, Ptr <Packet>, Ipv6Header, Ipv6Header> cb)
+{
+  NS_LOG_FUNCTION (this);
+  TxTracedCallback = cb;
 }
 
 } /* namespace ns3 */

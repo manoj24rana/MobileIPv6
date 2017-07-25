@@ -137,7 +137,6 @@ void BCache::SetHomePrefixes (std::list<Ipv6Address> halist)
         }
       Ipv6Address addr (buf2);
       m_HomePrefixList.push_back (addr);
-      std::cout << "Home Address: " << addr;
       hlist.pop_front ();
     }
 }
