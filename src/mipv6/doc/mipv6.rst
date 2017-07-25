@@ -288,6 +288,9 @@ real-time mode.
 * The support of RFC 6275, described in Section 11.5.5 i.e. ‘returning home’ feature is still not
 supported and would be resolved as soon as possible.
 
+* MN's address configuration only supports address autoconfiguration and so, RADVD must be installed
+in access routers.
+
 
 References
 ==========
@@ -336,13 +339,31 @@ See previous sub section: 'helper'.
 Attributes
 ==========
 
+Mipv6Demux::Mobilities->The set of IPv6 Mobilities registered with this demux
+Mipv6HA::BCache->The binding cache associated with this agent
+Mipv6MN::BList->The binding list associated with this MN
+
 What classes hold attributes, and what are the key ones worth mentioning?
 
 Output
 ======
 
-What kind of data does the model generate?  What are the key trace
-sources?   What kind of logging output can be enabled?
+TraceSources:
+
+Mipv6Agent::AgentTx->Trace source indicating a transmitted mobility handling
+packets (BU, BA etc.) by this agent
+Mipv6Agent::AgentPromiscRx->Trace source indicating a received mobility handling
+packets by this agent. This is a promiscuous trace
+Mipv6Agent::AgentRx->Trace source indicating a received mobility handling packets
+by this agent. This is a non-promiscuous trace
+Mipv6HA::RxBU->Receive BU packet from MN
+Mipv6MN::RxBA->Received BA packet from HA
+Mipv6MN::TxBU->Sent BU packet from MN
+Ipv6TunnelL4Protocol::RxHa->Receive tunneled data packets from MN
+Ipv6TunnelL4Protocol::RxMn->Receive tunneled data packets from HA
+TunnelNetDevice::MacTx2->Trace source indicating a packet has arrived for transmission
+by this device
+
 
 Advanced Usage
 ==============
@@ -361,31 +382,35 @@ Examples
 All sample examples are in ../src/mipv6/examples directory. These examples
 illustrates the following:
 
-* single MN, supporting only bu, no data transmission (mipv6-simple-single.cc)
-
-* multiple MNs, supporting only bu, no data transmission (mipv6-simple-multiple.cc)
-
 * single MN, supporting both bu and data transmission (mipv6-single.cc)
+   (server application running on CN and client application running on MN)
 
 * multiple MNs, supporting both bu and data transmission (mipv6-multiple.cc)
-
-* server application running on MN and client application running on CN (mipv6-mn-server.cc)
-
-* server application running on CN and client application running on MN (mipv6-cn-server.cc)
-
-* MN starts at home and goes to foreign (mipv6-ho-to-fo.cc)
+   (server application running on MN and client application running on CN)
 
 * wiFi to wimax (mipv6-wifi-wimax.cc)
-
-* wimax to wimax (mipv6-wimax-wimax.cc)
-
 
 Validation
 **********
 
-Describe how the model has been tested/validated.  What tests run in the
-test suite?  How much API and code is covered by the tests?  Again, 
-references to outside published work may help here.
+This test suite contains two use cases: without handoff and with handoff of an MN (done in two
+test case classes: NoHandoffTestCase and HandoffTestCase). Both tests are done by changing the
+direction of data transmissions (i.e. MN to CN and vice-versa) and varying the data transmission
+rate. The pass criteria of this test-suite are: 1) Every received packet (whether after or, before
+handoff it is received) must be tunneled properly i.e. tunnel identifiers must be as expected (as
+defined in RFC 6275) and 2) If there is a handoff, it must be a successful handoff. In the first
+test case, the first criteria will be fulfilled and in the second case, both criteria will be
+fulfilled. The tunnel identifier checking test is done at two trace functions: TxPktAtTun(), called
+when packet sent at tunnel starting point and, RxPktAtTun(), called when packet received at tunnel
+end point. These test functions only checks whether a packet, passed through a tunnel uses the right
+tunnel identifiers (IPv6Addresses) or, not. But, all received may not be tunneled. This test is
+performed in CheckForHandoff() and CheckForNoHandoff () functions, which tests whether all received
+packets passes through the tunnel i.e. pass the HA. A handoff is successful if and only if there is
+a successful BU-BA transmission between MN and HA and HA's Cache is updated with MN's new status (i.e.
+IP address is changed) and packets are successfully transmitted using this new tunnel, set by that
+binding process. The successful BU-BA transmission and HA's cache update tests are done at RxBA ()
+function, which is called while a BA is received by MN. Successful packet transmission after handoff
+is tested at CheckForHandoff () function usinf two counter variables: pkttotalcounter and pkthandoffcounter.
 
 * Validation against Linux Testbed results:
 
@@ -421,7 +446,9 @@ CI of a simulation parameter value ``v`` is x% means x runs (out of total 100 ru
 F. Z. Yousaf et al. measured the MIPv6 handoff delay in both the CNI-MIPv6 test bed and xMIPv6
 simulation model. The parameters they used and defined slightly differs from our definitions.
 To compute handoff delay they used movement detection delay (tmd), home binding delay (Thr),
-RR delay (trr) and correspondent binding delay (tcr).
+RR delay (trr) and correspondent binding delay (tcr) [Note: this delay component could not be found
+in our current implementation as route optimization is not supported. We have found this delay by just
+running some of the APIs in MIPv6 module, which are not tested yet].
 
 Hence, the overall delay (tho) and tmd can be expressed as follows:
 
@@ -440,13 +467,12 @@ as specified them:
 The comparison between the results (Table II) clearly shows that the delay components are almost same
 with their results. Although a significant variation of tmd is seen in case of CNI-MIPv6 testbed in test1.
 It happens because of the high value of RA intervals and also WLAN network setup in test bed and WLAN AP
-configuration in |ns3| are different. So depending on |ns3| wifi specification, the
-obtained value for tmd differs from their results. thr is 1.0 second more than the actual value because
-HA runs DAD process (that takes 1.0 second) before acknowledging home BU. In comparing trr and tcr, there
-is a high variation between testbed, OMNET++ based simulator and our simulator results. It is due to the
-queuing delay. However, during home registration, the queuing delay is not seen in between AR and HA, and
-so, there is no such variation in thr . The reason for low CI while computing tmd and tHO is same as discussed
-previously.
+configuration in |ns3| are different. So depending on |ns3| wifi specification, the obtained value for tmd
+differs from their results. thr is 1.0 second more than the actual value because HA runs DAD process (that
+takes 1.0 second) before acknowledging home BU. In comparing trr and tcr, there is a high variation between
+testbed, OMNET++ based simulator and our simulator results. It is due to the queuing delay. However, during
+home registration, the queuing delay is not seen in between AR and HA, and so, there is no such variation in
+thr . The reason for low CI while computing tmd and tHO is same as discussed previously.
 
 
 
