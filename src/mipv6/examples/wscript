@@ -1,6 +1,12 @@
-# - *- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
+## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 
-def build (bld)
-  : obj = bld.create_ns3_program ('mipv6-example', ['mipv6'])
+def build (bld):
+    obj = bld.create_ns3_program ('mipv6-example', ['mipv6'])
     obj.source = 'mipv6-example.cc'
+    obj = bld.create_ns3_program ('mipv6-single', ['mipv6'])
+    obj.source = 'mipv6-single.cc'
+    obj = bld.create_ns3_program ('mipv6-multiple', ['mipv6'])
+    obj.source = 'mipv6-multiple.cc'
+    obj = bld.create_ns3_program ('mipv6-wifi-wimax', ['mipv6'])
+    obj.source = 'mipv6-wifi-wimax.cc'
 
