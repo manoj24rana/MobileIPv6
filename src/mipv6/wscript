@@ -9,8 +9,6 @@
 def build(bld):
     module = bld.create_ns3_module('mipv6', ['core','internet','network'])
     module.source = [
-#        'model/mipv6.cc',
-#        'model/identifier.cc',
         'model/mipv6-option-header.cc',
         'model/mipv6-header.cc',
         'model/mipv6-demux.cc',
@@ -20,7 +18,6 @@ def build(bld):
         'model/mipv6-agent.cc',
         'model/mipv6-l4-protocol.cc',
         'model/tunnel-net-device.cc',
-#        'model/ipv6-static-source-routing.cc',
         'model/mipv6-tun-l4-protocol.cc',
         'model/blist.cc',
         'model/mipv6-mn.cc',
@@ -28,19 +25,17 @@ def build(bld):
         'model/mipv6-ha.cc',
         'model/mipv6-cn.cc',
         'helper/mipv6-helper.cc',
-#        'helper/ipv6-static-source-routing-helper.cc',
         ]
 
     module_test = bld.create_ns3_module_test_library('mipv6')
     module_test.source = [
         'test/mipv6-test-suite.cc',
+        'test/handoff-test.cc',
         ]
 
     headers = bld(features='ns3header')
     headers.module = 'mipv6'
     headers.source = [
-#        'model/mipv6.h',
-#        'model/identifier.h',
         'model/mipv6-option-header.h',
         'model/mipv6-demux.h',
         'model/mipv6-option-demux.h',
@@ -51,14 +46,12 @@ def build(bld):
         'model/mipv6-l4-protocol.h',
         'model/tunnel-net-device.h',
         'model/mipv6-tun-l4-protocol.h',
-#        'model/ipv6-static-source-routing.h',
         'model/blist.h',
         'model/mipv6-mn.h',
         'model/bcache.h',
         'model/mipv6-ha.h',
         'model/mipv6-cn.h',
         'helper/mipv6-helper.h',
-#        'helper/ipv6-static-source-routing-helper.h',
         ]
 
     if bld.env.ENABLE_EXAMPLES:
