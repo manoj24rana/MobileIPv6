@@ -37,6 +37,7 @@ This document is written in `reStructuredText <http://docutils.sourceforge.net/r
    lr-wpan
    lte
    mesh
+   mipv6
    distributed
    mobility
    network
