@@ -42,32 +42,42 @@ class Node;
  * mobility messages using MIPv6MobL4Protocol class
  */
 
-//HA Helper
-
-class mipv6HAHelper
+/**
+ * \brief HA Helper
+ */
+class Mipv6HaHelper
 {
 public:
-  mipv6HAHelper ();
-  ~mipv6HAHelper ();
+  Mipv6HaHelper ();
+  ~Mipv6HaHelper ();
   /**
    *
    * \param node The node on which to install the stack.
    */
   void Install (Ptr<Node> node);
+/**
+   *
 
+   * \returns all the link addresses of the home agent.
+   */
   std::list<Ipv6Address> GetHomeAgentAddressList ();
+
 protected:
 private:
+/**
+   * \brief node.
+   */
   Ptr<Node> m_node;
 };
 
-//CN Helper
-
-class mipv6CNHelper
+/**
+ * \brief CN Helper
+ */
+class Mipv6CnHelper
 {
 public:
-  mipv6CNHelper ();
-  ~mipv6CNHelper ();
+  Mipv6CnHelper ();
+  ~Mipv6CnHelper ();
 
   /**
    *
@@ -79,13 +89,19 @@ protected:
 private:
 };
 
-//MN Helper
-
-class mipv6MNHelper
+/**
+ * \brief MN Helper
+ */
+class Mipv6MnHelper
 {
 public:
-  mipv6MNHelper (std::list<Ipv6Address> haalist, bool rotopt);
-  ~mipv6MNHelper ();
+/**
+ * \brief constructor
+ * \param haalist home agent address list
+ * \param rotopt route optimization flag
+ */
+  Mipv6MnHelper (std::list<Ipv6Address> haalist, bool rotopt);
+  ~Mipv6MnHelper ();
   /**
    *
    * \param node The node on which to install the stack.
@@ -95,8 +111,14 @@ public:
 
 protected:
 private:
+/**
+ * \brief home agent address list
+ */
   std::list<Ipv6Address> m_Haalist;
-  bool m_rotopt;
+/**
+ * \brief route optimization flag
+ */
+  bool m_rotopt; //route optimization flag
 
 };
 

@@ -38,110 +38,110 @@ namespace ns3 {
 
 //HA Helper
 
-mipv6HAHelper::mipv6HAHelper ()
+Mipv6HaHelper::Mipv6HaHelper ()
 {
 }
 
-mipv6HAHelper::~mipv6HAHelper ()
+Mipv6HaHelper::~Mipv6HaHelper ()
 {
 }
 
 void
-mipv6HAHelper::Install (Ptr<Node> node)
+Mipv6HaHelper::Install (Ptr<Node> node)
 {
   m_node = node;
-  Ptr<MIPv6L4Protocol> mipv6 = node->GetObject<MIPv6L4Protocol>();
+  Ptr<Mipv6L4Protocol> mipv6 = node->GetObject<Mipv6L4Protocol> ();
 
   if (mipv6 == 0)
     {
-      mipv6 = CreateObject<MIPv6L4Protocol>();
+      mipv6 = CreateObject<Mipv6L4Protocol> ();
   
       node->AggregateObject (mipv6);
   
-      mipv6 = node->GetObject<MIPv6L4Protocol>();
+      mipv6 = node->GetObject<Mipv6L4Protocol> ();
   
       mipv6->RegisterMobility();
 
       mipv6->RegisterMobilityOptions();
     }
 
-  Ptr<Ipv6TunnelL4Protocol> ip6tunnel = node->GetObject<Ipv6TunnelL4Protocol>();
+  Ptr<Ipv6TunnelL4Protocol> ip6tunnel = node->GetObject<Ipv6TunnelL4Protocol> ();
   
   if ( ip6tunnel == 0 )
     {
-      ip6tunnel = CreateObject<Ipv6TunnelL4Protocol>();
+      ip6tunnel = CreateObject<Ipv6TunnelL4Protocol> ();
 	  
       node->AggregateObject (ip6tunnel);
     }
 
-  Ptr<mipv6MN> mn = node->GetObject<mipv6MN>();
+  Ptr<Mipv6Mn> mn = node->GetObject<Mipv6Mn> ();
   if (mn)
     {
 
       NS_ASSERT_MSG( !mn, "MN stack is installed on HA, not allowed");
   
     }  
-  Ptr<mipv6HA> ha = CreateObject<mipv6HA>();
+  Ptr<Mipv6Ha> ha = CreateObject<Mipv6Ha> ();
  	
   node->AggregateObject (ha);
 }
 
-std::list<Ipv6Address> mipv6HAHelper::GetHomeAgentAddressList ()
+std::list<Ipv6Address> Mipv6HaHelper::GetHomeAgentAddressList ()
 {
-  Ptr<mipv6HA> ha = m_node->GetObject<mipv6HA>();
+  Ptr<Mipv6Ha> ha = m_node->GetObject<Mipv6Ha> ();
   NS_ASSERT (ha != 0);  // must install mipv6ha before
   return ha->HomeAgentAddressList ();
 }
 
 //MN Helper
 
-mipv6MNHelper::mipv6MNHelper (std::list<Ipv6Address> haalist, bool rotopt)
+Mipv6MnHelper::Mipv6MnHelper (std::list<Ipv6Address> haalist, bool rotopt)
  : m_Haalist (haalist),  //home agent list
  m_rotopt (rotopt)     //must be false in this implementation (set as false by default)
 {
  m_rotopt = false;
 }
 
-mipv6MNHelper::~mipv6MNHelper ()
+Mipv6MnHelper::~Mipv6MnHelper ()
 {
 }
 
 void
-mipv6MNHelper::Install (Ptr<Node> node) const
+Mipv6MnHelper::Install (Ptr<Node> node) const
 {
-  Ptr<MIPv6L4Protocol> mipv6 = node->GetObject<MIPv6L4Protocol>();
+  Ptr<Mipv6L4Protocol> mipv6 = node->GetObject<Mipv6L4Protocol> ();
 
   if (mipv6 == 0)
     {
-      mipv6 = CreateObject<MIPv6L4Protocol>();
+      mipv6 = CreateObject<Mipv6L4Protocol> ();
   
       node->AggregateObject (mipv6);
 	  
-      mipv6 = node->GetObject<MIPv6L4Protocol>();
+      mipv6 = node->GetObject<Mipv6L4Protocol> ();
   
       mipv6->RegisterMobility ();
 
       mipv6->RegisterMobilityOptions ();
     }
 
-  Ptr<Ipv6TunnelL4Protocol> ip6tunnel = node->GetObject<Ipv6TunnelL4Protocol>();
+  Ptr<Ipv6TunnelL4Protocol> ip6tunnel = node->GetObject<Ipv6TunnelL4Protocol> ();
   
   if ( ip6tunnel == 0 )
     {
-      ip6tunnel = CreateObject<Ipv6TunnelL4Protocol>();
+      ip6tunnel = CreateObject<Ipv6TunnelL4Protocol> ();
 	  
       node->AggregateObject (ip6tunnel);
     }
 
-  Ptr<mipv6HA> ha = node->GetObject<mipv6HA>();
+  Ptr<Mipv6Ha> ha = node->GetObject<Mipv6Ha> ();
   if (ha)
     {
  
-      NS_ASSERT_MSG( !ha, "HA stack is installed on MN, not allowed");
+      NS_ASSERT_MSG ( !ha, "HA stack is installed on MN, not allowed");
 
     }
 
-  Ptr<mipv6MN> mn = CreateObject<mipv6MN> (m_Haalist);  // Pass Home Agent Address List as argument
+  Ptr<Mipv6Mn> mn = CreateObject<Mipv6Mn> (m_Haalist);  // Pass Home Agent Address List as argument
 
   mn->SetRouteOptimizationReuiredField (m_rotopt);  //Set by default false as the current implementation does
                                                 //not support route optimization, otherwise set to m_rotopt
@@ -150,26 +150,26 @@ mipv6MNHelper::Install (Ptr<Node> node) const
 
 //CN Helper
 
-mipv6CNHelper::mipv6CNHelper ()
+Mipv6CnHelper::Mipv6CnHelper ()
 {
 }
 
-mipv6CNHelper::~mipv6CNHelper ()
+Mipv6CnHelper::~Mipv6CnHelper ()
 {
 }
 
 void
-mipv6CNHelper::Install (Ptr<Node> node) const
+Mipv6CnHelper::Install (Ptr<Node> node) const
 {
-  Ptr<MIPv6L4Protocol> mipv6 = node->GetObject<MIPv6L4Protocol>();
+  Ptr<Mipv6L4Protocol> mipv6 = node->GetObject<Mipv6L4Protocol> ();
 
   if (mipv6 == 0)
     {
-      mipv6 = CreateObject<MIPv6L4Protocol>();
+      mipv6 = CreateObject<Mipv6L4Protocol> ();
   
       node->AggregateObject (mipv6);
   
-      mipv6 = node->GetObject<MIPv6L4Protocol>();
+      mipv6 = node->GetObject<Mipv6L4Protocol> ();
   
       mipv6->RegisterMobility ();
 
@@ -178,7 +178,7 @@ mipv6CNHelper::Install (Ptr<Node> node) const
 	
 
   
-  Ptr<mipv6CN> cn = CreateObject<mipv6CN>();
+  Ptr<Mipv6CN> cn = CreateObject<Mipv6CN> ();
  	
   node->AggregateObject (cn);
 }
