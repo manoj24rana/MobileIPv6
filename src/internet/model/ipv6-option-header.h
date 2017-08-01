@@ -424,6 +424,10 @@ private:
 
 //MIPv6 Extension starts
 
+/**
+ * \class Ipv6HomeAddressOptionHeader
+ * \brief Header of IPv6 Home address option
+ */
 class Ipv6HomeAddressOptionHeader : public Ipv6OptionHeader
 {
 public:
@@ -450,8 +454,16 @@ public:
    */
   virtual ~Ipv6HomeAddressOptionHeader ();
 
-
+  /**
+   * \brief set home address.
+   * \param ip home address
+   */
   void SetHomeAddress(Ipv6Address ip);
+
+  /**
+   * \brief get home address.
+   * \return home address
+   */
   Ipv6Address GetHomeAddress() const;
 
 
@@ -486,6 +498,9 @@ public:
 
 private:
 
+  /**
+   * \brief home address
+   */
   Ipv6Address m_hoa;
 };
 

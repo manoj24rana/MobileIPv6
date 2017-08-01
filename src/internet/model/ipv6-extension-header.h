@@ -522,6 +522,10 @@ private:
 
 //MIPv6 Extension starts
 
+/**
+ * \class Ipv6ExtensionType2RoutingHeader
+ * \brief Header of IPv6 Extension Type2 Routing
+ */
 class Ipv6ExtensionType2RoutingHeader : public Ipv6ExtensionRoutingHeader
 {
 public:
@@ -547,12 +551,35 @@ public:
    */
   virtual ~Ipv6ExtensionType2RoutingHeader ();
 
-
+  /**
+   * \brief set reserved2 field.
+   * \param reserved reserved2 value
+   */
   void SetReserved(uint32_t reserved);
+
+  /**
+   * \brief get reserved2 field.
+   * \return reserved2 value
+   */
   uint32_t GetReserved() const;
+
+  /**
+   * \brief set home address.
+   * \param ip home address
+   */
   void SetHomeAddress(Ipv6Address ip);
+
+  /**
+   * \brief get home address.
+   * \return home address
+   */
   Ipv6Address GetHomeAddress() const;
 
+  /**
+   * \brief Print some informations about the packet.
+   * \param os output stream
+   * \return info about this packet
+   */
   virtual void Print (std::ostream &os) const;
 
   /**
@@ -576,7 +603,14 @@ public:
 
 private:
 
+  /**
+   * \brief reserved 2
+   */
   uint32_t m_reserved;
+
+  /**
+   * \brief home address
+   */
   Ipv6Address m_hoa;
 };
 

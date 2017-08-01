@@ -234,7 +234,14 @@ public:
   virtual IpL4Protocol::DownTargetCallback6 GetDownTarget6 (void) const;
 //MIPv6 Extension Starts
 
+  /**
+   * \brief Callback rference for the function of Mipv6Mn class to get MN's HoA as the binding address
+   */
   Callback<Ipv6Address> m_mipv6callback;
+  /**
+   * \brief Callback function to set the bind address
+   * \param cb function prototype of to get the bind address
+   */
   void SetMipv6Callback (Callback<Ipv6Address> cb);
 
 //MIPv6 Extension Ends

@@ -590,6 +590,10 @@ public:
 
 //MIPv6 Extension starts
 
+/**
+ * \class Ipv6ExtensionType2Routing
+ * \brief IPv6 Extension Type 2 Routing
+ */
 class Ipv6ExtensionType2Routing : public Ipv6ExtensionRouting
 {
 public:
