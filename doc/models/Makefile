@@ -44,6 +44,7 @@ SOURCES = \
 	$(SRC)/mesh/doc/source/mesh-design.rst \
 	$(SRC)/mesh/doc/source/mesh-references.rst \
 	$(SRC)/mesh/doc/source/mesh-testing.rst \
+        $(SRC)/mipv6/doc/mipv6.rst \
 	$(SRC)/lte/doc/source/lte.rst \
 	$(SRC)/lte/doc/source/lte-user.rst \
 	$(SRC)/lte/doc/source/lte-design.rst \
@@ -239,6 +240,20 @@ SOURCEFIGS = \
 	$(SRC)/lte/doc/source/figures/lte-handover-campaign-rem.png \
 	$(SRC)/lte/doc/source/figures/lte-legacy-handover-algorithm.pdf \
 	$(SRC)/lte/doc/source/figures/lte-legacy-handover-algorithm.png \
+        $(SRC)/mipv6/doc/figures/bu.png \
+        $(SRC)/mipv6/doc/figures/bu.pdf \
+        $(SRC)/mipv6/doc/figures/ha-to-mn.png \
+        $(SRC)/mipv6/doc/figures/ha-to-mn.pdf \
+        $(SRC)/mipv6/doc/figures/mipv6-class.png \
+        $(SRC)/mipv6/doc/figures/mipv6-class.pdf \
+        $(SRC)/mipv6/doc/figures/mipv6-header.png \
+        $(SRC)/mipv6/doc/figures/mipv6-header.pdf \
+        $(SRC)/mipv6/doc/figures/mn-to-ha.png \
+        $(SRC)/mipv6/doc/figures/mn-to-ha.pdf \
+        $(SRC)/mipv6/doc/figures/fig-exp-comp-1.png \
+        $(SRC)/mipv6/doc/figures/fig-exp-comp-1.pdf \
+        $(SRC)/mipv6/doc/figures/fig-exp-comp-2.png \
+        $(SRC)/mipv6/doc/figures/fig-exp-comp-2.pdf \
 	$(SRC)/uan/doc/auvmobility-classes.dia \
 	$(SRC)/stats/doc/Stat-framework-arch.png \
 	$(SRC)/stats/doc/Wifi-default.png \
