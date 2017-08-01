@@ -86,8 +86,6 @@ TunnelNetDevice::TunnelNetDevice ()
   m_remoteAddress ("::"),
   m_refCount (1)
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
   m_needsArp = false;
   m_supportsSendFrom = true;
   m_isPointToPoint = true;
@@ -131,14 +129,13 @@ TunnelNetDevice::~TunnelNetDevice ()
 
 void TunnelNetDevice::DoDispose ()
 {
-  NS_LOG_FUNCTION_NOARGS ();
   m_node = 0;
   NetDevice::DoDispose ();
 }
 
 Ipv6Address TunnelNetDevice::GetLocalAddress () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 
   return m_localAddress;
 }
@@ -152,7 +149,7 @@ void TunnelNetDevice::SetLocalAddress (Ipv6Address laddr)
 
 Ipv6Address TunnelNetDevice::GetRemoteAddress () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 
   return m_remoteAddress;
 }
@@ -166,19 +163,19 @@ void TunnelNetDevice::SetRemoteAddress (Ipv6Address raddr)
 
 void TunnelNetDevice::IncreaseRefCount ()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   m_refCount++;
 }
 
 void TunnelNetDevice::DecreaseRefCount ()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   m_refCount--;
 }
 
 uint32_t TunnelNetDevice::GetRefCount () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return m_refCount;
 }
 
@@ -225,21 +222,21 @@ TunnelNetDevice::SetIfIndex (const uint32_t index)
 uint32_t
 TunnelNetDevice::GetIfIndex (void) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return m_index;
 }
 
 Ptr<Channel>
 TunnelNetDevice::GetChannel (void) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return Ptr<Channel> ();
 }
 
 Address
 TunnelNetDevice::GetAddress (void) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return m_myAddress;
 }
 
@@ -253,53 +250,53 @@ TunnelNetDevice::SetAddress (Address addr)
 uint16_t
 TunnelNetDevice::GetMtu (void) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return m_mtu;
 }
 
 bool
 TunnelNetDevice::IsLinkUp (void) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return true;
 }
 
 void
 TunnelNetDevice::AddLinkChangeCallback (Callback<void> callback)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 }
 
 bool
 TunnelNetDevice::IsBroadcast (void) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return true;
 }
 
 Address
 TunnelNetDevice::GetBroadcast (void) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return Mac48Address ("ff:ff:ff:ff:ff:ff");
 }
 
 bool
 TunnelNetDevice::IsMulticast (void) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return false;
 }
 
 Address TunnelNetDevice::GetMulticast (Ipv4Address multicastGroup) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return Mac48Address ("ff:ff:ff:ff:ff:ff");
 }
 
 Address TunnelNetDevice::GetMulticast (Ipv6Address addr) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return Mac48Address ("ff:ff:ff:ff:ff:ff");
 }
 
@@ -307,7 +304,7 @@ Address TunnelNetDevice::GetMulticast (Ipv6Address addr) const
 bool
 TunnelNetDevice::IsPointToPoint (void) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return m_isPointToPoint;
 }
 
@@ -461,27 +458,27 @@ TunnelNetDevice::NeedsArp (void) const
 void
 TunnelNetDevice::SetReceiveCallback (NetDevice::ReceiveCallback cb)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   m_rxCallback = cb;
 }
 
 void
 TunnelNetDevice::SetPromiscReceiveCallback (NetDevice::PromiscReceiveCallback cb)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   m_promiscRxCallback = cb;
 }
 
 bool
 TunnelNetDevice::SupportsSendFrom () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return m_supportsSendFrom;
 }
 
 bool TunnelNetDevice::IsBridge (void) const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return false;
 }
 

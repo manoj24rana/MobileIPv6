@@ -29,14 +29,14 @@
 
 namespace ns3 {
 
-class MIPv6Option;
+class Mipv6Option;
 class Node;
 
 /**
- * \class MIPv6OptionDemux
+ * \class Mipv6OptionDemux
  * \brief Ipv6 Mobility Option Demux.
  */
-class MIPv6OptionDemux : public Object
+class Mipv6OptionDemux : public Object
 {
 public:
   /**
@@ -48,12 +48,12 @@ public:
   /**
    * \brief Constructor.
    */
-  MIPv6OptionDemux ();
+  Mipv6OptionDemux ();
 
   /**
    * \brief Destructor.
    */
-  virtual ~MIPv6OptionDemux ();
+  virtual ~Mipv6OptionDemux ();
 
   /**
    * \brief Set the node.
@@ -65,20 +65,20 @@ public:
    * \brief Insert a new IPv6 Mobility Option.
    * \param option the option to insert
    */
-  void Insert (Ptr<MIPv6Option> option);
+  void Insert (Ptr<Mipv6Option> option);
 
   /**
    * \brief Get the option corresponding to optionNumber.
    * \param optionNumber the option number of the option to retrieve
    * \return a matching IPv6 Mobility option
    */
-  Ptr<MIPv6Option> GetOption (int optionNumber);
+  Ptr<Mipv6Option> GetOption (int optionNumber);
 
   /**
    * \brief Remove an option from this demux.
    * \param option pointer on the option to remove
    */
-  void Remove (Ptr<MIPv6Option> option);
+  void Remove (Ptr<Mipv6Option> option);
 
 protected:
   /**
@@ -87,7 +87,10 @@ protected:
   virtual void DoDispose ();
 
 private:
-  typedef std::list<Ptr<MIPv6Option> > Ipv6MobilityOptionList_t;
+  /**
+   * \brief List of IPv6 Options supported.
+   */
+  typedef std::list<Ptr<Mipv6Option> > Ipv6MobilityOptionList_t;
 
   /**
    * \brief List of IPv6 Options supported.

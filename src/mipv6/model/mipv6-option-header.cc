@@ -23,81 +23,81 @@
 #include "mipv6-header.h"
 #include "mipv6-option-header.h"
 
-NS_LOG_COMPONENT_DEFINE ("MIPv6OptionHeader");
+NS_LOG_COMPONENT_DEFINE ("Mipv6OptionHeader");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (MIPv6OptionHeader);
+NS_OBJECT_ENSURE_REGISTERED (Mipv6OptionHeader);
 
-TypeId MIPv6OptionHeader::GetTypeId ()
+TypeId Mipv6OptionHeader::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::MIPv6OptionHeader")
+  static TypeId tid = TypeId ("ns3::Mipv6OptionHeader")
     .SetParent<Header> ()
-    .AddConstructor<MIPv6OptionHeader> ()
+    .AddConstructor<Mipv6OptionHeader> ()
   ;
   return tid;
 }
 
-TypeId MIPv6OptionHeader::GetInstanceTypeId () const
+TypeId Mipv6OptionHeader::GetInstanceTypeId () const
 {
   return GetTypeId ();
 }
 
 
-MIPv6OptionHeader::MIPv6OptionHeader ()
+Mipv6OptionHeader::Mipv6OptionHeader ()
 {
   m_type = 0;
   m_len = 0;
 }
 
-MIPv6OptionHeader::~MIPv6OptionHeader ()
+Mipv6OptionHeader::~Mipv6OptionHeader ()
 {
 }
 
-uint8_t MIPv6OptionHeader::GetType () const
+uint8_t Mipv6OptionHeader::GetType () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return m_type;
 }
 
-void MIPv6OptionHeader::SetType (uint8_t type)
+void Mipv6OptionHeader::SetType (uint8_t type)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << type);
   m_type = type;
 }
 
-uint8_t MIPv6OptionHeader::GetLength () const
+uint8_t Mipv6OptionHeader::GetLength () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return m_len;
 }
 
-void MIPv6OptionHeader::SetLength (uint8_t len)
+void Mipv6OptionHeader::SetLength (uint8_t len)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << len);
   m_len = len;
 }
 
-void MIPv6OptionHeader::Print (std::ostream& os) const
+void Mipv6OptionHeader::Print (std::ostream& os) const
 {
   os << "( type = " << (uint32_t)GetType () << " length = " << (uint32_t)GetLength () << ")";
 }
 
-uint32_t MIPv6OptionHeader::GetSerializedSize () const
+uint32_t Mipv6OptionHeader::GetSerializedSize () const
 {
   return m_len;
 }
 
-uint32_t MIPv6OptionHeader::Deserialize (Buffer::Iterator start)
+uint32_t Mipv6OptionHeader::Deserialize (Buffer::Iterator start)
 {
   return GetSerializedSize ();
 }
 
-void MIPv6OptionHeader::Serialize (Buffer::Iterator start) const
+void Mipv6OptionHeader::Serialize (Buffer::Iterator start) const
 {
 }
 
-MIPv6OptionHeader::Alignment MIPv6OptionHeader::GetAlignment () const
+Mipv6OptionHeader::Alignment Mipv6OptionHeader::GetAlignment () const
 {
   return (Alignment){
            1,0
@@ -109,7 +109,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityOptionPad1Header);
 TypeId Ipv6MobilityOptionPad1Header::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityOptionPad1Header")
-    .SetParent<MIPv6OptionHeader> ()
+    .SetParent<Mipv6OptionHeader> ()
     .AddConstructor<Ipv6MobilityOptionPad1Header> ()
   ;
   return tid;
@@ -122,7 +122,7 @@ TypeId Ipv6MobilityOptionPad1Header::GetInstanceTypeId () const
 
 Ipv6MobilityOptionPad1Header::Ipv6MobilityOptionPad1Header ()
 {
-  SetType (MIPv6Header::IPV6_MOBILITY_OPT_PAD1);
+  SetType (Mipv6Header::IPV6_MOBILITY_OPT_PAD1);
   SetLength (0);
 }
 
@@ -161,7 +161,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityOptionPadnHeader);
 TypeId Ipv6MobilityOptionPadnHeader::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityOptionPadnHeader")
-    .SetParent<MIPv6OptionHeader> ()
+    .SetParent<Mipv6OptionHeader> ()
     .AddConstructor<Ipv6MobilityOptionPadnHeader> ()
   ;
   return tid;
@@ -174,7 +174,7 @@ TypeId Ipv6MobilityOptionPadnHeader::GetInstanceTypeId () const
 
 Ipv6MobilityOptionPadnHeader::Ipv6MobilityOptionPadnHeader (uint8_t length)
 {
-  SetType (MIPv6Header::IPV6_MOBILITY_OPT_PADN);
+  SetType (Mipv6Header::IPV6_MOBILITY_OPT_PADN);
   SetLength (length - 2);
 }
 
@@ -227,7 +227,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityOptionBindingRefreshAdviceHeader);
 TypeId Ipv6MobilityOptionBindingRefreshAdviceHeader::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityOptionBindingRefreshAdviceHeader")
-    .SetParent<MIPv6OptionHeader> ()
+    .SetParent<Mipv6OptionHeader> ()
     .AddConstructor<Ipv6MobilityOptionBindingRefreshAdviceHeader> ()
   ;
   return tid;
@@ -240,7 +240,7 @@ TypeId Ipv6MobilityOptionBindingRefreshAdviceHeader::GetInstanceTypeId () const
 
 Ipv6MobilityOptionBindingRefreshAdviceHeader::Ipv6MobilityOptionBindingRefreshAdviceHeader ()
 {
-  SetType (MIPv6Header::IPV6_MOBILITY_OPT_BINDING_REFRESH_ADVICE);
+  SetType (Mipv6Header::IPV6_MOBILITY_OPT_BINDING_REFRESH_ADVICE);
   SetLength (2);
   SetRefreshInterval (10);
 }
@@ -295,7 +295,7 @@ uint32_t Ipv6MobilityOptionBindingRefreshAdviceHeader::Deserialize (Buffer::Iter
   return GetSerializedSize ();
 }
 
-MIPv6OptionHeader::Alignment Ipv6MobilityOptionBindingRefreshAdviceHeader::GetAlignment () const
+Mipv6OptionHeader::Alignment Ipv6MobilityOptionBindingRefreshAdviceHeader::GetAlignment () const
 {
   return (Alignment){
            2,0
@@ -308,7 +308,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityOptionAlternateCareofAddressHeader);
 TypeId Ipv6MobilityOptionAlternateCareofAddressHeader::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityOptionAlternateCareofAddressHeader")
-    .SetParent<MIPv6OptionHeader> ()
+    .SetParent<Mipv6OptionHeader> ()
     .AddConstructor<Ipv6MobilityOptionAlternateCareofAddressHeader> ()
   ;
   return tid;
@@ -321,7 +321,7 @@ TypeId Ipv6MobilityOptionAlternateCareofAddressHeader::GetInstanceTypeId () cons
 
 Ipv6MobilityOptionAlternateCareofAddressHeader::Ipv6MobilityOptionAlternateCareofAddressHeader ()
 {
-  SetType (MIPv6Header::IPV6_MOBILITY_OPT_ALTERNATE_CARE_OF_ADDRESS);
+  SetType (Mipv6Header::IPV6_MOBILITY_OPT_ALTERNATE_CARE_OF_ADDRESS);
   SetLength (16);
 
   m_coa.Set ("::");
@@ -383,7 +383,7 @@ uint32_t Ipv6MobilityOptionAlternateCareofAddressHeader::Deserialize (Buffer::It
   return GetSerializedSize ();
 }
 
-MIPv6OptionHeader::Alignment Ipv6MobilityOptionAlternateCareofAddressHeader::GetAlignment () const
+Mipv6OptionHeader::Alignment Ipv6MobilityOptionAlternateCareofAddressHeader::GetAlignment () const
 {
   return (Alignment){
            8,6
@@ -395,7 +395,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityOptionNonceIndicesHeader);
 TypeId Ipv6MobilityOptionNonceIndicesHeader::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityOptionNonceIndicesHeader")
-    .SetParent<MIPv6OptionHeader> ()
+    .SetParent<Mipv6OptionHeader> ()
     .AddConstructor<Ipv6MobilityOptionNonceIndicesHeader> ()
   ;
   return tid;
@@ -408,7 +408,7 @@ TypeId Ipv6MobilityOptionNonceIndicesHeader::GetInstanceTypeId () const
 
 Ipv6MobilityOptionNonceIndicesHeader::Ipv6MobilityOptionNonceIndicesHeader ()
 {
-  SetType (MIPv6Header::IPV6_MOBILITY_OPT_NONCE_INDICES);
+  SetType (Mipv6Header::IPV6_MOBILITY_OPT_NONCE_INDICES);
   SetLength (4);
 
   m_homenonceindex = 0;
@@ -474,7 +474,7 @@ uint32_t Ipv6MobilityOptionNonceIndicesHeader::Deserialize (Buffer::Iterator sta
 }
 
 
-MIPv6OptionHeader::Alignment Ipv6MobilityOptionNonceIndicesHeader::GetAlignment () const
+Mipv6OptionHeader::Alignment Ipv6MobilityOptionNonceIndicesHeader::GetAlignment () const
 {
   return (Alignment){
            2,0
@@ -486,7 +486,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityOptionBindingAuthorizationDataHeader);
 TypeId Ipv6MobilityOptionBindingAuthorizationDataHeader::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityOptionBindingAuthorizationDataHeader")
-    .SetParent<MIPv6OptionHeader> ()
+    .SetParent<Mipv6OptionHeader> ()
     .AddConstructor<Ipv6MobilityOptionBindingAuthorizationDataHeader> ()
   ;
   return tid;
@@ -499,7 +499,7 @@ TypeId Ipv6MobilityOptionBindingAuthorizationDataHeader::GetInstanceTypeId () co
 
 Ipv6MobilityOptionBindingAuthorizationDataHeader::Ipv6MobilityOptionBindingAuthorizationDataHeader ()
 {
-  SetType (MIPv6Header::IPV6_MOBILITY_OPT_BINDING_AUTHORIZATION_DATA);
+  SetType (Mipv6Header::IPV6_MOBILITY_OPT_BINDING_AUTHORIZATION_DATA);
   SetLength (8);
 
   m_auth = 0;
@@ -554,7 +554,7 @@ uint32_t Ipv6MobilityOptionBindingAuthorizationDataHeader::Deserialize (Buffer::
 }
 
 
-MIPv6OptionHeader::Alignment Ipv6MobilityOptionBindingAuthorizationDataHeader::GetAlignment () const
+Mipv6OptionHeader::Alignment Ipv6MobilityOptionBindingAuthorizationDataHeader::GetAlignment () const
 {
   return (Alignment){
            8,2

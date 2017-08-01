@@ -26,29 +26,29 @@
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (MIPv6OptionDemux);
+NS_OBJECT_ENSURE_REGISTERED (Mipv6OptionDemux);
 
-TypeId MIPv6OptionDemux::GetTypeId ()
+TypeId Mipv6OptionDemux::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::MIPv6OptionDemux")
+  static TypeId tid = TypeId ("ns3::Mipv6OptionDemux")
     .SetParent<Object> ()
     .AddAttribute ("MobilityOptions", "The set of IPv6 Mobility options registered with this demux.",
                    ObjectVectorValue (),
-                   MakeObjectVectorAccessor (&MIPv6OptionDemux::m_options),
-                   MakeObjectVectorChecker<MIPv6Option> ())
+                   MakeObjectVectorAccessor (&Mipv6OptionDemux::m_options),
+                   MakeObjectVectorChecker<Mipv6Option> ())
   ;
   return tid;
 }
 
-MIPv6OptionDemux::MIPv6OptionDemux ()
+Mipv6OptionDemux::Mipv6OptionDemux ()
 {
 }
 
-MIPv6OptionDemux::~MIPv6OptionDemux ()
+Mipv6OptionDemux::~Mipv6OptionDemux ()
 {
 }
 
-void MIPv6OptionDemux::DoDispose ()
+void Mipv6OptionDemux::DoDispose ()
 {
   for (Ipv6MobilityOptionList_t::iterator it = m_options.begin (); it != m_options.end (); it++)
     {
@@ -60,17 +60,17 @@ void MIPv6OptionDemux::DoDispose ()
   Object::DoDispose ();
 }
 
-void MIPv6OptionDemux::SetNode (Ptr<Node> node)
+void Mipv6OptionDemux::SetNode (Ptr<Node> node)
 {
   m_node = node;
 }
 
-void MIPv6OptionDemux::Insert (Ptr<MIPv6Option> option)
+void Mipv6OptionDemux::Insert (Ptr<Mipv6Option> option)
 {
   m_options.push_back (option);
 }
 
-Ptr<MIPv6Option> MIPv6OptionDemux::GetOption (int optionNumber)
+Ptr<Mipv6Option> Mipv6OptionDemux::GetOption (int optionNumber)
 {
   for (Ipv6MobilityOptionList_t::iterator i = m_options.begin (); i != m_options.end (); ++i)
     {
@@ -82,7 +82,7 @@ Ptr<MIPv6Option> MIPv6OptionDemux::GetOption (int optionNumber)
   return 0;
 }
 
-void MIPv6OptionDemux::Remove (Ptr<MIPv6Option> option)
+void Mipv6OptionDemux::Remove (Ptr<Mipv6Option> option)
 {
   m_options.remove (option);
 }

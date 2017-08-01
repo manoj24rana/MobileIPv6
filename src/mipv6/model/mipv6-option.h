@@ -33,7 +33,7 @@
 
 namespace ns3 {
 
-class MIPv6OptionBundle;
+class Mipv6OptionBundle;
 
 /**
  * \class Ipv6MobilityOption
@@ -42,7 +42,7 @@ class MIPv6OptionBundle;
  * If you want to implement a new Ipv6 Mobility option, all you have to do is
  * implement a subclass of this class and add it to an Ipv6MobilityOptionDemux.
  */
-class MIPv6Option : public Object
+class Mipv6Option : public Object
 {
 public:
   /**
@@ -54,7 +54,7 @@ public:
   /**
    * \brief Destructor.
    */
-  virtual ~MIPv6Option ();
+  virtual ~Mipv6Option ();
 
   /**
    * \brief Set the node.
@@ -73,10 +73,11 @@ public:
    *
    * Called from Ipv6MobilityL4Protocol::Receive.
    * \param packet the packet
+   * \param offset offset
    * \param bundle bundle of all option data
    * \return the processed size
    */
-  virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, MIPv6OptionBundle& bundle) = 0;
+  virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, Mipv6OptionBundle& bundle) = 0;
 
 private:
   /**
@@ -85,37 +86,114 @@ private:
   Ptr<Node> m_node;
 };
 
-class MIPv6OptionBundle
+/**
+ * \brief Option Bundle
+ */
+class Mipv6OptionBundle
 {
 public:
-  MIPv6OptionBundle ();
 
+  /**
+   * \brief constructor
+   */
+  Mipv6OptionBundle ();
+
+  /**
+   * \brief Get the Home address.
+   * \return home address
+   */
   Ipv6Address GetHomeAddress () const;
+  /**
+   * \brief Set the Home address.
+   * \param hoa home address
+   */
   void SetHomeAddress (Ipv6Address hoa);
-
+  /**
+   * \brief Get the CoA.
+   * \return CoA
+   */
   Ipv6Address GetCareofAddress () const;
+  /**
+   * \brief Set the CoA.
+   * \param coa CoA
+   */
   void SetCareofAddress (Ipv6Address coa);
 
+  /**
+   * \brief Get the home nonce index.
+   * \return home nonce index
+   */
   uint16_t GetHomeNonceIndex () const;
+  /**
+   * \brief Set the home nonce index.
+   * \param hi home nonce index
+   */
   void SetHomeNonceIndex (uint16_t hi);
 
+
+  /**
+   * \brief Get the care-of nonce index.
+   * \return care-of nonce index
+   */
   uint16_t GetCareofNonceIndex () const;
+
+  /**
+   * \brief Set the care-of nonce index.
+   * \param coi care-of nonce index
+   */
   void SetCareofNonceIndex (uint16_t coi);
 
+
+  /**
+   * \brief Get the authenticator.
+   * \return authenticator
+   */
   uint64_t GetAuthenticator () const;
+
+  /**
+   * \brief Set the authenticator.
+   * \param auth the authenticator
+   */
   void SetAuthenticator (uint64_t auth);
 
+  /**
+   * \brief Get the refresh interval.
+   * \return refresh interval
+   */
   uint16_t GetRefreshInterval () const;
+
+  /**
+   * \brief Set the refresh interval.
+   * \param intvl the refresh interval
+   */
   void SetRefreshInterval (uint16_t intvl);
 
 protected:
 private:
   //for MIPv6
+  /**
+   * \brief home address.
+   */
   Ipv6Address m_hoa;
+  /**
+   * \brief care-of-address.
+   */
   Ipv6Address m_coa;
+ /**
+   * \brief home init cookie.
+   */
   uint16_t m_hi;
+ /**
+   * \brief care-of init cookie.
+   */
   uint16_t m_coi;
+ /**
+   * \brief authenticator.
+   */
   uint64_t m_auth;
+ /**
+   * \brief refresh interval.
+   */
   uint16_t m_interval;
 };
 
@@ -123,9 +201,12 @@ private:
  * \class Ipv6MobilityOptionPad1
  * \brief Ipv6 Mobility Option
  */
-class Ipv6MobilityOptionPad1 : public MIPv6Option
+class Ipv6MobilityOptionPad1 : public Mipv6Option
 {
 public:
+ /**
+   * \brief option no.
+   */
   static const uint8_t OPT_NUMBER = 0;
 
   /**
@@ -150,10 +231,11 @@ public:
    *
    * Called from Ipv6MobilityL4Protocol::Receive.
    * \param packet the packet
+   * \param offset offset
    * \param bundle bundle of all option data
    * \return the processed size
    */
-  virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, MIPv6OptionBundle& bundle);
+  virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, Mipv6OptionBundle& bundle);
 
 private:
 };
@@ -162,9 +244,12 @@ private:
  * \class Ipv6MobilityOptionPadn
  * \brief Ipv6 Mobility Option
  */
-class Ipv6MobilityOptionPadn : public MIPv6Option
+class Ipv6MobilityOptionPadn : public Mipv6Option
 {
 public:
+ /**
+   * \brief option no.
+   */
   static const uint8_t OPT_NUMBER = 1;
 
   /**
@@ -189,10 +274,11 @@ public:
    *
    * Called from Ipv6MobilityL4Protocol::Receive.
    * \param packet the packet
+   * \param offset offset
    * \param bundle bundle of all option data
    * \return the processed size
    */
-  virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, MIPv6OptionBundle& bundle);
+  virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, Mipv6OptionBundle& bundle);
 
 private:
 };
@@ -201,9 +287,12 @@ private:
  * \class Ipv6MobilityOptionMobileNodeIdentifier
  * \brief Ipv6 Mobility Option
  */
-class Ipv6MobilityOptionBindingRefreshAdvice : public MIPv6Option
+class Ipv6MobilityOptionBindingRefreshAdvice : public Mipv6Option
 {
 public:
+  /**
+   * \brief option no.
+   */
   static const uint8_t OPT_NUMBER = 2;
 
   /**
@@ -228,10 +317,11 @@ public:
    *
    * Called from Ipv6MobilityL4Protocol::Receive.
    * \param packet the packet
+   * \param offset offset
    * \param bundle bundle of all option data
    * \return the processed size
    */
-  virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, MIPv6OptionBundle& bundle);
+  virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, Mipv6OptionBundle& bundle);
 
 private:
 };
@@ -240,9 +330,12 @@ private:
  * \class Ipv6MobilityOptionHomeNetworkPrefix
  * \brief Ipv6 Mobility Option
  */
-class Ipv6MobilityOptionAlternateCareofAddress : public MIPv6Option
+class Ipv6MobilityOptionAlternateCareofAddress : public Mipv6Option
 {
 public:
+ /**
+   * \brief option no.
+   */
   static const uint8_t OPT_NUMBER = 3;
 
   /**
@@ -267,10 +360,11 @@ public:
    *
    * Called from Ipv6MobilityL4Protocol::Receive.
    * \param packet the packet
+   * \param offset offset
    * \param bundle bundle of all option data
    * \return the processed size
    */
-  virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, MIPv6OptionBundle& bundle);
+  virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, Mipv6OptionBundle& bundle);
 
 private:
 };
@@ -279,9 +373,12 @@ private:
  * \class Ipv6MobilityOptionHandoffIndicator
  * \brief Ipv6 Mobility Option
  */
-class Ipv6MobilityOptionNonceIndices : public MIPv6Option
+class Ipv6MobilityOptionNonceIndices : public Mipv6Option
 {
 public:
+ /**
+   * \brief option no.
+   */
   static const uint8_t OPT_NUMBER = 4;
 
   /**
@@ -306,10 +403,11 @@ public:
    *
    * Called from Ipv6MobilityL4Protocol::Receive.
    * \param packet the packet
+   * \param offset offset
    * \param bundle bundle of all option data
    * \return the processed size
    */
-  virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, MIPv6OptionBundle& bundle);
+  virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, Mipv6OptionBundle& bundle);
 
 private:
 };
@@ -318,9 +416,12 @@ private:
  * \class Ipv6MobilityOptionAccessTechnologyType
  * \brief Ipv6 Mobility Option
  */
-class Ipv6MobilityOptionBindingAuthorizationData : public MIPv6Option
+class Ipv6MobilityOptionBindingAuthorizationData : public Mipv6Option
 {
 public:
+ /**
+   * \brief option no.
+   */
   static const uint8_t OPT_NUMBER = 5;
 
   /**
@@ -345,10 +446,11 @@ public:
    *
    * Called from Ipv6MobilityL4Protocol::Receive.
    * \param packet the packet
+   * \param offset offset
    * \param bundle bundle of all option data
    * \return the processed size
    */
-  virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, MIPv6OptionBundle& bundle);
+  virtual uint8_t Process (Ptr<Packet> packet, uint8_t offset, Mipv6OptionBundle& bundle);
 
 private:
 };

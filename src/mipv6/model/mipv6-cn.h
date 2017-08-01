@@ -28,13 +28,22 @@
 namespace ns3 {
 class Packet;
 
-class mipv6CN : public mipv6Agent
+class Mipv6CN : public Mipv6Agent
 {
 public:
+  /**
+   * \brief The interface ID.
+   * \return type ID
+   */
   static TypeId GetTypeId (void);
-  mipv6CN ();
-
-  virtual ~mipv6CN ();
+  /**
+   * \brief Constructor.
+   */
+  Mipv6CN ();
+  /**
+   * \brief Destructor.
+   */
+  virtual ~Mipv6CN ();
 
   /**
    * TracedCallback signature for BU reception event.
@@ -50,14 +59,66 @@ public:
 protected:
   virtual void NotifyNewAggregate ();
 
+  /**
+   * \brief build BA.
+   * \param bu the received bu header
+   * \param hoa home address
+   * \param status staus of BU reception
+   * \return the built BA 
+   */
   Ptr<Packet> BuildBA (Ipv6MobilityBindingUpdateHeader bu, Ipv6Address hoa, uint8_t status);
+
+  /**
+   * \brief build HoT.
+   * \param hoti the received hoti header
+   * \param hoa home address
+   * \return the built HoT 
+   */
   Ptr<Packet> BuildHoT (Ipv6HoTIHeader hoti, Ipv6Address hoa);
+
+  /**
+   * \brief build CoT.
+   * \param coti the received coti header
+   * \param hoa home address
+   * \return the built CoT 
+   */
   Ptr<Packet> BuildCoT (Ipv6CoTIHeader coti, Ipv6Address hoa);
+
+  /**
+   * \brief Handle BU.
+   * \param packet the received BU packet
+   * \param src source address
+   * \param dst destination address
+   * \param interface where it is received
+   * \return BU handling status
+   */
   virtual uint8_t HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface);
+
+  /**
+   * \brief Handle HoTI.
+   * \param packet the received HoTI packet
+   * \param src source address
+   * \param dst destination address
+   * \param interface where it is received
+   * \return status 
+   */
   virtual uint8_t HandleHoTI (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface);
+
+  /**
+   * \brief Handle CoTI.
+   * \param packet the received CoTI packet
+   * \param src source address
+   * \param dst destination address
+   * \param interface where it is received 
+   * \return status 
+   */
   virtual uint8_t HandleCoTI (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface);
 
 private:
+
+  /**
+   * \brief the binding cache associated with this CN 
+   */
   Ptr<BCache> m_bCache;
 
   /**

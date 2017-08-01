@@ -34,26 +34,26 @@
 
 using namespace std;
 
-NS_LOG_COMPONENT_DEFINE ("mipv6CN");
+NS_LOG_COMPONENT_DEFINE ("Mipv6CN");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (mipv6CN);
+NS_OBJECT_ENSURE_REGISTERED (Mipv6CN);
 
 TypeId
-mipv6CN::GetTypeId (void)
+Mipv6CN::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::mipv6CN")
-    .SetParent<mipv6Agent> ()
-    .AddConstructor<mipv6CN> ()
+  static TypeId tid = TypeId ("ns3::Mipv6CN")
+    .SetParent<Mipv6Agent> ()
+    .AddConstructor<Mipv6CN> ()
     .AddAttribute ("BCache", "The binding cache associated with this agent.",
                    PointerValue (),
-                   MakePointerAccessor (&mipv6CN::m_bCache),
+                   MakePointerAccessor (&Mipv6CN::m_bCache),
                    MakePointerChecker<BCache> ())
     .AddTraceSource ("RxBU",
                      "Receive BU packet from MN",
-                     MakeTraceSourceAccessor (&mipv6CN::m_rxbuTrace),
-                     "ns3::mipv6CN::RxBuTracedCallback")
+                     MakeTraceSourceAccessor (&Mipv6CN::m_rxbuTrace),
+                     "ns3::Mipv6CN::RxBuTracedCallback")
 
 
     ;
@@ -61,17 +61,17 @@ mipv6CN::GetTypeId (void)
 }
 
 
-mipv6CN::mipv6CN ()
+Mipv6CN::Mipv6CN ()
   : m_bCache (0)
 {
 }
 
-mipv6CN::~mipv6CN ()
+Mipv6CN::~Mipv6CN ()
 {
   m_bCache = 0;
 }
 
-void mipv6CN::NotifyNewAggregate ()
+void Mipv6CN::NotifyNewAggregate ()
 {
   if (GetNode () == 0)
     {
@@ -86,11 +86,11 @@ void mipv6CN::NotifyNewAggregate ()
 
     }
 
-  mipv6Agent::NotifyNewAggregate ();
+  Mipv6Agent::NotifyNewAggregate ();
 }
 
 
-Ptr<Packet> mipv6CN::BuildBA (Ipv6MobilityBindingUpdateHeader bu, Ipv6Address hoa, uint8_t status)
+Ptr<Packet> Mipv6CN::BuildBA (Ipv6MobilityBindingUpdateHeader bu, Ipv6Address hoa, uint8_t status)
 {
   NS_LOG_FUNCTION (this << status << "BUILD BACK");
 
@@ -104,14 +104,14 @@ Ptr<Packet> mipv6CN::BuildBA (Ipv6MobilityBindingUpdateHeader bu, Ipv6Address ho
   ba.SetSequence (bu.GetSequence ());
   ba.SetFlagK (true);
   ba.SetStatus (status);
-  ba.SetLifetime ((uint16_t)MIPv6L4Protocol::MAX_BINDING_LIFETIME);
+  ba.SetLifetime ((uint16_t)Mipv6L4Protocol::MAX_BINDING_LIFETIME);
   p->AddHeader (type2extn);
   p->AddHeader (ba);
 
   return p;
 }
 
-Ptr<Packet> mipv6CN::BuildHoT (Ipv6HoTIHeader hoti, Ipv6Address hoa)
+Ptr<Packet> Mipv6CN::BuildHoT (Ipv6HoTIHeader hoti, Ipv6Address hoa)
 {
 
   Ptr<Packet> p = Create<Packet> ();
@@ -136,7 +136,7 @@ Ptr<Packet> mipv6CN::BuildHoT (Ipv6HoTIHeader hoti, Ipv6Address hoa)
   return p;
 }
 
-Ptr<Packet> mipv6CN::BuildCoT (Ipv6CoTIHeader coti, Ipv6Address hoa)
+Ptr<Packet> Mipv6CN::BuildCoT (Ipv6CoTIHeader coti, Ipv6Address hoa)
 {
 
   Ptr<Packet> p = Create<Packet> ();
@@ -166,7 +166,7 @@ Ptr<Packet> mipv6CN::BuildCoT (Ipv6CoTIHeader coti, Ipv6Address hoa)
 }
 
 
-uint8_t mipv6CN::HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
+uint8_t Mipv6CN::HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
 {
   NS_LOG_FUNCTION (this << packet << src << dst << interface);
 
@@ -189,10 +189,10 @@ uint8_t mipv6CN::HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
   Ipv6Address homeaddr;
   homeaddr = homopt.GetHomeAddress ();
 
-  Ptr<MIPv6Demux> ipv6MobilityDemux = GetNode ()->GetObject<MIPv6Demux> ();
+  Ptr<Mipv6Demux> ipv6MobilityDemux = GetNode ()->GetObject<Mipv6Demux> ();
   NS_ASSERT (ipv6MobilityDemux);
 
-  Ptr<MIPv6Mobility> ipv6Mobility = ipv6MobilityDemux->GetMobility (bu.GetMhType ());
+  Ptr<Mipv6Mobility> ipv6Mobility = ipv6MobilityDemux->GetMobility (bu.GetMhType ());
   NS_ASSERT (ipv6Mobility);
 
 
@@ -209,7 +209,7 @@ uint8_t mipv6CN::HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
       bce->SetHA (dst);
       bce->SetLastBindingUpdateSequence (bu.GetSequence ());
       bce->SetLastBindingUpdateTime (Time (bu.GetLifetime ()));
-      errStatus = MIPv6Header::BA_STATUS_BINDING_UPDATE_ACCEPTED;
+      errStatus = Mipv6Header::BA_STATUS_BINDING_UPDATE_ACCEPTED;
       bce->MarkReachable ();
     }
 
@@ -220,7 +220,7 @@ uint8_t mipv6CN::HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
       bce2->SetHA (dst);
       bce2->SetLastBindingUpdateSequence (bu.GetSequence ());
       bce2->SetLastBindingUpdateTime (Time (bu.GetLifetime ()));
-      errStatus = MIPv6Header::BA_STATUS_BINDING_UPDATE_ACCEPTED;
+      errStatus = Mipv6Header::BA_STATUS_BINDING_UPDATE_ACCEPTED;
       bce2->MarkReachable ();
 
       m_bCache->Add (bce2);
@@ -236,7 +236,7 @@ uint8_t mipv6CN::HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
 
   return 0;
 }
-uint8_t mipv6CN::HandleHoTI (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
+uint8_t Mipv6CN::HandleHoTI (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
 {
   NS_LOG_FUNCTION (this << packet << src << dst << interface);
 
@@ -258,10 +258,10 @@ uint8_t mipv6CN::HandleHoTI (Ptr<Packet> packet, const Ipv6Address &src, const I
   Ipv6Address homeaddr;
   homeaddr = homopt.GetHomeAddress ();
 
-  Ptr<MIPv6Demux> ipv6MobilityDemux = GetNode ()->GetObject<MIPv6Demux> ();
+  Ptr<Mipv6Demux> ipv6MobilityDemux = GetNode ()->GetObject<Mipv6Demux> ();
   NS_ASSERT (ipv6MobilityDemux);
 
-  Ptr<MIPv6Mobility> ipv6Mobility = ipv6MobilityDemux->GetMobility (hoti.GetMhType ());
+  Ptr<Mipv6Mobility> ipv6Mobility = ipv6MobilityDemux->GetMobility (hoti.GetMhType ());
   NS_ASSERT (ipv6Mobility);
 
 
@@ -293,7 +293,7 @@ uint8_t mipv6CN::HandleHoTI (Ptr<Packet> packet, const Ipv6Address &src, const I
   return 0;
 }
 
-uint8_t mipv6CN::HandleCoTI (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
+uint8_t Mipv6CN::HandleCoTI (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
 {
   NS_LOG_FUNCTION (this << packet << src << dst << interface);
 
@@ -315,10 +315,10 @@ uint8_t mipv6CN::HandleCoTI (Ptr<Packet> packet, const Ipv6Address &src, const I
   Ipv6Address homeaddr;
   homeaddr = homopt.GetHomeAddress ();
 
-  Ptr<MIPv6Demux> ipv6MobilityDemux = GetNode ()->GetObject<MIPv6Demux> ();
+  Ptr<Mipv6Demux> ipv6MobilityDemux = GetNode ()->GetObject<Mipv6Demux> ();
   NS_ASSERT (ipv6MobilityDemux);
 
-  Ptr<MIPv6Mobility> ipv6Mobility = ipv6MobilityDemux->GetMobility (coti.GetMhType ());
+  Ptr<Mipv6Mobility> ipv6Mobility = ipv6MobilityDemux->GetMobility (coti.GetMhType ());
   NS_ASSERT (ipv6Mobility);
 
 

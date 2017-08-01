@@ -30,10 +30,10 @@ class Node;
 class Packet;
 
 /**
- * \class MIPv6L4Protocol
+ * \class Mipv6L4Protocol
  * \brief An implementation of the Mobile Ipv6 protocol.
  */
-class MIPv6L4Protocol : public IpL4Protocol
+class Mipv6L4Protocol : public IpL4Protocol
 {
 public:
   /**
@@ -65,7 +65,13 @@ public:
    * \brief Binding Update Maximum retry count (=3)
    */
   static const uint8_t MAX_BINDING_UPDATE_RETRY_COUNT;
+  /**
+   * \brief HoTI Maximum retry count (=3)
+   */
   static const uint8_t MAX_HOTI_RETRY_COUNT;
+  /**
+   * \brief CoTI Maximum retry count (=3)
+   */
   static const uint8_t MAX_COTI_RETRY_COUNT;
 
   /**
@@ -92,12 +98,12 @@ public:
   /**
    * \brief Constructor.
    */
-  MIPv6L4Protocol ();
+  Mipv6L4Protocol ();
 
   /**
    * \brief Destructor.
    */
-  virtual ~MIPv6L4Protocol ();
+  virtual ~Mipv6L4Protocol ();
 
   /**
    * \brief Set the node.
@@ -144,6 +150,7 @@ public:
    * \param src source address
    * \param dst destination address
    * \param interface the interface from which the packet is coming
+   * \return receive status
    */
   virtual enum IpL4Protocol::RxStatus Receive (Ptr<Packet> p, Ipv6Address const &src, Ipv6Address const &dst, Ptr<Ipv6Interface> interface);
   virtual enum IpL4Protocol::RxStatus Receive (Ptr<Packet> p,Ipv6Header const &header,Ptr<Ipv6Interface> incomingInterface);
@@ -157,12 +164,14 @@ public:
    * \brief Register the IPv6 Mobility.
    */
   virtual void RegisterMobility ();
+  /**
+   * \brief Register the IPv6 Mobility options.
+   */
   virtual void RegisterMobilityOptions ();
 
   /**
-   * \brief Register the IPv6 Mobility Options.
+   * \brief Inherited from IpL4Protocol class
    */
-  // virtual void RegisterMobilityOptions ();
   virtual void SetDownTarget (IpL4Protocol::DownTargetCallback cb);
   virtual void SetDownTarget6 (IpL4Protocol::DownTargetCallback6 cb);
   virtual IpL4Protocol::DownTargetCallback GetDownTarget (void) const;

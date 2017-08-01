@@ -26,36 +26,36 @@
 #include "mipv6-option.h"
 #include "mipv6-option-header.h"
 
-NS_LOG_COMPONENT_DEFINE ("MIPv6Option");
+NS_LOG_COMPONENT_DEFINE ("Mipv6Option");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (MIPv6Option);
+NS_OBJECT_ENSURE_REGISTERED (Mipv6Option);
 
-TypeId MIPv6Option::GetTypeId ()
+TypeId Mipv6Option::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::MIPv6Option")
+  static TypeId tid = TypeId ("ns3::Mipv6Option")
     .SetParent<Object>()
     .AddAttribute ("MobilityOptionNumber", "The IPv6 mobility option number.",
                    UintegerValue (0),
-                   MakeUintegerAccessor (&MIPv6Option::GetMobilityOptionNumber),
+                   MakeUintegerAccessor (&Mipv6Option::GetMobilityOptionNumber),
                    MakeUintegerChecker<uint8_t> ())
   ;
   return tid;
 }
 
-MIPv6Option::~MIPv6Option ()
+Mipv6Option::~Mipv6Option ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
 
-void MIPv6Option::SetNode (Ptr<Node> node)
+void Mipv6Option::SetNode (Ptr<Node> node)
 {
   NS_LOG_FUNCTION (this << node);
   m_node = node;
 }
 
-MIPv6OptionBundle::MIPv6OptionBundle ()
+Mipv6OptionBundle::Mipv6OptionBundle ()
   : m_hoa ("0::0"),
   m_coa ("0::0"),
   m_hi (0),
@@ -63,81 +63,78 @@ MIPv6OptionBundle::MIPv6OptionBundle ()
   m_auth (0),
   m_interval (0)
 {
-  NS_LOG_FUNCTION_NOARGS ();
 }
 
 
-Ipv6Address MIPv6OptionBundle::GetHomeAddress () const
+Ipv6Address Mipv6OptionBundle::GetHomeAddress () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this);
   return m_hoa;
 }
 
-void MIPv6OptionBundle::SetHomeAddress (Ipv6Address hoa)
+void Mipv6OptionBundle::SetHomeAddress (Ipv6Address hoa)
 {
   NS_LOG_FUNCTION ( this << hoa );
 
   m_hoa = hoa;
 }
 
-Ipv6Address MIPv6OptionBundle::GetCareofAddress () const
+Ipv6Address Mipv6OptionBundle::GetCareofAddress () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this);
   return m_coa;
 }
 
-void MIPv6OptionBundle::SetCareofAddress (Ipv6Address coa)
+void Mipv6OptionBundle::SetCareofAddress (Ipv6Address coa)
 {
   NS_LOG_FUNCTION ( this << m_coa );
 
   m_coa = coa;
 }
 
-uint16_t MIPv6OptionBundle::GetHomeNonceIndex () const
+uint16_t Mipv6OptionBundle::GetHomeNonceIndex () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 
   return m_hi;
 }
 
-void MIPv6OptionBundle::SetHomeNonceIndex (uint16_t hi)
+void Mipv6OptionBundle::SetHomeNonceIndex (uint16_t hi)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << hi);
 
   m_hi = hi;
 }
 
-uint16_t MIPv6OptionBundle::GetCareofNonceIndex () const
+uint16_t Mipv6OptionBundle::GetCareofNonceIndex () const
 {
 
   return m_coi;
 }
 
-void MIPv6OptionBundle::SetCareofNonceIndex (uint16_t coi)
+void Mipv6OptionBundle::SetCareofNonceIndex (uint16_t coi)
 {
 
   m_coi = coi;
 }
 
-uint64_t MIPv6OptionBundle::GetAuthenticator () const
+uint64_t Mipv6OptionBundle::GetAuthenticator () const
 {
   return m_auth;
 }
 
-void MIPv6OptionBundle::SetAuthenticator (uint64_t auth)
+void Mipv6OptionBundle::SetAuthenticator (uint64_t auth)
 {
 
   m_auth = auth;
 }
 
-uint16_t MIPv6OptionBundle::GetRefreshInterval () const
+uint16_t Mipv6OptionBundle::GetRefreshInterval () const
 {
   return m_interval;
 }
 
-void MIPv6OptionBundle::SetRefreshInterval (uint16_t intvl)
+void Mipv6OptionBundle::SetRefreshInterval (uint16_t intvl)
 {
   m_interval = intvl;
 }
@@ -148,7 +145,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityOptionPad1);
 TypeId Ipv6MobilityOptionPad1::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityOptionPad1")
-    .SetParent<MIPv6Option>()
+    .SetParent<Mipv6Option>()
   ;
   return tid;
 }
@@ -160,12 +157,12 @@ Ipv6MobilityOptionPad1::~Ipv6MobilityOptionPad1 ()
 
 uint8_t Ipv6MobilityOptionPad1::GetMobilityOptionNumber () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 
   return OPT_NUMBER;
 }
 
-uint8_t Ipv6MobilityOptionPad1::Process (Ptr<Packet> packet, uint8_t offset, MIPv6OptionBundle& bundle)
+uint8_t Ipv6MobilityOptionPad1::Process (Ptr<Packet> packet, uint8_t offset, Mipv6OptionBundle& bundle)
 {
   NS_LOG_FUNCTION ( this << packet );
 
@@ -185,7 +182,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityOptionPadn);
 TypeId Ipv6MobilityOptionPadn::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityOptionPadn")
-    .SetParent<MIPv6Option>()
+    .SetParent<Mipv6Option>()
   ;
   return tid;
 }
@@ -197,12 +194,12 @@ Ipv6MobilityOptionPadn::~Ipv6MobilityOptionPadn ()
 
 uint8_t Ipv6MobilityOptionPadn::GetMobilityOptionNumber () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 
   return OPT_NUMBER;
 }
 
-uint8_t Ipv6MobilityOptionPadn::Process (Ptr<Packet> packet, uint8_t offset, MIPv6OptionBundle& bundle)
+uint8_t Ipv6MobilityOptionPadn::Process (Ptr<Packet> packet, uint8_t offset, Mipv6OptionBundle& bundle)
 {
   NS_LOG_FUNCTION ( this << packet );
 
@@ -222,7 +219,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityOptionBindingRefreshAdvice);
 TypeId Ipv6MobilityOptionBindingRefreshAdvice::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityOptionBindingRefreshAdvice")
-    .SetParent<MIPv6Option>()
+    .SetParent<Mipv6Option>()
   ;
   return tid;
 }
@@ -234,12 +231,11 @@ Ipv6MobilityOptionBindingRefreshAdvice::~Ipv6MobilityOptionBindingRefreshAdvice 
 
 uint8_t Ipv6MobilityOptionBindingRefreshAdvice::GetMobilityOptionNumber () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this);
   return OPT_NUMBER;
 }
 
-uint8_t Ipv6MobilityOptionBindingRefreshAdvice::Process (Ptr<Packet> packet, uint8_t offset, MIPv6OptionBundle& bundle)
+uint8_t Ipv6MobilityOptionBindingRefreshAdvice::Process (Ptr<Packet> packet, uint8_t offset, Mipv6OptionBundle& bundle)
 {
   NS_LOG_FUNCTION ( this << packet << (uint32_t)offset);
 
@@ -264,7 +260,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityOptionAlternateCareofAddress);
 TypeId Ipv6MobilityOptionAlternateCareofAddress::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityOptionAlternateCareofAddress")
-    .SetParent<MIPv6Option>()
+    .SetParent<Mipv6Option>()
   ;
   return tid;
 }
@@ -276,12 +272,11 @@ Ipv6MobilityOptionAlternateCareofAddress::~Ipv6MobilityOptionAlternateCareofAddr
 
 uint8_t Ipv6MobilityOptionAlternateCareofAddress::GetMobilityOptionNumber () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this);
   return OPT_NUMBER;
 }
 
-uint8_t Ipv6MobilityOptionAlternateCareofAddress::Process (Ptr<Packet> packet, uint8_t offset, MIPv6OptionBundle& bundle)
+uint8_t Ipv6MobilityOptionAlternateCareofAddress::Process (Ptr<Packet> packet, uint8_t offset, Mipv6OptionBundle& bundle)
 {
   NS_LOG_FUNCTION ( this << packet );
 
@@ -303,7 +298,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityOptionNonceIndices);
 TypeId Ipv6MobilityOptionNonceIndices::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityOptionNonceIndices")
-    .SetParent<MIPv6Option>()
+    .SetParent<Mipv6Option>()
   ;
   return tid;
 }
@@ -315,12 +310,11 @@ Ipv6MobilityOptionNonceIndices::~Ipv6MobilityOptionNonceIndices ()
 
 uint8_t Ipv6MobilityOptionNonceIndices::GetMobilityOptionNumber () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this);
   return OPT_NUMBER;
 }
 
-uint8_t Ipv6MobilityOptionNonceIndices::Process (Ptr<Packet> packet, uint8_t offset, MIPv6OptionBundle& bundle)
+uint8_t Ipv6MobilityOptionNonceIndices::Process (Ptr<Packet> packet, uint8_t offset, Mipv6OptionBundle& bundle)
 {
   NS_LOG_FUNCTION ( this << packet );
 
@@ -343,7 +337,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityOptionBindingAuthorizationData);
 TypeId Ipv6MobilityOptionBindingAuthorizationData::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityOptionBindingAuthorizationData")
-    .SetParent<MIPv6Option>()
+    .SetParent<Mipv6Option>()
   ;
   return tid;
 }
@@ -355,12 +349,12 @@ Ipv6MobilityOptionBindingAuthorizationData::~Ipv6MobilityOptionBindingAuthorizat
 
 uint8_t Ipv6MobilityOptionBindingAuthorizationData::GetMobilityOptionNumber () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 
   return OPT_NUMBER;
 }
 
-uint8_t Ipv6MobilityOptionBindingAuthorizationData::Process (Ptr<Packet> packet, uint8_t offset, MIPv6OptionBundle& bundle)
+uint8_t Ipv6MobilityOptionBindingAuthorizationData::Process (Ptr<Packet> packet, uint8_t offset, Mipv6OptionBundle& bundle)
 {
   NS_LOG_FUNCTION ( this << packet );
 

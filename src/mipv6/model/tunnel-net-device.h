@@ -40,6 +40,11 @@ namespace ns3 {
 class TunnelNetDevice : public NetDevice
 {
 public:
+
+  /**
+   * \brief get typeid
+   * \return typeid
+   */
   static TypeId GetTypeId (void);
   TunnelNetDevice ();
 
@@ -74,14 +79,43 @@ public:
    */
   bool SetMtu (const uint16_t mtu);
 
+  /**
+   * \brief get local address.
+   * \returns local address
+   */
   Ipv6Address GetLocalAddress () const;
+
+  /**
+   * \brief set local address.
+   * \param laddr local address
+   */
   void SetLocalAddress (Ipv6Address laddr);
 
+  /**
+   * \brief get remote address.
+   * \returns remote address
+   */
   Ipv6Address GetRemoteAddress () const;
+
+  /**
+   * \brief set remote address.
+   * \param raddr remote address
+   */
   void SetRemoteAddress (Ipv6Address raddr);
 
+  /**
+   * \brief increase ref count.
+  */
   void IncreaseRefCount ();
+
+  /**
+   * \brief decrease ref count.
+  */
   void DecreaseRefCount ();
+
+  /**
+   * \brief get the ref count.
+  */
   uint32_t GetRefCount () const;
 
   /**
@@ -124,6 +158,13 @@ public:
   virtual void SetPromiscReceiveCallback (NetDevice::PromiscReceiveCallback cb);
   virtual bool SupportsSendFrom () const;
   virtual bool IsBridge (void) const;
+
+  /**
+   * TracedCallback signature for arrived packet going to be transmitted by this device.
+   * \param [in] packet The arrived packet.
+   * \param [in] ih The inner header
+   * \param [in] oh The outer header
+   */
   typedef void (* TracedCallback2)
     (Ptr<Packet> packet, Ipv6Header ih, Ipv6Header oh);
 
@@ -132,26 +173,84 @@ protected:
   virtual void DoDispose (void);
 
 private:
+
+  /**
+   * \brief mac address.
+   */
   Address m_myAddress;
+  /**
+   * \brief Callback to trace received non-promiscuous packets which will be forwarded up the local protocol stack.
+   */
   TracedCallback<Ptr<const Packet> > m_macRxTrace;
+  /**
+   * \brief Callback to trace received packets arrived for transmission.
+   */
   TracedCallback<Ptr<const Packet> > m_macTxTrace;
+  /**
+   * \brief Callback to trace received promiscuous packets which will be forwarded up the local protocol stack.
+   */
   TracedCallback<Ptr<const Packet> > m_macPromiscRxTrace;
+  /**
+   * \brief Callback to trace a non-promiscuous packet sniffer attached to the device.
+   */
   TracedCallback<Ptr<const Packet> > m_snifferTrace;
+  /**
+   * \brief Callback to trace a promiscuous packet sniffer attached to the device.
+   */
   TracedCallback<Ptr<const Packet> > m_promiscSnifferTrace;
+  /**
+   * \brief Callback to trace a packet arrived for transmission by this device.
+   */
   TracedCallback<Ptr<Packet>, Ipv6Header, Ipv6Header> m_macTxTrace2;
 
+  /**
+   * \brief node which contains this device.
+   */
   Ptr<Node> m_node;
+  /**
+   * \brief received packet callback variable.
+   */
   ReceiveCallback m_rxCallback;
+  /**
+   * \brief received promiscuous packet callback variable.
+   */
   PromiscReceiveCallback m_promiscRxCallback;
+  /**
+   * \brief currently not used.
+   */
   std::string m_name;
-  uint32_t m_index;
-  uint16_t m_mtu;
-  bool m_needsArp;
-  bool m_supportsSendFrom;
-  bool m_isPointToPoint;
 
+  /**
+   * \brief interface index.
+  */
+  uint32_t m_index;
+  /**
+   * \brief MTU.
+  */
+  uint16_t m_mtu;
+  /**
+   * \brief flag whether ARP required.
+  */
+  bool m_needsArp;
+  /**
+   * \brief flag whether it supports send from.
+  */
+  bool m_supportsSendFrom;
+  /**
+   * \brief point-to-point flag.
+  */
+  bool m_isPointToPoint;
+  /**
+   * \brief local address.
+  */
   Ipv6Address m_localAddress;
+  /**
+   * \brief remote address.
+  */
   Ipv6Address m_remoteAddress;
+  /**
+   * \brief ref count.
+  */
   uint32_t m_refCount;
 };
 

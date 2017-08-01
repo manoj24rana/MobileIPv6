@@ -100,11 +100,15 @@ public:
   /**
    * \brief Receive method.
    * \param p the packet
-   * \param src source address
-   * \param dst destination address
-   * \param interface the interface from which the packet is coming
+   * \param header IPv6 header
+   * \param incomingInterface the interface from which the packet is coming
+   * \return status
    */
   virtual enum IpL4Protocol::RxStatus Receive (Ptr<Packet> p,Ipv6Header const &header,Ptr<Ipv6Interface> incomingInterface);
+
+  /**
+   * \brief Inherited from IpL4Protocol class
+   */
   virtual void SetDownTarget (IpL4Protocol::DownTargetCallback cb);
   virtual void SetDownTarget6 (IpL4Protocol::DownTargetCallback6 cb);
   virtual IpL4Protocol::DownTargetCallback GetDownTarget (void) const;
@@ -113,23 +117,70 @@ public:
                                                Ipv4Header const &header,
                                                Ptr<Ipv4Interface> incomingInterface);
 
+  /**
+   * \brief Add a tunnel
+   * \param remote remote address
+   * \param local local address
+   * \returns the status of tunnel add
+   */
   uint16_t AddTunnel (Ipv6Address remote, Ipv6Address local = Ipv6Address::GetZero ());
+
+  /**
+   * \brief Remove a tunnel
+   * \param remote remote address
+   */
   void RemoveTunnel (Ipv6Address remote);
+
+  /**
+   * \brief Modify a tunnel
+   * \param remote remote address
+   * \param newRemote new remote address
+   * \param local local address
+   * \returns the status of tunnel modify
+   */
   uint16_t ModifyTunnel (Ipv6Address remote, Ipv6Address newRemote, Ipv6Address local = Ipv6Address::GetZero ());
+
+  /**
+   * \brief get tunnel net device
+   * \param remote remote address
+   * \returns the associated net device
+   */
   Ptr<TunnelNetDevice> GetTunnelDevice (Ipv6Address remote);
 
-
-
-  // myfile.open ("example.txt");
-  //myfile.close();
-  //void filewriter(uint64_t u, Time t);
+  /**
+   * \brief set home address of an MN only, other agents do not call it
+   * \param hoa address
+   */
   void SetHomeAddress (Ipv6Address hoa);
+
+  /**
+   * \brief get home address
+   * \return the home address of an MN
+   */
   Ipv6Address GetHomeAddress ();
 
+  /**
+   * \brief set home agent address list
+   * \param list IPv6 address list
+   */
   void SetCacheAddressList (std::list<Ipv6Address> list);
+
+  /**
+   * \brief get home agent address list
+   * \returns IPv6 address list
+   */
   std::list<Ipv6Address> GetCacheAddressList ();
 
+  /**
+   * \brief set home agent address which is chosen by an MN
+   * \param ha Home agent address
+   */
   void SetHA (Ipv6Address ha);
+
+  /**
+   * \brief get home agent address
+   * \return home agent address
+   */
   Ipv6Address GetHA ();
 
   /**
@@ -137,8 +188,11 @@ public:
    *
    * \param [in] packet The data packet originally sent.
   */
-
   Callback<void, Ptr <Packet>, Ipv6Header, Ipv6Header> TxTracedCallback;
+
+  /**
+   * Set Callback for data Packet sending event function.
+  */
   void SetTxCallback (Callback<void, Ptr <Packet>, Ipv6Header, Ipv6Header> cb);
 
   /**
@@ -159,23 +213,47 @@ protected:
   virtual void DoDispose ();
 
 private:
+
+  /**
+   * \brief mapping of tunnelnetdevice with remote address.
+  */
   typedef std::map<Ipv6Address, Ptr<TunnelNetDevice> > TunnelMap;
+
+  /**
+   * \brief iterator of the mapping of tunnelnetdevice with remote address.
+  */
   typedef std::map<Ipv6Address, Ptr<TunnelNetDevice> >::iterator TunnelMapI;
+
   /**
    * \brief The node.
    */
   Ptr<Node> m_node;
-  uint64_t counter;
-  Time sctime;
-  //std::ofstream myfile;
+
+  /**
+   * \brief create a tunnel map.
+  */
   TunnelMap m_tunnelMap;
+
+  /**
+   * \brief home address.
+  */
   Ipv6Address m_hoa;
+
+  /**
+   * \brief home agent address list.
+  */
   std::list<Ipv6Address> m_Cachelist;
+
+  /**
+   * \brief home agent address.
+  */
   Ipv6Address m_ha;
+
   /**
    * \brief Callback to trace RX (reception) data packets at HA.
    */ 
   TracedCallback<Ptr<Packet>, Ipv6Header, Ipv6Header, Ptr<Ipv6Interface> > m_rxHaPktTrace;
+
   /**
    * \brief Callback to trace RX (reception) data packets at MN.
    */ 

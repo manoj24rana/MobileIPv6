@@ -58,10 +58,9 @@ TypeId Ipv6TunnelL4Protocol::GetTypeId ()
 }
 
 Ipv6TunnelL4Protocol::Ipv6TunnelL4Protocol ()
-  : m_node (0), counter(202)
+  : m_node (0)
 {
   SetHomeAddress("::");
-  NS_LOG_FUNCTION_NOARGS ();
 }
 
 Ipv6TunnelL4Protocol::~Ipv6TunnelL4Protocol ()
@@ -71,8 +70,6 @@ Ipv6TunnelL4Protocol::~Ipv6TunnelL4Protocol ()
 
 void Ipv6TunnelL4Protocol::DoDispose ()
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
   m_node = 0;
   
   for ( TunnelMapI i = m_tunnelMap.begin(); i != m_tunnelMap.end(); i++ )
@@ -86,7 +83,7 @@ void Ipv6TunnelL4Protocol::DoDispose ()
 
 void Ipv6TunnelL4Protocol::NotifyNewAggregate ()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 
   if (m_node == 0)
     {
@@ -112,13 +109,13 @@ void Ipv6TunnelL4Protocol::SetNode (Ptr<Node> node)
 
 Ptr<Node> Ipv6TunnelL4Protocol::GetNode (void)
 {
-  NS_LOG_FUNCTION_NOARGS();
+  NS_LOG_FUNCTION (this);
   return m_node;
 }
 
 int Ipv6TunnelL4Protocol::GetProtocolNumber () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return PROT_NUMBER;
 }
 

@@ -47,36 +47,36 @@
 
 using namespace std;
 
-NS_LOG_COMPONENT_DEFINE ("mipv6MN");
+NS_LOG_COMPONENT_DEFINE ("Mipv6Mn");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (mipv6MN);
+NS_OBJECT_ENSURE_REGISTERED (Mipv6Mn);
 
 TypeId
-mipv6MN::GetTypeId (void)
+Mipv6Mn::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::mipv6MN")
-    .SetParent<mipv6Agent> ()
+  static TypeId tid = TypeId ("ns3::Mipv6Mn")
+    .SetParent<Mipv6Agent> ()
     .AddAttribute ("BList", "The binding list associated with this MN.",
                    PointerValue (),
-                   MakePointerAccessor (&mipv6MN::m_buinf),
+                   MakePointerAccessor (&Mipv6Mn::m_buinf),
                    MakePointerChecker<BList> ())
     .AddTraceSource ("RxBA",
                      "Received BA packet from HA",
-                     MakeTraceSourceAccessor (&mipv6MN::m_rxbaTrace),
-                     "ns3::mipv6MN::RxBaTracedCallback")
+                     MakeTraceSourceAccessor (&Mipv6Mn::m_rxbaTrace),
+                     "ns3::Mipv6Mn::RxBaTracedCallback")
     .AddTraceSource ("TxBU",
                      "Sent BU packet from MN",
-                     MakeTraceSourceAccessor (&mipv6MN::m_txbuTrace),
-                     "ns3::mipv6MN::TxBuTracedCallback")
+                     MakeTraceSourceAccessor (&Mipv6Mn::m_txbuTrace),
+                     "ns3::Mipv6Mn::TxBuTracedCallback")
 
 
     ;
   return tid;
 }
 
-mipv6MN::mipv6MN (std::list<Ipv6Address> haalist)
+Mipv6Mn::Mipv6Mn (std::list<Ipv6Address> haalist)
 {
   m_Haalist = haalist;
   m_hsequence = 0;
@@ -84,14 +84,14 @@ mipv6MN::mipv6MN (std::list<Ipv6Address> haalist)
   m_roflag = false;
 }
 
-mipv6MN::~mipv6MN ()
+Mipv6Mn::~Mipv6Mn ()
 {
   delete this;
 }
 
-void mipv6MN::NotifyNewAggregate ()
+void Mipv6Mn::NotifyNewAggregate ()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 
   uint8_t buf1[8],buf2[16],buf[16];
   uint8_t i;
@@ -142,11 +142,11 @@ void mipv6MN::NotifyNewAggregate ()
 
 
       Ptr<Icmpv6L4Protocol> icmpv6l4 = GetNode ()->GetObject<Icmpv6L4Protocol> ();
-      icmpv6l4->SetNewIPCallback (MakeCallback (&mipv6MN::HandleNewAttachment, this));
-      icmpv6l4->SetCheckAddressCallback (MakeCallback (&mipv6MN::CheckAddresses, this));
+      icmpv6l4->SetNewIPCallback (MakeCallback (&Mipv6Mn::HandleNewAttachment, this));
+      icmpv6l4->SetCheckAddressCallback (MakeCallback (&Mipv6Mn::CheckAddresses, this));
 
       Ptr<Ipv6L3Protocol> ipv6l3 = GetNode ()->GetObject<Ipv6L3Protocol> ();
-      ipv6l3->SetPrefixCallback (MakeCallback (&mipv6MN::SetDefaultRouterAddress, this));
+      ipv6l3->SetPrefixCallback (MakeCallback (&Mipv6Mn::SetDefaultRouterAddress, this));
 
       Ptr<UdpL4Protocol> udpl4 = GetNode ()->GetObject<UdpL4Protocol> ();
       udpl4->SetMipv6Callback (MakeCallback (&BList::GetHoa, m_buinf));
@@ -158,26 +158,26 @@ void mipv6MN::NotifyNewAggregate ()
       tunnell4->SetCacheAddressList (m_Haalist);
       tunnell4->SetHA (m_buinf->GetHA ());
     }
-  mipv6Agent::NotifyNewAggregate ();
+  Mipv6Agent::NotifyNewAggregate ();
 }
 
 
-uint16_t mipv6MN::GetHomeBUSequence ()
+uint16_t Mipv6Mn::GetHomeBUSequence ()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 
   return ++m_hsequence;
 }
 
-uint16_t mipv6MN::GetCNBUSequence ()
+uint16_t Mipv6Mn::GetCNBUSequence ()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 
   return ++m_cnsequence;
 }
 
 
-Ptr<Packet> mipv6MN::BuildHomeBU ()
+Ptr<Packet> Mipv6Mn::BuildHomeBU ()
 {
 
   Ptr<Packet> p = Create<Packet> ();
@@ -203,14 +203,14 @@ Ptr<Packet> mipv6MN::BuildHomeBU ()
   bu.SetFlagK (true);
 
 
-  bu.SetLifetime ((uint16_t)MIPv6L4Protocol::MAX_BINDING_LIFETIME);
+  bu.SetLifetime ((uint16_t)Mipv6L4Protocol::MAX_BINDING_LIFETIME);
 
   p->AddHeader (bu);
 
   return p;
 }
 
-Ptr<Packet> mipv6MN::BuildCNBU ()
+Ptr<Packet> Mipv6Mn::BuildCNBU ()
 {
 
   Ptr<Packet> p = Create<Packet> ();
@@ -236,7 +236,7 @@ Ptr<Packet> mipv6MN::BuildCNBU ()
   bu.SetFlagK (true);
 
 
-  bu.SetLifetime ((uint16_t)MIPv6L4Protocol::MAX_BINDING_LIFETIME);
+  bu.SetLifetime ((uint16_t)Mipv6L4Protocol::MAX_BINDING_LIFETIME);
 
   p->AddHeader (bu);
 
@@ -245,7 +245,7 @@ Ptr<Packet> mipv6MN::BuildCNBU ()
 
 
 
-Ptr<Packet> mipv6MN::BuildHoTI ()
+Ptr<Packet> Mipv6Mn::BuildHoTI ()
 {
 
   Ptr<Packet> p = Create<Packet> ();
@@ -271,7 +271,7 @@ Ptr<Packet> mipv6MN::BuildHoTI ()
   return p;
 }
 
-Ptr<Packet> mipv6MN::BuildCoTI ()
+Ptr<Packet> Mipv6Mn::BuildCoTI ()
 {
 
   Ptr<Packet> p = Create<Packet> ();
@@ -299,7 +299,7 @@ Ptr<Packet> mipv6MN::BuildCoTI ()
 
 
 
-void mipv6MN::HandleNewAttachment (Ipv6Address ipr)
+void Mipv6Mn::HandleNewAttachment (Ipv6Address ipr)
 {
   if (!ipr.IsLinkLocal () )// && !ipr.IsEqual(m_buinf->GetHoa()))
     {
@@ -348,7 +348,7 @@ void mipv6MN::HandleNewAttachment (Ipv6Address ipr)
     }
 }
 
-uint8_t mipv6MN::HandleBA (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
+uint8_t Mipv6Mn::HandleBA (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
 {
 
   // Options are not implemented yet!!
@@ -365,10 +365,10 @@ uint8_t mipv6MN::HandleBA (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
   p->RemoveHeader (ba);
   p->RemoveHeader (exttype2);
 
-  Ptr<MIPv6Demux> mipv6Demux = GetNode ()->GetObject<MIPv6Demux> ();
+  Ptr<Mipv6Demux> mipv6Demux = GetNode ()->GetObject<Mipv6Demux> ();
   NS_ASSERT (mipv6Demux);
 
-  Ptr<MIPv6Mobility> ipv6Mobility = mipv6Demux->GetMobility (ba.GetMhType ());
+  Ptr<Mipv6Mobility> ipv6Mobility = mipv6Demux->GetMobility (ba.GetMhType ());
   NS_ASSERT (ipv6Mobility);
 
   //check for sequence
@@ -387,7 +387,7 @@ uint8_t mipv6MN::HandleBA (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
       //check status code
       switch (ba.GetStatus ())
         {
-        case MIPv6Header::BA_STATUS_BINDING_UPDATE_ACCEPTED:
+        case Mipv6Header::BA_STATUS_BINDING_UPDATE_ACCEPTED:
           {
             m_buinf->StopHomeRetransTimer ();
             m_buinf->SetHomeAddressRegistered (true);
@@ -450,7 +450,7 @@ uint8_t mipv6MN::HandleBA (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
       //check status code
       switch (ba.GetStatus ())
         {
-        case MIPv6Header::BA_STATUS_BINDING_UPDATE_ACCEPTED:
+        case Mipv6Header::BA_STATUS_BINDING_UPDATE_ACCEPTED:
           {
             m_buinf->StopCNRetransTimer ();
             m_buinf->SetCNBUPacket (0);
@@ -489,7 +489,7 @@ uint8_t mipv6MN::HandleBA (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
 
 }
 
-bool mipv6MN::IsHomeMatch (Ipv6Address addr)
+bool Mipv6Mn::IsHomeMatch (Ipv6Address addr)
 {
   std::list<Ipv6Address>::iterator iter = std::find (m_Haalist.begin (), m_Haalist.end (), addr);
   if ( m_Haalist.end () == iter )
@@ -502,13 +502,13 @@ bool mipv6MN::IsHomeMatch (Ipv6Address addr)
     }
 }
 
-Ipv6Address mipv6MN::GetCoA ()
+Ipv6Address Mipv6Mn::GetCoA ()
 {
 return m_buinf->GetCoa ();
 }
 
 
-uint8_t mipv6MN::HandleHoT (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
+uint8_t Mipv6Mn::HandleHoT (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
 {
   NS_LOG_FUNCTION (this << packet << src << dst << interface << "HANDLE HoT");
 
@@ -520,10 +520,10 @@ uint8_t mipv6MN::HandleHoT (Ptr<Packet> packet, const Ipv6Address &src, const Ip
   p->RemoveHeader (hot);
   p->RemoveHeader (exttype2);
 
-  Ptr<MIPv6Demux> mipv6Demux = GetNode ()->GetObject<MIPv6Demux> ();
+  Ptr<Mipv6Demux> mipv6Demux = GetNode ()->GetObject<Mipv6Demux> ();
   NS_ASSERT (mipv6Demux);
 
-  Ptr<MIPv6Mobility> ipv6Mobility = mipv6Demux->GetMobility (hot.GetMhType ());
+  Ptr<Mipv6Mobility> ipv6Mobility = mipv6Demux->GetMobility (hot.GetMhType ());
   NS_ASSERT (ipv6Mobility);
 
   //check for timestamp and sequence
@@ -556,7 +556,7 @@ uint8_t mipv6MN::HandleHoT (Ptr<Packet> packet, const Ipv6Address &src, const Ip
   return 0;
 }
 
-uint8_t mipv6MN::HandleCoT (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
+uint8_t Mipv6Mn::HandleCoT (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
 {
   NS_LOG_FUNCTION (this << packet << src << dst << interface << "HANDLE CoT");
 
@@ -568,10 +568,10 @@ uint8_t mipv6MN::HandleCoT (Ptr<Packet> packet, const Ipv6Address &src, const Ip
   p->RemoveHeader (cot);
   p->RemoveHeader (exttype2);
 
-  Ptr<MIPv6Demux> mipv6Demux = GetNode ()->GetObject<MIPv6Demux> ();
+  Ptr<Mipv6Demux> mipv6Demux = GetNode ()->GetObject<Mipv6Demux> ();
   NS_ASSERT (mipv6Demux);
 
-  Ptr<MIPv6Mobility> ipv6Mobility = mipv6Demux->GetMobility (cot.GetMhType ());
+  Ptr<Mipv6Mobility> ipv6Mobility = mipv6Demux->GetMobility (cot.GetMhType ());
   NS_ASSERT (ipv6Mobility);
 
   //check for sequence
@@ -620,7 +620,7 @@ uint8_t mipv6MN::HandleCoT (Ptr<Packet> packet, const Ipv6Address &src, const Ip
 
 
 
-bool mipv6MN::SetupTunnelAndRouting ()
+bool Mipv6Mn::SetupTunnelAndRouting ()
 {
   Ptr<Ipv6TunnelL4Protocol> th = GetNode ()->GetObject<Ipv6TunnelL4Protocol> ();
   NS_ASSERT (th);
@@ -668,7 +668,7 @@ bool mipv6MN::SetupTunnelAndRouting ()
 
 }
 
-void mipv6MN::ClearTunnelAndRouting ()
+void Mipv6Mn::ClearTunnelAndRouting ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -691,24 +691,24 @@ void mipv6MN::ClearTunnelAndRouting ()
 }
 
 
-void mipv6MN::SetRouteOptimizationReuiredField (bool roflag)
+void Mipv6Mn::SetRouteOptimizationReuiredField (bool roflag)
 {
   m_roflag = roflag;
 }
 
 
-bool mipv6MN::IsRouteOptimizationRequired ()
+bool Mipv6Mn::IsRouteOptimizationRequired ()
 {
   return m_roflag;
 }
 
-void mipv6MN::SetDefaultRouterAddress (Ipv6Address addr,  uint32_t index)
+void Mipv6Mn::SetDefaultRouterAddress (Ipv6Address addr,  uint32_t index)
 {
   m_defaultrouteraddress = addr;
   m_IfIndex = index;
 }
 
-bool mipv6MN::CheckAddresses (Ipv6Address ha, Ipv6Address hoa)
+bool Mipv6Mn::CheckAddresses (Ipv6Address ha, Ipv6Address hoa)
 {
   if (ha.IsEqual (m_buinf->GetHA ()) && hoa.IsEqual (m_buinf->GetHoa ()))
     {
@@ -717,7 +717,7 @@ bool mipv6MN::CheckAddresses (Ipv6Address ha, Ipv6Address hoa)
   return false;
 }
 
-Ipv6Address mipv6MN::GetHomeAddress ()
+Ipv6Address Mipv6Mn::GetHomeAddress ()
 {
 return m_buinf->GetHoa ();
 }

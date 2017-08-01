@@ -51,7 +51,7 @@ BCache::~BCache ()
 
 void BCache::DoDispose ()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   Flush ();
   Object::DoDispose ();
 }
@@ -101,7 +101,7 @@ void BCache::Add (BCache::Entry *bce)
 
 void BCache::Remove (BCache::Entry* entry)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << entry);
 
   for (BCacheI i = m_bCache.begin (); i != m_bCache.end (); i++)
     {
@@ -145,7 +145,7 @@ void BCache::SetHomePrefixes (std::list<Ipv6Address> halist)
 
 void BCache::Flush ()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 
   for (BCacheI i = m_bCache.begin (); i != m_bCache.end (); i++)
     {
@@ -158,7 +158,7 @@ void BCache::Flush ()
 
 Ptr<Node> BCache::GetNode () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << m_node);
 
   return m_node;
 }
@@ -183,12 +183,11 @@ BCache::Entry::Entry (Ptr<BCache> bcache)
   m_homenonceindex (0xFF),
   m_careofnonceindex (0xFF)
 {
-  NS_LOG_FUNCTION_NOARGS ();
 }
 
 BCache::Entry *BCache::Entry::Copy ()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 
   Entry *bce = new Entry (this->m_bCache);
 
@@ -206,14 +205,14 @@ BCache::Entry *BCache::Entry::Copy ()
 
 bool BCache::Entry::IsUnreachable () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 
   return m_state == UNREACHABLE;
 }
 
 void BCache::Entry::MarkReachable ()
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 
   m_state = REACHABLE;
 }
@@ -236,7 +235,7 @@ bool BCache::Entry::Match (Ipv6Address mnhoa) const
 
 Ipv6Address BCache::Entry::GetSolicitedHoA () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return m_shoa;
 }
 
@@ -250,21 +249,21 @@ void BCache::Entry::SetSolicitedHoA (Ipv6Address shoa)
 
 Ipv6Address BCache::Entry::GetCoa () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 
   return m_coa;
 }
 
 Ipv6Address BCache::Entry::GetHoa () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 
   return m_hoa;
 }
 
 Ipv6Address BCache::Entry::GetHA () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return m_haa;
 }
 
@@ -291,8 +290,7 @@ void BCache::Entry::SetHA (Ipv6Address haa)
 
 int16_t BCache::Entry::GetTunnelIfIndex () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this);
   return m_tunnelIfIndex;
 }
 
@@ -305,7 +303,7 @@ void BCache::Entry::SetTunnelIfIndex (int16_t tunnelif)
 
 Time BCache::Entry::GetLastBindingUpdateTime () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 
   return m_lastBindingUpdateTime;
 }
@@ -319,8 +317,7 @@ void BCache::Entry::SetLastBindingUpdateTime (Time tm)
 
 uint16_t BCache::Entry::GetLastBindingUpdateSequence () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this);
   return m_lastBindingUpdateSequence;
 }
 
@@ -333,7 +330,7 @@ void BCache::Entry::SetLastBindingUpdateSequence (uint16_t seq)
 
 BCache::Entry *BCache::Entry::GetNext () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 
   return m_next;
 }
@@ -347,104 +344,92 @@ void BCache::Entry::SetNext (BCache::Entry *entry)
 
 Ipv6Address BCache::Entry::GetOldCoa () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this);
   return m_oldCoa;
 }
 
 uint64_t BCache::Entry::GetHomeInitCookie () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 
   return m_homeinitcookie;
 }
 
 void BCache::Entry::SetHomeInitCookie (uint64_t hcookie)
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this << hcookie);
   m_homeinitcookie = hcookie;
 }
 
 uint64_t BCache::Entry::GetCareOfInitCookie () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this);
   return m_careofinitcookie;
 }
 
 void BCache::Entry::SetCareOfInitCookie (uint64_t ccookie)
 {
+  NS_LOG_FUNCTION (this << ccookie);
   m_careofinitcookie = ccookie;
 }
 
 uint64_t BCache::Entry::GetHomeKeygenToken () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this);
   return m_homekeygentoken;
 }
 
 void BCache::Entry::SetHomeKeygenToken (uint64_t htoken)
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this << htoken);
   m_homekeygentoken = htoken;
 }
 
 uint64_t BCache::Entry::GetCareOfKeygenToken () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this);
   return m_careofkeygentoken;
 }
 
 void BCache::Entry::SetCareOfKeygenToken (uint64_t ctoken)
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this << ctoken);
   m_careofkeygentoken = ctoken;
 }
 
 uint16_t BCache::Entry::GetHomeNonceIndex () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this);
   return m_homenonceindex;
 }
 
 void BCache::Entry::SetHomeNonceIndex (uint16_t hnonce)
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this << hnonce);
   m_homenonceindex = hnonce;
 }
 
 uint16_t BCache::Entry::GetCareOfNonceIndex () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this);
   return m_careofnonceindex;
 }
 
 void BCache::Entry::SetCareOfNonceIndex (uint16_t cnonce)
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this << cnonce);
   m_careofnonceindex = cnonce;
 }
 
 void BCache::Entry::SetState (BCache::Entry::State_e state)
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this << state);
   m_addrstate = state;
 }
 
 BCache::Entry::State_e BCache::Entry::GetState ()
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this);
   return m_addrstate;
 }
 

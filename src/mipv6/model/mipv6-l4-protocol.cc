@@ -39,63 +39,60 @@
 
 using namespace std;
 
-NS_LOG_COMPONENT_DEFINE ("MIPv6L4Protocol");
+NS_LOG_COMPONENT_DEFINE ("Mipv6L4Protocol");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (MIPv6L4Protocol);
+NS_OBJECT_ENSURE_REGISTERED (Mipv6L4Protocol);
 
-const uint8_t MIPv6L4Protocol::PROT_NUMBER = 135;
+const uint8_t Mipv6L4Protocol::PROT_NUMBER = 135;
 
-const double MIPv6L4Protocol::MAX_BINDING_LIFETIME = (int)0xffff << 2;
+const double Mipv6L4Protocol::MAX_BINDING_LIFETIME = (int)0xffff << 2;
 
-const double MIPv6L4Protocol::INITIAL_BINDING_ACK_TIMEOUT_FIRSTREG = 1.5;
+const double Mipv6L4Protocol::INITIAL_BINDING_ACK_TIMEOUT_FIRSTREG = 1.5;
 
-const double MIPv6L4Protocol::INITIAL_BINDING_ACK_TIMEOUT_REREG = 1.0;
+const double Mipv6L4Protocol::INITIAL_BINDING_ACK_TIMEOUT_REREG = 1.0;
 
-const uint8_t MIPv6L4Protocol::MAX_BINDING_UPDATE_RETRY_COUNT = 3;
+const uint8_t Mipv6L4Protocol::MAX_BINDING_UPDATE_RETRY_COUNT = 3;
 
-const uint8_t MIPv6L4Protocol::MAX_HOTI_RETRY_COUNT = 3;
+const uint8_t Mipv6L4Protocol::MAX_HOTI_RETRY_COUNT = 3;
 
-const uint8_t MIPv6L4Protocol::MAX_COTI_RETRY_COUNT = 3;
+const uint8_t Mipv6L4Protocol::MAX_COTI_RETRY_COUNT = 3;
 
-const uint32_t MIPv6L4Protocol::MIN_DELAY_BEFORE_BCE_DELETE = 10000;
+const uint32_t Mipv6L4Protocol::MIN_DELAY_BEFORE_BCE_DELETE = 10000;
 
-const uint32_t MIPv6L4Protocol::MIN_DELAY_BEFORE_NEW_BCE_ASSIGN = 1500;
+const uint32_t Mipv6L4Protocol::MIN_DELAY_BEFORE_NEW_BCE_ASSIGN = 1500;
 
-const uint32_t MIPv6L4Protocol::TIMESTAMP_VALIDITY_WINDOW = 300;
+const uint32_t Mipv6L4Protocol::TIMESTAMP_VALIDITY_WINDOW = 300;
 
-TypeId MIPv6L4Protocol::GetTypeId ()
+TypeId Mipv6L4Protocol::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::MIPv6L4Protocol")
+  static TypeId tid = TypeId ("ns3::Mipv6L4Protocol")
     .SetParent<IpL4Protocol> ()
-    .AddConstructor<MIPv6L4Protocol> ();
+    .AddConstructor<Mipv6L4Protocol> ();
   return tid;
 }
 
-MIPv6L4Protocol::MIPv6L4Protocol ()
+Mipv6L4Protocol::Mipv6L4Protocol ()
   : m_node (0)
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
 
-MIPv6L4Protocol::~MIPv6L4Protocol ()
+Mipv6L4Protocol::~Mipv6L4Protocol ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
 
-void MIPv6L4Protocol::DoDispose ()
+void Mipv6L4Protocol::DoDispose ()
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
   m_node = 0;
   IpL4Protocol::DoDispose ();
 }
 
-void MIPv6L4Protocol::NotifyNewAggregate ()
+void Mipv6L4Protocol::NotifyNewAggregate ()
 {
-  NS_LOG_FUNCTION_NOARGS ();
-
+  NS_LOG_FUNCTION (this);
   if (m_node == 0)
     {
       Ptr<Node> node = this->GetObject<Node> ();
@@ -112,31 +109,31 @@ void MIPv6L4Protocol::NotifyNewAggregate ()
   IpL4Protocol::NotifyNewAggregate ();
 }
 
-void MIPv6L4Protocol::SetNode (Ptr<Node> node)
+void Mipv6L4Protocol::SetNode (Ptr<Node> node)
 {
   NS_LOG_FUNCTION (this << node);
   m_node = node;
 }
 
-Ptr<Node> MIPv6L4Protocol::GetNode (void)
+Ptr<Node> Mipv6L4Protocol::GetNode (void)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return m_node;
 }
 
-int MIPv6L4Protocol::GetProtocolNumber () const
+int Mipv6L4Protocol::GetProtocolNumber () const
 {
-  //NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return PROT_NUMBER;
 }
 
-int MIPv6L4Protocol::GetVersion () const
+int Mipv6L4Protocol::GetVersion () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
   return 1;
 }
 
-void MIPv6L4Protocol::SendMessage (Ptr<Packet> packet, Ipv6Address src, Ipv6Address dst, uint8_t ttl)
+void Mipv6L4Protocol::SendMessage (Ptr<Packet> packet, Ipv6Address src, Ipv6Address dst, uint8_t ttl)
 {
   NS_LOG_FUNCTION (this << packet << src << dst << (uint32_t)ttl);
   Ptr<Ipv6L3Protocol> ipv6 = m_node->GetObject<Ipv6L3Protocol> ();
@@ -148,13 +145,13 @@ void MIPv6L4Protocol::SendMessage (Ptr<Packet> packet, Ipv6Address src, Ipv6Addr
   ipv6->Send (packet, src, dst, PROT_NUMBER, 0);
 }
 
-enum IpL4Protocol::RxStatus MIPv6L4Protocol::Receive (Ptr<Packet> packet, Ipv6Address const &src, Ipv6Address const &dst, Ptr<Ipv6Interface> interface)
+enum IpL4Protocol::RxStatus Mipv6L4Protocol::Receive (Ptr<Packet> packet, Ipv6Address const &src, Ipv6Address const &dst, Ptr<Ipv6Interface> interface)
 {
   NS_LOG_FUNCTION (this << packet << src << dst << interface << "VANCH");
   Ptr<Packet> p = packet->Copy ();
-  Ptr<MIPv6Demux> ipv6MobilityDemux = GetObject<MIPv6Demux>();
-  Ptr<MIPv6Mobility> ipv6Mobility = 0;
-  MIPv6Header mh;
+  Ptr<Mipv6Demux> ipv6MobilityDemux = GetObject<Mipv6Demux>();
+  Ptr<Mipv6Mobility> ipv6Mobility = 0;
+  Mipv6Header mh;
 
   p->PeekHeader (mh);
 
@@ -172,14 +169,14 @@ enum IpL4Protocol::RxStatus MIPv6L4Protocol::Receive (Ptr<Packet> packet, Ipv6Ad
   return IpL4Protocol::RX_OK;
 }
 
-enum IpL4Protocol::RxStatus MIPv6L4Protocol::Receive (Ptr<Packet> p, Ipv6Header const &header, Ptr<Ipv6Interface> incomingInterface)
+enum IpL4Protocol::RxStatus Mipv6L4Protocol::Receive (Ptr<Packet> p, Ipv6Header const &header, Ptr<Ipv6Interface> incomingInterface)
 {
 
   NS_LOG_FUNCTION (this << p << header << incomingInterface << "VAMCH");
   Ptr<Packet> packet = p->Copy ();
-  Ptr<MIPv6Demux> ipv6MobilityDemux = GetObject<MIPv6Demux>();
-  Ptr<MIPv6Mobility> ipv6Mobility = 0;
-  MIPv6Header mh;
+  Ptr<Mipv6Demux> ipv6MobilityDemux = GetObject<Mipv6Demux>();
+  Ptr<Mipv6Mobility> ipv6Mobility = 0;
+  Mipv6Header mh;
 
   packet->PeekHeader (mh);
   ipv6Mobility = ipv6MobilityDemux->GetMobility ( mh.GetMhType () );
@@ -199,7 +196,7 @@ enum IpL4Protocol::RxStatus MIPv6L4Protocol::Receive (Ptr<Packet> p, Ipv6Header 
 
 }
 
-enum IpL4Protocol::RxStatus MIPv6L4Protocol::Receive (Ptr<Packet> p, Ipv4Header const &header, Ptr<Ipv4Interface> incomingInterface)
+enum IpL4Protocol::RxStatus Mipv6L4Protocol::Receive (Ptr<Packet> p, Ipv4Header const &header, Ptr<Ipv4Interface> incomingInterface)
 {
 
 
@@ -208,9 +205,9 @@ enum IpL4Protocol::RxStatus MIPv6L4Protocol::Receive (Ptr<Packet> p, Ipv4Header 
 }
 
 
-void MIPv6L4Protocol::RegisterMobility ()
+void Mipv6L4Protocol::RegisterMobility ()
 {
-  Ptr<MIPv6Demux> ipv6MobilityDemux = CreateObject<MIPv6Demux>();
+  Ptr<Mipv6Demux> ipv6MobilityDemux = CreateObject<Mipv6Demux>();
   ipv6MobilityDemux->SetNode ( m_node );
 
   m_node->AggregateObject ( ipv6MobilityDemux );
@@ -240,26 +237,26 @@ void MIPv6L4Protocol::RegisterMobility ()
   ipv6MobilityDemux->Insert (cot);
 
 }
-void MIPv6L4Protocol::SetDownTarget (IpL4Protocol::DownTargetCallback cb)
+void Mipv6L4Protocol::SetDownTarget (IpL4Protocol::DownTargetCallback cb)
 {
 }
-void MIPv6L4Protocol::SetDownTarget6 (IpL4Protocol::DownTargetCallback6 cb)
+void Mipv6L4Protocol::SetDownTarget6 (IpL4Protocol::DownTargetCallback6 cb)
 {
 }
-IpL4Protocol::DownTargetCallback MIPv6L4Protocol::GetDownTarget (void) const
+IpL4Protocol::DownTargetCallback Mipv6L4Protocol::GetDownTarget (void) const
 {
   IpL4Protocol::DownTargetCallback t;
   return t;
 }
-IpL4Protocol::DownTargetCallback6 MIPv6L4Protocol::GetDownTarget6 (void) const
+IpL4Protocol::DownTargetCallback6 Mipv6L4Protocol::GetDownTarget6 (void) const
 {
   IpL4Protocol::DownTargetCallback6 y;
   return y;
 }
 
-void MIPv6L4Protocol::RegisterMobilityOptions ()
+void Mipv6L4Protocol::RegisterMobilityOptions ()
 {
-  Ptr<MIPv6OptionDemux> ipv6MobilityOptionDemux = CreateObject<MIPv6OptionDemux>();
+  Ptr<Mipv6OptionDemux> ipv6MobilityOptionDemux = CreateObject<Mipv6OptionDemux>();
   ipv6MobilityOptionDemux->SetNode ( m_node );
 
   m_node->AggregateObject ( ipv6MobilityOptionDemux );

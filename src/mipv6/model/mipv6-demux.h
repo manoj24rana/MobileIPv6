@@ -27,14 +27,14 @@
 
 namespace ns3 {
 
-class MIPv6Mobility;
+class Mipv6Mobility;
 class Node;
 
 /**
  * \class Ipv6MobilityDemux
  * \brief Ipv6 Mobility Demux.
  */
-class MIPv6Demux : public Object
+class Mipv6Demux : public Object
 {
 public:
   /**
@@ -46,12 +46,12 @@ public:
   /**
    * \brief Constructor.
    */
-  MIPv6Demux ();
+  Mipv6Demux ();
 
   /**
    * \brief Destructor.
    */
-  virtual ~MIPv6Demux ();
+  virtual ~Mipv6Demux ();
 
   /**
    * \brief Set the node.
@@ -61,22 +61,22 @@ public:
 
   /**
    * \brief Insert a new IPv6 Mobility.
-   * \param option the option to insert
+   * \param mobility mobility
    */
-  void Insert (Ptr<MIPv6Mobility> mobility);
+  void Insert (Ptr<Mipv6Mobility> mobility);
 
   /**
    * \brief Get the mobility corresponding to mobilityNumber.
    * \param mobilityNumber the mobility number of the option to retrieve
    * \return a matching IPv6 Mobility mobility
    */
-  Ptr<MIPv6Mobility> GetMobility (int mobilityNumber);
+  Ptr<Mipv6Mobility> GetMobility (int mobilityNumber);
 
   /**
    * \brief Remove an mobility from this demux.
    * \param mobility pointer on the mobility to remove
    */
-  void Remove (Ptr<MIPv6Mobility> mobility);
+  void Remove (Ptr<Mipv6Mobility> mobility);
 
 protected:
   /**
@@ -85,7 +85,10 @@ protected:
   virtual void DoDispose ();
 
 private:
-  typedef std::list<Ptr<MIPv6Mobility> > Ipv6MobilityList_t;
+  /**
+   * \brief Signature of the list of all IPv6 Mobility supported.
+   */
+  typedef std::list<Ptr<Mipv6Mobility> > Ipv6MobilityList_t;
 
   /**
    * \brief List of IPv6 Mobility supported.

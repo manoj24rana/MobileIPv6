@@ -29,7 +29,7 @@
 
 namespace ns3 {
 
-class MIPv6OptionBundle;
+class Mipv6OptionBundle;
 /**
  * \class Ipv6Mobility
  * \brief Ipv6 Mobility base
@@ -37,7 +37,7 @@ class MIPv6OptionBundle;
  * If you want to implement a new Ipv6 Mobility, all you have to do is
  * implement a subclass of this class and add it to an Ipv6MobilityDemux.
  */
-class MIPv6Mobility : public Object
+class Mipv6Mobility : public Object
 {
 public:
   /**
@@ -49,7 +49,7 @@ public:
   /**
    * \brief Destructor.
    */
-  virtual ~MIPv6Mobility ();
+  virtual ~Mipv6Mobility ();
 
   /**
    * \brief Set the node.
@@ -57,6 +57,11 @@ public:
    */
   void SetNode (Ptr<Node> node);
 
+
+  /**
+   * \brief Set the node.
+   * \returns the node
+   */
   Ptr<Node> GetNode () const;
 
   /**
@@ -66,16 +71,25 @@ public:
   virtual uint8_t GetMobilityNumber () const = 0;
 
   /**
-   * \brief Process method
-   *
-   * Called from Ipv6MobilityL4Protocol::Receive.
-   * \param packet the packet
-   * \param offset the offset of the extension to process
+   * \brief Process method, Called from Ipv6MobilityL4Protocol::Receive.
+   * \param p the packet
+   * \param src the source address
+   * \param dst the destination address
+   * \param interface IPv6 interface
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface) = 0;
 
-  virtual uint8_t ProcessOptions (Ptr<Packet> packet, uint8_t offset, uint8_t length, MIPv6OptionBundle &bundle);
+
+  /**
+   * \brief Process method, Called from Ipv6MobilityL4Protocol::Receive.
+   * \param packet the packet
+   * \param offset the offset of the extension to process
+   * \param length length
+   * \param bundle bundle
+   * \return the processed size
+   */
+  virtual uint8_t ProcessOptions (Ptr<Packet> packet, uint8_t offset, uint8_t length, Mipv6OptionBundle &bundle);
 
 private:
   /**
@@ -86,14 +100,15 @@ private:
 
 /**
  * \class Ipv6MobilityBindingUpdate
- * \brief Ipv6 Mobility Binding Update
- *
- * If you want to implement a new Ipv6 Mobility, all you have to do is
- * implement a subclass of this class and add it to an Ipv6MobilityDemux.
+ * \brief Ipv6 Mobility Binding Update. If you want to implement a new Ipv6 Mobility,
+    all you have to do is implement a subclass of this class and add it to an Ipv6MobilityDemux.
  */
-class Ipv6MobilityBindingUpdate : public MIPv6Mobility
+class Ipv6MobilityBindingUpdate : public Mipv6Mobility
 {
 public:
+  /**
+   * \brief mobility no.
+   */
   static const uint8_t MOB_NUMBER = 5;
 
   /**
@@ -117,8 +132,10 @@ public:
    * \brief Process method
    *
    * Called from Ipv6MobilityL4Protocol::Receive.
-   * \param packet the packet
-   * \param offset the offset of the extension to process
+   * \param p the packet
+   * \param src the source address
+   * \param dst the destination address
+   * \param interface the interface
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface);
@@ -133,9 +150,12 @@ private:
  * If you want to implement a new Ipv6 Mobility, all you have to do is
  * implement a subclass of this class and add it to an Ipv6MobilityDemux.
  */
-class Ipv6MobilityBindingAck : public MIPv6Mobility
+class Ipv6MobilityBindingAck : public Mipv6Mobility
 {
 public:
+  /**
+   * \brief mobility no.
+   */
   static const uint8_t MOB_NUMBER = 6;
 
   /**
@@ -159,8 +179,10 @@ public:
    * \brief Process method
    *
    * Called from Ipv6MobilityL4Protocol::Receive.
-   * \param packet the packet
-   * \param offset the offset of the extension to process
+   * \param p the packet
+   * \param src the source address
+   * \param dst the destination address
+   * \param interface the interface
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface);
@@ -168,9 +190,12 @@ public:
 private:
 };
 
-class Ipv6MobilityHoTI : public MIPv6Mobility
+class Ipv6MobilityHoTI : public Mipv6Mobility
 {
 public:
+  /**
+   * \brief mobility no.
+   */
   static const uint8_t MOB_NUMBER = 1;
 
   /**
@@ -194,8 +219,10 @@ public:
    * \brief Process method
    *
    * Called from Ipv6MobilityL4Protocol::Receive.
-   * \param packet the packet
-   * \param offset the offset of the extension to process
+   * \param p the packet
+   * \param src the source address
+   * \param dst the destination address
+   * \param interface the interface
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface);
@@ -203,9 +230,12 @@ public:
 private:
 };
 
-class Ipv6MobilityCoTI : public MIPv6Mobility
+class Ipv6MobilityCoTI : public Mipv6Mobility
 {
 public:
+  /**
+   * \brief mobility no.
+   */
   static const uint8_t MOB_NUMBER = 2;
 
   /**
@@ -229,8 +259,10 @@ public:
    * \brief Process method
    *
    * Called from Ipv6MobilityL4Protocol::Receive.
-   * \param packet the packet
-   * \param offset the offset of the extension to process
+   * \param p the packet
+   * \param src the source address
+   * \param dst the destination address
+   * \param interface the interface
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface);
@@ -238,9 +270,12 @@ public:
 private:
 };
 
-class Ipv6MobilityHoT : public MIPv6Mobility
+class Ipv6MobilityHoT : public Mipv6Mobility
 {
 public:
+  /**
+   * \brief mobility no.
+   */
   static const uint8_t MOB_NUMBER = 3;
 
   /**
@@ -262,10 +297,11 @@ public:
 
   /**
    * \brief Process method
-   *
    * Called from Ipv6MobilityL4Protocol::Receive.
-   * \param packet the packet
-   * \param offset the offset of the extension to process
+   * \param p the packet
+   * \param src the source address
+   * \param dst the destination address
+   * \param interface the interface
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface);
@@ -273,9 +309,12 @@ public:
 private:
 };
 
-class Ipv6MobilityCoT : public MIPv6Mobility
+class Ipv6MobilityCoT : public Mipv6Mobility
 {
 public:
+  /**
+   * \brief mobility no.
+   */
   static const uint8_t MOB_NUMBER = 4;
 
   /**
@@ -299,8 +338,10 @@ public:
    * \brief Process method
    *
    * Called from Ipv6MobilityL4Protocol::Receive.
-   * \param packet the packet
-   * \param offset the offset of the extension to process
+   * \param p the packet
+   * \param src the source address
+   * \param dst the destination address
+   * \param interface the interface
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface);
@@ -309,9 +350,12 @@ private:
 };
 
 
-class Ipv6BindingRefreshRequest : public MIPv6Mobility
+class Ipv6BindingRefreshRequest : public Mipv6Mobility
 {
 public:
+  /**
+   * \brief mobility no.
+   */
   static const uint8_t MOB_NUMBER = 5;
 
   /**
@@ -338,8 +382,10 @@ public:
    *
    * Called from Ipv6MobilityL4Protocol::Receive.
 
-   * \param packet the packet
-   * \param offset the offset of the extension to process
+   * \param p the packet
+   * \param src the source address
+   * \param dst the destination address
+   * \param interface the interface
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface);
@@ -347,9 +393,12 @@ public:
 private:
 };
 
-class Ipv6BindingError : public MIPv6Mobility
+class Ipv6BindingError : public Mipv6Mobility
 {
 public:
+  /**
+   * \brief mobility no.
+   */
   static const uint8_t MOB_NUMBER = 6;
 
   /**
@@ -373,8 +422,10 @@ public:
    * \brief Process method
    *
    * Called from Ipv6MobilityL4Protocol::Receive.
-   * \param packet the packet
-   * \param offset the offset of the extension to process
+   * \param p the packet
+   * \param src the source address
+   * \param dst the destination address
+   * \param interface the interface
    * \return the processed size
    */
   virtual uint8_t Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface);

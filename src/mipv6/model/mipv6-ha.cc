@@ -41,42 +41,42 @@
 
 using namespace std;
 
-NS_LOG_COMPONENT_DEFINE ("mipv6HA");
+NS_LOG_COMPONENT_DEFINE ("Mipv6Ha");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (mipv6HA);
+NS_OBJECT_ENSURE_REGISTERED (Mipv6Ha);
 
 TypeId
-mipv6HA::GetTypeId (void)
+Mipv6Ha::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::mipv6HA")
-    .SetParent<mipv6Agent> ()
-    .AddConstructor<mipv6HA> ()
+  static TypeId tid = TypeId ("ns3::Mipv6Ha")
+    .SetParent<Mipv6Agent> ()
+    .AddConstructor<Mipv6Ha> ()
     .AddAttribute ("BCache", "The binding cache associated with this agent.",
                    PointerValue (),
-                   MakePointerAccessor (&mipv6HA::m_bCache),
+                   MakePointerAccessor (&Mipv6Ha::m_bCache),
                    MakePointerChecker<BCache> ())
     .AddTraceSource ("RxBU",
                      "Receive BU packet from MN",
-                     MakeTraceSourceAccessor (&mipv6HA::m_rxbuTrace),
-                     "ns3::mipv6HA::RxBuTracedCallback")
+                     MakeTraceSourceAccessor (&Mipv6Ha::m_rxbuTrace),
+                     "ns3::Mipv6Ha::RxBuTracedCallback")
 
     ;
   return tid;
 }
 
-mipv6HA::mipv6HA ()
+Mipv6Ha::Mipv6Ha ()
   : m_bCache (0)
 {
 }
 
-mipv6HA::~mipv6HA ()
+Mipv6Ha::~Mipv6Ha ()
 {
   m_bCache = 0;
 }
 
-void mipv6HA::NotifyNewAggregate ()
+void Mipv6Ha::NotifyNewAggregate ()
 {
   if (GetNode () == 0)
     {
@@ -87,16 +87,16 @@ void mipv6HA::NotifyNewAggregate ()
       m_bCache->SetNode (node);
       Ptr<Icmpv6L4Protocol> icmpv6l4 = node->GetObject<Icmpv6L4Protocol> ();
       Ptr<Ipv6L3Protocol> ipv6 = node->GetObject<Ipv6L3Protocol> ();
-      icmpv6l4->SetDADCallback (MakeCallback (&mipv6HA::DADFailureIndication, this));
-      icmpv6l4->SetNSCallback (MakeCallback (&mipv6HA::IsAddress, this));
-      icmpv6l4->SetHandleNSCallback (MakeCallback (&mipv6HA::HandleNS, this));
-      ipv6->SetNSCallback2 (MakeCallback (&mipv6HA::IsAddress2, this));
+      icmpv6l4->SetDADCallback (MakeCallback (&Mipv6Ha::DADFailureIndication, this));
+      icmpv6l4->SetNSCallback (MakeCallback (&Mipv6Ha::IsAddress, this));
+      icmpv6l4->SetHandleNSCallback (MakeCallback (&Mipv6Ha::HandleNS, this));
+      ipv6->SetNSCallback2 (MakeCallback (&Mipv6Ha::IsAddress2, this));
     }
 
-  mipv6Agent::NotifyNewAggregate ();
+  Mipv6Agent::NotifyNewAggregate ();
 }
 
-void mipv6HA::DADFailureIndication (Ipv6Address addr)
+void Mipv6Ha::DADFailureIndication (Ipv6Address addr)
 {
   BCache::Entry *bce = m_bCache->Lookup (addr);
   if (bce)
@@ -105,7 +105,7 @@ void mipv6HA::DADFailureIndication (Ipv6Address addr)
     }
 }
 
-bool mipv6HA::IsAddress (Ipv6Address addr)
+bool Mipv6Ha::IsAddress (Ipv6Address addr)
 {
   BCache::Entry *bce = m_bCache->Lookup (addr);
   if (bce)
@@ -115,12 +115,12 @@ bool mipv6HA::IsAddress (Ipv6Address addr)
   return false;
 }
 
-bool mipv6HA::IsAddress2 (Ipv6Address addr)
+bool Mipv6Ha::IsAddress2 (Ipv6Address addr)
 {
   return m_bCache->LookupSHoa (addr);
 }
 
-Ptr<Packet> mipv6HA::BuildBA (Ipv6MobilityBindingUpdateHeader bu,Ipv6Address hoa, uint8_t status)
+Ptr<Packet> Mipv6Ha::BuildBA (Ipv6MobilityBindingUpdateHeader bu,Ipv6Address hoa, uint8_t status)
 {
   NS_LOG_FUNCTION (this << status << "BUILD BACK");
 
@@ -134,7 +134,7 @@ Ptr<Packet> mipv6HA::BuildBA (Ipv6MobilityBindingUpdateHeader bu,Ipv6Address hoa
   ba.SetSequence (bu.GetSequence ());
   ba.SetFlagK (true);
   ba.SetStatus (status);
-  ba.SetLifetime ((uint16_t)MIPv6L4Protocol::MAX_BINDING_LIFETIME);
+  ba.SetLifetime ((uint16_t)Mipv6L4Protocol::MAX_BINDING_LIFETIME);
   p->AddHeader (type2extn);
   p->AddHeader (ba);
 
@@ -142,7 +142,7 @@ Ptr<Packet> mipv6HA::BuildBA (Ipv6MobilityBindingUpdateHeader bu,Ipv6Address hoa
 }
 
 
-uint8_t mipv6HA::HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
+uint8_t Mipv6Ha::HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface)
 {
   NS_LOG_FUNCTION (this << packet << src << dst << interface);
   uint32_t r = interface->GetNAddresses ();
@@ -171,10 +171,10 @@ uint8_t mipv6HA::HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
   Ipv6Address homeaddr;
   homeaddr = homopt.GetHomeAddress ();
 
-  Ptr<MIPv6Demux> ipv6MobilityDemux = GetNode ()->GetObject<MIPv6Demux> ();
+  Ptr<Mipv6Demux> ipv6MobilityDemux = GetNode ()->GetObject<Mipv6Demux> ();
   NS_ASSERT (ipv6MobilityDemux);
 
-  Ptr<MIPv6Mobility> ipv6Mobility = ipv6MobilityDemux->GetMobility (bu.GetMhType ());
+  Ptr<Mipv6Mobility> ipv6Mobility = ipv6MobilityDemux->GetMobility (bu.GetMhType ());
   NS_ASSERT (ipv6Mobility);
 
 
@@ -190,7 +190,7 @@ uint8_t mipv6HA::HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
   bce2->SetSolicitedHoA (Ipv6Address::MakeSolicitedAddress (homeaddr));
   bce2->SetLastBindingUpdateSequence (bu.GetSequence ());
   bce2->SetLastBindingUpdateTime (Time (bu.GetLifetime ()));
-  errStatus = MIPv6Header::BA_STATUS_BINDING_UPDATE_ACCEPTED;
+  errStatus = Mipv6Header::BA_STATUS_BINDING_UPDATE_ACCEPTED;
   bce2->MarkReachable ();
 
 
@@ -241,8 +241,8 @@ uint8_t mipv6HA::HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
       if (bu.GetFlagA ())
         {
           m_bCache->Add (bce2);
-          Simulator::Schedule (Seconds (0.), &mipv6HA::DoDADForOffLinkAddress, this, homeaddr, interface);
-          Simulator::Schedule (Seconds (1.), &mipv6HA::FunctionDadTimeoutForOffLinkAddress, this, interface, ba, homeaddr);
+          Simulator::Schedule (Seconds (0.), &Mipv6Ha::DoDADForOffLinkAddress, this, homeaddr, interface);
+          Simulator::Schedule (Seconds (1.), &Mipv6Ha::FunctionDadTimeoutForOffLinkAddress, this, interface, ba, homeaddr);
         }
       return 0;
     }
@@ -251,7 +251,7 @@ uint8_t mipv6HA::HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv
 
 }
 
-std::list<Ipv6Address> mipv6HA::HomeAgentAddressList ()
+std::list<Ipv6Address> Mipv6Ha::HomeAgentAddressList ()
 {
   NS_LOG_FUNCTION (this);
   std::list<Ipv6Address> HaaList;
@@ -276,7 +276,7 @@ std::list<Ipv6Address> mipv6HA::HomeAgentAddressList ()
   return HaaList;
 }
 
-bool mipv6HA::SetupTunnelAndRouting (BCache::Entry *bce)
+bool Mipv6Ha::SetupTunnelAndRouting (BCache::Entry *bce)
 {
   NS_LOG_FUNCTION (this << bce);
 
@@ -301,7 +301,7 @@ bool mipv6HA::SetupTunnelAndRouting (BCache::Entry *bce)
 }
 
 
-bool mipv6HA::ClearTunnelAndRouting (BCache::Entry *bce)
+bool Mipv6Ha::ClearTunnelAndRouting (BCache::Entry *bce)
 {
   NS_LOG_FUNCTION (this << bce);
 
@@ -324,7 +324,7 @@ bool mipv6HA::ClearTunnelAndRouting (BCache::Entry *bce)
   return true;
 }
 
-void mipv6HA::DoDADForOffLinkAddress (Ipv6Address target, Ptr<Ipv6Interface> interface)
+void Mipv6Ha::DoDADForOffLinkAddress (Ipv6Address target, Ptr<Ipv6Interface> interface)
 {
   NS_LOG_FUNCTION (this << target << interface);
   Ipv6Address addr;
@@ -343,7 +343,7 @@ void mipv6HA::DoDADForOffLinkAddress (Ipv6Address target, Ptr<Ipv6Interface> int
   Simulator::Schedule (Time (0), &Ipv6Interface::Send, interface, p.first, p.second, Ipv6Address::MakeSolicitedAddress (target));
 }
 
-void mipv6HA::FunctionDadTimeoutForOffLinkAddress (Ptr<Ipv6Interface> interface, Ptr<Packet> ba, Ipv6Address homeaddr)
+void Mipv6Ha::FunctionDadTimeoutForOffLinkAddress (Ptr<Ipv6Interface> interface, Ptr<Packet> ba, Ipv6Address homeaddr)
 {
   if (m_bCache->Lookup (homeaddr)->GetState () != BCache::Entry::INVALID)
     {
@@ -352,7 +352,7 @@ void mipv6HA::FunctionDadTimeoutForOffLinkAddress (Ptr<Ipv6Interface> interface,
   SetupTunnelAndRouting (m_bCache->Lookup (homeaddr));
 }
 
-void mipv6HA::HandleNS (Ptr<Packet> packet, Ptr<Ipv6Interface> interface, Ipv6Address src, Ipv6Address target)
+void Mipv6Ha::HandleNS (Ptr<Packet> packet, Ptr<Ipv6Interface> interface, Ipv6Address src, Ipv6Address target)
 {
   Ipv6InterfaceAddress ifaddr (target);
 

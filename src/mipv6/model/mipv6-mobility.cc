@@ -29,52 +29,52 @@
 #include "mipv6-header.h"
 #include "mipv6-agent.h"
 
-NS_LOG_COMPONENT_DEFINE ("MIPv6Mobility");
+NS_LOG_COMPONENT_DEFINE ("Mipv6Mobility");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (MIPv6Mobility);
+NS_OBJECT_ENSURE_REGISTERED (Mipv6Mobility);
 
-TypeId MIPv6Mobility::GetTypeId ()
+TypeId Mipv6Mobility::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::MIPv6Mobility")
+  static TypeId tid = TypeId ("ns3::Mipv6Mobility")
     .SetParent<Object>()
     .AddAttribute ("MobilityNumber", "The IPv6 mobility number.",
                    UintegerValue (0),
-                   MakeUintegerAccessor (&MIPv6Mobility::GetMobilityNumber),
+                   MakeUintegerAccessor (&Mipv6Mobility::GetMobilityNumber),
                    MakeUintegerChecker<uint8_t> ())
   ;
   return tid;
 }
 
-MIPv6Mobility::~MIPv6Mobility ()
+Mipv6Mobility::~Mipv6Mobility ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
 
-void MIPv6Mobility::SetNode (Ptr<Node> node)
+void Mipv6Mobility::SetNode (Ptr<Node> node)
 {
   NS_LOG_FUNCTION (this << node);
   m_node = node;
 }
 
-Ptr<Node> MIPv6Mobility::GetNode () const
+Ptr<Node> Mipv6Mobility::GetNode () const
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this);
 
   return m_node;
 }
 
-uint8_t MIPv6Mobility::ProcessOptions (Ptr<Packet> packet, uint8_t offset, uint8_t length, MIPv6OptionBundle &bundle)
+uint8_t Mipv6Mobility::ProcessOptions (Ptr<Packet> packet, uint8_t offset, uint8_t length, Mipv6OptionBundle &bundle)
 {
   NS_LOG_FUNCTION (this << packet << length);
   Ptr<Packet> p = packet->Copy ();
   p->RemoveAtStart (offset);
 
-  Ptr<MIPv6OptionDemux> ipv6MobilityOptionDemux = GetNode ()->GetObject<MIPv6OptionDemux>();
+  Ptr<Mipv6OptionDemux> ipv6MobilityOptionDemux = GetNode ()->GetObject<Mipv6OptionDemux>();
   NS_ASSERT (ipv6MobilityOptionDemux != 0);
 
-  Ptr<MIPv6Option> ipv6MobilityOption = 0;
+  Ptr<Mipv6Option> ipv6MobilityOption = 0;
 
   uint8_t processedSize = 0;
   uint32_t size = p->GetSize ();
@@ -124,7 +124,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityBindingUpdate);
 TypeId Ipv6MobilityBindingUpdate::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityBindingUpdate")
-    .SetParent<MIPv6Mobility>()
+    .SetParent<Mipv6Mobility>()
     .AddConstructor<Ipv6MobilityBindingUpdate>()
   ;
   return tid;
@@ -142,30 +142,30 @@ uint8_t Ipv6MobilityBindingUpdate::GetMobilityNumber () const
 
 uint8_t Ipv6MobilityBindingUpdate::Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << p << src << dst << interface);
 
   Ptr<Packet> packet = p->Copy ();
 
   Ipv6MobilityBindingUpdateHeader buh;
-  MIPv6OptionBundle bundle;
+  Mipv6OptionBundle bundle;
   /*  Mobile Ipv6 process routine */
   packet->RemoveHeader (buh);
 
-  Ptr<mipv6Agent> mip6 = GetNode ()->GetObject<mipv6Agent>();
+  Ptr<Mipv6Agent> mip6 = GetNode ()->GetObject<Mipv6Agent>();
 
   if ( mip6 )
     {
 
-      Simulator::ScheduleNow ( &mipv6Agent::Receive, mip6, p, src, dst, interface);
+      Simulator::ScheduleNow ( &Mipv6Agent::Receive, mip6, p, src, dst, interface);
       NS_LOG_FUNCTION ( this << packet << src << dst << interface << "PROCESS BU" );
       return 0;
     }
 
 
-  Ptr<MIPv6Demux> ipv6MobilityDemux = GetNode ()->GetObject<MIPv6Demux>();
+  Ptr<Mipv6Demux> ipv6MobilityDemux = GetNode ()->GetObject<Mipv6Demux>();
   NS_ASSERT ( ipv6MobilityDemux );
 
-  Ptr<MIPv6Mobility> ipv6Mobility = ipv6MobilityDemux->GetMobility (buh.GetMhType ());
+  Ptr<Mipv6Mobility> ipv6Mobility = ipv6MobilityDemux->GetMobility (buh.GetMhType ());
   NS_ASSERT ( ipv6Mobility );
 
   uint8_t length = ((buh.GetHeaderLen () + 1 ) << 3) - buh.GetOptionsOffset ();
@@ -183,7 +183,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityBindingAck);
 TypeId Ipv6MobilityBindingAck::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityBindingAck")
-    .SetParent<MIPv6Mobility>()
+    .SetParent<Mipv6Mobility>()
     .AddConstructor<Ipv6MobilityBindingAck>()
   ;
   return tid;
@@ -201,30 +201,30 @@ uint8_t Ipv6MobilityBindingAck::GetMobilityNumber () const
 
 uint8_t Ipv6MobilityBindingAck::Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << p << src << dst << interface);
 
   Ptr<Packet> packet = p->Copy ();
 
   Ipv6MobilityBindingAckHeader bah;
-  MIPv6OptionBundle bundle;
+  Mipv6OptionBundle bundle;
   /* Mobile Ipv6 process routine */
   packet->PeekHeader (bah);
 
-  Ptr<mipv6Agent> mip6 = GetNode ()->GetObject<mipv6Agent>();
+  Ptr<Mipv6Agent> mip6 = GetNode ()->GetObject<Mipv6Agent>();
 
   if ( mip6 )
     {
       NS_LOG_FUNCTION ( this << packet << src << dst << interface << "PROCESS BACK" );
-      Simulator::ScheduleNow ( &mipv6Agent::Receive, mip6, p, src, dst, interface);
+      Simulator::ScheduleNow ( &Mipv6Agent::Receive, mip6, p, src, dst, interface);
 
       return 0;
     }
 
 
-  Ptr<MIPv6Demux> ipv6MobilityDemux = GetNode ()->GetObject<MIPv6Demux>();
+  Ptr<Mipv6Demux> ipv6MobilityDemux = GetNode ()->GetObject<Mipv6Demux>();
   NS_ASSERT ( ipv6MobilityDemux );
 
-  Ptr<MIPv6Mobility> ipv6Mobility = ipv6MobilityDemux->GetMobility (bah.GetMhType ());
+  Ptr<Mipv6Mobility> ipv6Mobility = ipv6MobilityDemux->GetMobility (bah.GetMhType ());
   NS_ASSERT ( ipv6Mobility );
 
   uint8_t length = ((bah.GetHeaderLen () + 1 ) << 3) - bah.GetOptionsOffset ();
@@ -240,7 +240,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityHoTI);
 TypeId Ipv6MobilityHoTI::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityHoTI")
-    .SetParent<MIPv6Mobility>()
+    .SetParent<Mipv6Mobility>()
     .AddConstructor<Ipv6MobilityHoTI>()
   ;
   return tid;
@@ -258,17 +258,17 @@ uint8_t Ipv6MobilityHoTI::GetMobilityNumber () const
 
 uint8_t Ipv6MobilityHoTI::Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << p << src << dst << interface);
 
   Ptr<Packet> packet = p->Copy ();
 
 
-  Ptr<mipv6Agent> mip6 = GetNode ()->GetObject<mipv6Agent>();
+  Ptr<Mipv6Agent> mip6 = GetNode ()->GetObject<Mipv6Agent>();
 
   if ( mip6 )
     {
       NS_LOG_FUNCTION ( this << packet << src << dst << interface << "PROCESS HoTI" );
-      Simulator::ScheduleNow ( &mipv6Agent::Receive, mip6, p, src, dst, interface);
+      Simulator::ScheduleNow ( &Mipv6Agent::Receive, mip6, p, src, dst, interface);
 
       return 0;
     }
@@ -285,7 +285,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityCoTI);
 TypeId Ipv6MobilityCoTI::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityCoTI")
-    .SetParent<MIPv6Mobility>()
+    .SetParent<Mipv6Mobility>()
     .AddConstructor<Ipv6MobilityCoTI>()
   ;
   return tid;
@@ -303,17 +303,17 @@ uint8_t Ipv6MobilityCoTI::GetMobilityNumber () const
 
 uint8_t Ipv6MobilityCoTI::Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << p << src << dst << interface);
 
   Ptr<Packet> packet = p->Copy ();
 
 
-  Ptr<mipv6Agent> mip6 = GetNode ()->GetObject<mipv6Agent>();
+  Ptr<Mipv6Agent> mip6 = GetNode ()->GetObject<Mipv6Agent>();
 
   if ( mip6 )
     {
       NS_LOG_FUNCTION ( this << packet << src << dst << interface << "PROCESS CoTI" );
-      Simulator::ScheduleNow ( &mipv6Agent::Receive, mip6, p, src, dst, interface);
+      Simulator::ScheduleNow ( &Mipv6Agent::Receive, mip6, p, src, dst, interface);
 
       return 0;
     }
@@ -330,7 +330,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityHoT);
 TypeId Ipv6MobilityHoT::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityHoT")
-    .SetParent<MIPv6Mobility>()
+    .SetParent<Mipv6Mobility>()
     .AddConstructor<Ipv6MobilityHoT>()
   ;
   return tid;
@@ -348,17 +348,17 @@ uint8_t Ipv6MobilityHoT::GetMobilityNumber () const
 
 uint8_t Ipv6MobilityHoT::Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << p << src << dst << interface);
 
   Ptr<Packet> packet = p->Copy ();
 
 
-  Ptr<mipv6Agent> mip6 = GetNode ()->GetObject<mipv6Agent>();
+  Ptr<Mipv6Agent> mip6 = GetNode ()->GetObject<Mipv6Agent>();
 
   if ( mip6 )
     {
       NS_LOG_FUNCTION ( this << packet << src << dst << interface << "PROCESS HoT" );
-      Simulator::ScheduleNow ( &mipv6Agent::Receive, mip6, p, src, dst, interface);
+      Simulator::ScheduleNow ( &Mipv6Agent::Receive, mip6, p, src, dst, interface);
 
       return 0;
     }
@@ -375,7 +375,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityCoT);
 TypeId Ipv6MobilityCoT::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityCoT")
-    .SetParent<MIPv6Mobility>()
+    .SetParent<Mipv6Mobility>()
     .AddConstructor<Ipv6MobilityCoT>()
   ;
   return tid;
@@ -393,17 +393,17 @@ uint8_t Ipv6MobilityCoT::GetMobilityNumber () const
 
 uint8_t Ipv6MobilityCoT::Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << p << src << dst << interface);
 
   Ptr<Packet> packet = p->Copy ();
 
 
-  Ptr<mipv6Agent> mip6 = GetNode ()->GetObject<mipv6Agent>();
+  Ptr<Mipv6Agent> mip6 = GetNode ()->GetObject<Mipv6Agent>();
 
   if ( mip6 )
     {
       NS_LOG_FUNCTION ( this << packet << src << dst << interface << "PROCESS CoTI" );
-      Simulator::ScheduleNow ( &mipv6Agent::Receive, mip6, p, src, dst, interface);
+      Simulator::ScheduleNow ( &Mipv6Agent::Receive, mip6, p, src, dst, interface);
 
       return 0;
     }
@@ -420,7 +420,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6BindingRefreshRequest);
 TypeId Ipv6BindingRefreshRequest::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6BindingRefreshRequest")
-    .SetParent<MIPv6Mobility>()
+    .SetParent<Mipv6Mobility>()
     .AddConstructor<Ipv6BindingRefreshRequest>()
   ;
   return tid;
@@ -438,17 +438,17 @@ uint8_t Ipv6BindingRefreshRequest::GetMobilityNumber () const
 
 uint8_t Ipv6BindingRefreshRequest::Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << p << src << dst << interface);
 
   Ptr<Packet> packet = p->Copy ();
 
 
-  Ptr<mipv6Agent> mip6 = GetNode ()->GetObject<mipv6Agent>();
+  Ptr<Mipv6Agent> mip6 = GetNode ()->GetObject<Mipv6Agent>();
 
   if ( mip6 )
     {
       NS_LOG_FUNCTION ( this << packet << src << dst << interface << "PROCESS BRR" );
-      Simulator::ScheduleNow ( &mipv6Agent::Receive, mip6, p, src, dst, interface);
+      Simulator::ScheduleNow ( &Mipv6Agent::Receive, mip6, p, src, dst, interface);
 
       return 0;
     }
@@ -465,7 +465,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6BindingError);
 TypeId Ipv6BindingError::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6BindingError")
-    .SetParent<MIPv6Mobility>()
+    .SetParent<Mipv6Mobility>()
     .AddConstructor<Ipv6BindingError>()
   ;
   return tid;
@@ -483,17 +483,17 @@ uint8_t Ipv6BindingError::GetMobilityNumber () const
 
 uint8_t Ipv6BindingError::Process (Ptr<Packet> p, Ipv6Address src, Ipv6Address dst, Ptr<Ipv6Interface> interface)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << p << src << dst << interface);
 
   Ptr<Packet> packet = p->Copy ();
 
 
-  Ptr<mipv6Agent> mip6 = GetNode ()->GetObject<mipv6Agent>();
+  Ptr<Mipv6Agent> mip6 = GetNode ()->GetObject<Mipv6Agent>();
 
   if ( mip6 )
     {
       NS_LOG_FUNCTION ( this << packet << src << dst << interface << "PROCESS BE" );
-      Simulator::ScheduleNow ( &mipv6Agent::Receive, mip6, p, src, dst, interface);
+      Simulator::ScheduleNow ( &Mipv6Agent::Receive, mip6, p, src, dst, interface);
 
       return 0;
     }

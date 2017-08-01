@@ -31,7 +31,7 @@ namespace ns3 {
 class Node;
 class Packet;
 class Ipv6Interface;
-class mipv6Agent : public Object
+class Mipv6Agent : public Object
 {
 public:
   /**
@@ -42,12 +42,12 @@ public:
   /**
    * \brief Constructor.
    */
-  mipv6Agent ();
+  Mipv6Agent ();
 
   /**
    * \brief Destructor.
    */
-  virtual ~mipv6Agent ();
+  virtual ~Mipv6Agent ();
 
   /**
    * \brief Set the node.
@@ -61,16 +61,84 @@ public:
    */
   Ptr<Node> GetNode (void);
 
+  /**
+   * \brief receive mobility handling packets (BU/BA).
+   * \param packet the packet
+   * \param src source address
+   * \param dst the destination address
+   * \param interface the interface where the packet is received
+   * \return status
+   */
   virtual uint8_t Receive (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface);
 
+  /**
+   * \brief send a mobility handling packets (BU/BA).
+   * \param packet the packet
+   * \param dst the destination address
+   * \param ttl time to live field 
+   */
   void SendMessage (Ptr<Packet> packet, Ipv6Address dst, uint32_t ttl);
 
 protected:
+
+  /**
+   * \brief hanling packets if BU is received and calls the corresponding function inherited from this class.
+   * \param packet the packet
+   * \param src source address
+   * \param dst the destination address
+   * \param interface the interface where the packet is received
+   * \return status
+   */
   virtual uint8_t HandleBU (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface);
+
+  /**
+   * \brief hanling packets if BA is received and calls the corresponding function inherited from this class.
+   * \param packet the packet
+   * \param src source address
+   * \param dst the destination address
+   * \param interface the interface where the packet is received
+   * \return status
+   */
   virtual uint8_t HandleBA (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface);
+
+  /**
+   * \brief hanling packets if HoTI is received and calls the corresponding function inherited from this class.
+   * \param packet the packet
+   * \param src source address
+   * \param dst the destination address
+   * \param interface the interface where the packet is received
+   * \return status
+   */
   virtual uint8_t HandleHoTI (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface);
+
+  /**
+   * \brief hanling packets if HoT is received and calls the corresponding function inherited from this class.
+   * \param packet the packet
+   * \param src source address
+   * \param dst the destination address
+   * \param interface the interface where the packet is received
+   * \return status
+   */
   virtual uint8_t HandleHoT (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface);
+
+  /**
+   * \brief hanling packets if CoTI is received and calls the corresponding function inherited from this class.
+   * \param packet the packet
+   * \param src source address
+   * \param dst the destination address
+   * \param interface the interface where the packet is received
+   * \return status
+   */
   virtual uint8_t HandleCoTI (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface);
+
+  /**
+   * \brief hanling packets if CoT is received and calls the corresponding function inherited from this class.
+   * \param packet the packet
+   * \param src source address
+   * \param dst the destination address
+   * \param interface the interface where the packet is received
+   * \return status
+   */
   virtual uint8_t HandleCoT (Ptr<Packet> packet, const Ipv6Address &src, const Ipv6Address &dst, Ptr<Ipv6Interface> interface);
 
   /**
@@ -84,8 +152,19 @@ private:
    */
   Ptr<Node> m_node;
 
+  /**
+   * \brief Trace source indicating a transmitted mobility handling packets by this agent 
+   */
   TracedCallback<Ptr<const Packet> > m_agentTxTrace;
+
+  /**
+   * \brief Trace source indicating a received mobility handling packets by this agent. This is a non-promiscuous trace 
+   */
   TracedCallback<Ptr<const Packet> > m_agentRxTrace;
+
+  /**
+   * \brief Trace source indicating a received mobility handling packets by this agent. This is a promiscuous trace 
+   */
   TracedCallback<Ptr<const Packet> > m_agentPromiscRxTrace;
 
 };

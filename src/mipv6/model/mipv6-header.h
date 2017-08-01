@@ -30,9 +30,15 @@ namespace ns3 {
 
 //class Identifier;
 
-class MIPv6Header : public Header
+class Mipv6Header : public Header
 {
 public:
+
+
+  /**
+   * \enum MhType_e
+   * \brief IPv6 mobility header type
+   */
   enum MhType_e
   {
     HOME_TEST_INIT = 1,
@@ -45,6 +51,10 @@ public:
     IPv6_BINDING_ERROR = 8
 
   };
+  /**
+   * \enum BAStatus_e
+   * \brief Binding acknowledgement status type
+   */
   enum BAStatus_e
   {
     BA_STATUS_BINDING_UPDATE_ACCEPTED = 0,
@@ -66,6 +76,11 @@ public:
     BA_STATUS_INVALID_COA = 174
 
   };
+
+  /**
+   * \enum OptionType_e
+   * \brief IPv6 mobility option type
+   */
   enum OptionType_e
   {
     IPV6_MOBILITY_OPT_PAD1 = 0,
@@ -77,7 +92,10 @@ public:
 
 
   };
-
+  /**
+   * \brief Get the type identifier.
+   * \return type identifier
+   */
   static TypeId GetTypeId ();
 
   /**
@@ -89,12 +107,12 @@ public:
   /**
    * \brief Constructor.
    */
-  MIPv6Header ();
+  Mipv6Header ();
 
   /**
    * \brief Destructor.
    */
-  virtual ~MIPv6Header ();
+  virtual ~Mipv6Header ();
 
   /**
    * \brief Get the payload proto field.
@@ -157,9 +175,9 @@ public:
   void SetChecksum (uint16_t checksum);
 
   /**
- * \brief Print informations.
- * \param os output stream
- */
+   * \brief Print informations.
+   * \param os output stream
+   */
   virtual void Print (std::ostream& os) const;
 
   /**
@@ -210,28 +228,26 @@ private:
 };
 
 /**
- * \class MobilityOptionField
  * \brief Option field for an IPv6MobilityHeader
  * Enables adding options to an IPv6MobilityHeader
- *
  * Implementor's note: Make sure to add the result of
  * MobilityOptionField::GetSerializedSize () to your IPv6MobilityHeader::GetSerializedSize ()
  * return value. Call MobilityOptionField::Serialize and MobilityOptionField::Deserialize at the
  * end of your corresponding IPv6MobilityHeader methods.
  */
-class MIPv6OptionField
+class Mipv6OptionField
 {
 public:
   /**
    * \brief Constructor.
    * \param optionsOffset option offset
    */
-  MIPv6OptionField (uint32_t optionsOffset);
+  Mipv6OptionField (uint32_t optionsOffset);
 
   /**
    * \brief Destructor.
    */
-  ~MIPv6OptionField ();
+  ~Mipv6OptionField ();
 
   /**
    * \brief Get the serialized size of the packet.
@@ -257,7 +273,7 @@ public:
    * \brief Serialize the option, prepending pad1 or padn option as necessary
    * \param option the option header to serialize
    */
-  void AddOption (MIPv6OptionHeader const& option);
+  void AddOption (Mipv6OptionHeader const& option);
 
   /**
    * \brief Get the offset where the options begin, measured from the start of
@@ -273,11 +289,13 @@ public:
   Buffer GetOptionBuffer ();
 
 private:
+
   /**
    * \brief Calculate padding.
    * \param alignment alignment
+   * \return calculated pad
    */
-  uint32_t CalculatePad (MIPv6OptionHeader::Alignment alignment) const;
+  uint32_t CalculatePad (Mipv6OptionHeader::Alignment alignment) const;
 
   /**
    * \brief Data payload.
@@ -291,8 +309,8 @@ private:
 };
 
 
-class Ipv6MobilityBindingUpdateHeader : public MIPv6Header,
-                                        public MIPv6OptionField
+class Ipv6MobilityBindingUpdateHeader : public Mipv6Header,
+                                        public Mipv6OptionField
 {
 public:
   /**
@@ -380,15 +398,15 @@ public:
 
 
   /**
-   * \brief Get the Reserved value.
-   * \return Reserved value
+   * \brief Get the Reserved2 value.
+   * \return Reserved2 value
    */
 
   uint16_t GetReserved2 () const;
 
   /**
    * \brief Set the Reserved.
-   * \param reserved reserved value
+   * \param reserved2 reserved value
    */
   void SetReserved2 (uint16_t reserved2);
 
@@ -473,8 +491,8 @@ private:
  * \class Ipv6MobilityBindingAckHeader
  * \brief Ipv6 Mobility Binding Acknowledgement header.
  */
-class Ipv6MobilityBindingAckHeader : public MIPv6Header,
-                                     public MIPv6OptionField
+class Ipv6MobilityBindingAckHeader : public Mipv6Header,
+                                     public Mipv6OptionField
 {
 public:
   /**
@@ -618,7 +636,7 @@ private:
 };
 
 
-class Ipv6HoTIHeader : public MIPv6Header
+class Ipv6HoTIHeader : public Mipv6Header
 {
 public:
   /**
@@ -643,20 +661,32 @@ public:
    * \brief Destructor.
    */
   virtual ~Ipv6HoTIHeader ();
-
+  /**
+   * \brief Get the Reserved2 field.
+   * \return reserved2 value
+   */
   uint16_t GetReserved2 () const;
 
   /**
-   * \brief Set the Reserved.
-   * \param reserved reserved value
+   * \brief Set the Reserved2 field.
+   * \param reserved2 reserved value
    */
   void SetReserved2 (uint16_t reserved2);
-
+  /**
+   * \brief Get the home init cookie.
+   * \return home init cookie
+   */
   uint64_t GetHomeInitCookie () const;
-
+  /**
+   * \brief Set the home init cookie.
+   * \param hicookie home init cookie
+   */
   void SetHomeInitCookie (uint64_t hicookie);
 
-
+  /**
+   * \brief Print informations.
+   * \param os output stream
+   */
   virtual void Print (std::ostream& os) const;
 
   /**
@@ -684,12 +714,14 @@ private:
    * \brief The reserved value.
    */
   uint16_t m_reserved2;
-
+  /**
+   * \brief home init cookie.
+   */
   uint64_t m_homeinitcookie;
 
 };
 
-class Ipv6CoTIHeader : public MIPv6Header
+class Ipv6CoTIHeader : public Mipv6Header
 {
 public:
   /**
@@ -713,21 +745,30 @@ public:
    * \brief Destructor.
    */
   virtual ~Ipv6CoTIHeader ();
-
+  /**
+   * \brief get reserved 2 field.
+   */
   uint16_t GetReserved2 () const;
 
   /**
-   * \brief Set the Reserved.
-   * \param reserved reserved value
+   * \brief Set the Reserved 2.
+   * \param reserved2 reserved value
    */
   void SetReserved2 (uint16_t reserved2);
-
+  /**
+   * \brief get care-of init cookie.
+   * \return care-of init cookie
+   */
   uint64_t GetCareOfInitCookie () const;
-
+  /**
+   * \brief set care-of init cookie.
+   * \param coaicookie care-of init cookie
+   */
   void SetCareOfInitCookie (uint64_t coaicookie);
-
-
-
+  /**
+   * \brief Print informations.
+   * \param os output stream
+   */
   virtual void Print (std::ostream& os) const;
 
   /**
@@ -754,11 +795,14 @@ private:
    * \brief The reserved value.
    */
   uint16_t m_reserved2;
+  /**
+   * \brief care-of init cookie.
+   */
   uint64_t m_careofinitcookie;
 
 };
 
-class Ipv6HoTHeader : public MIPv6Header
+class Ipv6HoTHeader : public Mipv6Header
 {
 public:
   /**
@@ -782,24 +826,44 @@ public:
    * \brief Destructor.
    */
   virtual ~Ipv6HoTHeader ();
-
+  /**
+   * \brief Get home nonce index.
+   * \return home nonce index
+   */
   uint16_t GetHomeNonceIndex () const;
 
   /**
-   * \brief Set the Reserved.
-   * \param reserved reserved value
+   * \brief Set the nonce index.
+   * \param homenonceind nonce id
    */
   void SetHomeNonceIndex (uint16_t homenonceind);
-
+  /**
+   * \brief Get home init cookie.
+   * \return home init cookie
+   */
   uint64_t GetHomeInitCookie () const;
-
+  /**
+   * \brief Set the home init cookie.
+   * \param homeinitcookie home init cookie
+   */
   void SetHomeInitCookie (uint64_t homeinitcookie);
 
+  /**
+   * \brief Get the home keygen token.
+   * \return the home keygen token
+   */
   uint64_t GetHomeKeygenToken () const;
 
+  /**
+   * \brief Set the home keygen token.
+   * \param homekeygentoken the home keygen token
+   */
   void SetHomeKeygenToken (uint64_t homekeygentoken);
 
-
+  /**
+   * \brief Print informations.
+   * \param os output stream
+   */
   virtual void Print (std::ostream& os) const;
 
   /**
@@ -823,15 +887,21 @@ public:
 
 private:
   /**
-   * \brief The reserved value.
+   * \brief The home nonce index.
    */
   uint16_t m_homenonceindex;
+  /**
+   * \brief The home init cookie.
+   */
   uint16_t m_homeinitcookie;
+  /**
+   * \brief The home keygen token.
+   */
   uint16_t m_homekeygentoken;
 
 };
 
-class Ipv6CoTHeader : public MIPv6Header
+class Ipv6CoTHeader : public Mipv6Header
 {
 public:
   /**
@@ -855,25 +925,45 @@ public:
    * \brief Destructor.
    */
   virtual ~Ipv6CoTHeader ();
-
+  /**
+   * \brief Get the care-of nonce index.
+   * \return the care-of nonce index
+   */
   uint16_t GetCareOfNonceIndex () const;
 
   /**
-
-   * \brief Set the Reserved.
-   * \param reserved reserved value
+   * \brief Set care of nonce index.
+   * \param careofnonceind care of nonce index
    */
   void SetCareOfNonceIndex (uint16_t careofnonceind);
 
+  /**
+   * \brief Get  care-of init cookie.
+   * \return care-of init cookie
+   */
   uint64_t GetCareOfInitCookie () const;
 
+  /**
+   * \brief Set care of init cookie.
+   * \param careofinitcookie care of init cookie
+   */
   void SetCareOfInitCookie (uint64_t careofinitcookie);
 
+  /**
+   * \brief Get care of keygen token.
+   * \return care of keygen token
+   */
   uint64_t GetCareOfKeygenToken () const;
-
+  /**
+   * \brief Set care of keygen token.
+   * \param careofkeygentoken care of keygen token
+   */
   void SetCareOfKeygenToken (uint64_t careofkeygentoken);
 
-
+  /**
+   * \brief Print informations.
+   * \param os output stream
+   */
   virtual void Print (std::ostream& os) const;
 
   /**
@@ -897,15 +987,21 @@ public:
 
 private:
   /**
-   * \brief The reserved value.
+   * \brief The care-of nonce index.
    */
   uint16_t m_careofnonceindex;
+  /**
+   * \brief The care-of init cookie.
+   */
   uint16_t m_careofinitcookie;
+  /**
+   * \brief The care-of keygen token.
+   */
   uint16_t m_careofkeygenoken;
 
 };
 
-class Ipv6BindingRefreshRequestHeader : public MIPv6Header
+class Ipv6BindingRefreshRequestHeader : public Mipv6Header
 {
 public:
   /**
@@ -923,31 +1019,33 @@ public:
 
   /**
    * \brief Constructor.
-
    */
   Ipv6BindingRefreshRequestHeader ();
 
   /**
-
    * \brief Destructor.
    */
   virtual ~Ipv6BindingRefreshRequestHeader ();
-
+  /**
+   * \brief get reserved 2 field value.
+   * \return reserved2 field value
+   */
   uint16_t GetReserved2 () const;
 
   /**
-   * \brief Set the Reserved.
-
-   * \param reserved reserved value
+   * \brief Set the Reserved2 field value.
+   * \param reserved2 reserved2 value
    */
   void SetReserved2 (uint16_t reserved2);
 
-
+  /**
+   * \brief Print informations.
+   * \param os output stream
+   */
   virtual void Print (std::ostream& os) const;
 
   /**
    * \brief Get the serialized size.
-
    * \return serialized size
    */
   virtual uint32_t GetSerializedSize () const;
@@ -960,7 +1058,6 @@ public:
 
   /**
    * \brief Deserialize the packet.
-
    * \param start start offset
    * \return length of packet
    */
@@ -974,7 +1071,7 @@ private:
 
 };
 
-class Ipv6BindingErrorHeader : public MIPv6Header
+class Ipv6BindingErrorHeader : public Mipv6Header
 {
 public:
   /**
@@ -999,23 +1096,43 @@ public:
    */
   virtual ~Ipv6BindingErrorHeader ();
 
-
+  /**
+   * \brief Set the status.
+   * \param stat status value
+   */
   void SetStatus (uint8_t stat);
+  /**
+   * \brief Get the status value.
+   * \return the status value
+   */
   uint8_t GetStatus () const;
 
+  /**
+   * \brief Get the reserved2.
+   * \return reserved 2
+   */
   uint8_t GetReserved2 () const;
 
   /**
-   * \brief Set the Reserved.
-
-   * \param reserved reserved value
+   * \brief Set the Reserved2 field value.
+   * \param reserved2 reserved2 value
    */
   void SetReserved2 (uint8_t reserved2);
-
+  /**
+   * \brief Get the home address.
+   * \return home address
+   */
   Ipv6Address GetHomeAddress () const;
+  /**
+   * \brief Set the home address.
+   * \param hoa home address
+   */
   void SetHomeAddress (Ipv6Address hoa);
 
-
+  /**
+   * \brief Print informations.
+   * \param os output stream
+   */
   virtual void Print (std::ostream& os) const;
 
   /**
@@ -1038,12 +1155,17 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start);
 
 private:
+  /**
+   * \brief The status.
+   */
   uint8_t m_status;
-
   /**
    * \brief The reserved value.
    */
   uint16_t m_reserved2;
+  /**
+   * \brief The home address.
+   */
   Ipv6Address m_hoa;
 
 };

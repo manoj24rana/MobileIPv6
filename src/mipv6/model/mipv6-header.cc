@@ -24,25 +24,25 @@
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (MIPv6Header);
+NS_OBJECT_ENSURE_REGISTERED (Mipv6Header);
 
-NS_LOG_COMPONENT_DEFINE ("MIPv6Header");
+NS_LOG_COMPONENT_DEFINE ("Mipv6Header");
 
-TypeId MIPv6Header::GetTypeId ()
+TypeId Mipv6Header::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::MIPv6Header")
+  static TypeId tid = TypeId ("ns3::Mipv6Header")
     .SetParent<Header> ()
-    .AddConstructor<MIPv6Header> ()
+    .AddConstructor<Mipv6Header> ()
   ;
   return tid;
 }
 
-TypeId MIPv6Header::GetInstanceTypeId () const
+TypeId Mipv6Header::GetInstanceTypeId () const
 {
   return GetTypeId ();
 }
 
-MIPv6Header::MIPv6Header ()
+Mipv6Header::Mipv6Header ()
   : m_payload_proto (59),
   m_header_len (0),
   m_mh_type (0),
@@ -51,71 +51,71 @@ MIPv6Header::MIPv6Header ()
 {
 }
 
-MIPv6Header::~MIPv6Header ()
+Mipv6Header::~Mipv6Header ()
 {
 }
 
-uint8_t MIPv6Header::GetPayloadProto () const
+uint8_t Mipv6Header::GetPayloadProto () const
 {
   return m_payload_proto;
 }
 
-void MIPv6Header::SetPayloadProto (uint8_t payload_proto)
+void Mipv6Header::SetPayloadProto (uint8_t payload_proto)
 {
   m_payload_proto = payload_proto;
 }
 
-uint8_t MIPv6Header::GetHeaderLen () const
+uint8_t Mipv6Header::GetHeaderLen () const
 {
   return m_header_len;
 }
 
-void MIPv6Header::SetHeaderLen (uint8_t header_len)
+void Mipv6Header::SetHeaderLen (uint8_t header_len)
 {
   m_header_len = header_len;
 }
 
-uint8_t MIPv6Header::GetMhType () const
+uint8_t Mipv6Header::GetMhType () const
 {
   return m_mh_type;
 }
 
-void MIPv6Header::SetMhType (uint8_t mh_type)
+void Mipv6Header::SetMhType (uint8_t mh_type)
 {
   m_mh_type = mh_type;
 }
 
-uint8_t MIPv6Header::GetReserved () const
+uint8_t Mipv6Header::GetReserved () const
 {
   return m_reserved;
 }
 
-void MIPv6Header::SetReserved (uint8_t reserved)
+void Mipv6Header::SetReserved (uint8_t reserved)
 {
   m_reserved = reserved;
 }
 
-uint16_t MIPv6Header::GetChecksum () const
+uint16_t Mipv6Header::GetChecksum () const
 {
   return m_checksum;
 }
 
-void MIPv6Header::SetChecksum (uint16_t checksum)
+void Mipv6Header::SetChecksum (uint16_t checksum)
 {
   m_checksum = checksum;
 }
 
-void MIPv6Header::Print (std::ostream& os) const
+void Mipv6Header::Print (std::ostream& os) const
 {
   os << "( payload_proto = " << (uint32_t)GetPayloadProto () << " header_len = " << (uint32_t)GetHeaderLen () << " mh_type = " << (uint32_t)GetMhType () << " checksum = " << (uint32_t)GetChecksum () << ")";
 }
 
-uint32_t MIPv6Header::GetSerializedSize () const
+uint32_t Mipv6Header::GetSerializedSize () const
 {
   return 6;
 }
 
-uint32_t MIPv6Header::Deserialize (Buffer::Iterator start)
+uint32_t Mipv6Header::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
 
@@ -128,7 +128,7 @@ uint32_t MIPv6Header::Deserialize (Buffer::Iterator start)
   return GetSerializedSize ();
 }
 
-void MIPv6Header::Serialize (Buffer::Iterator start) const
+void Mipv6Header::Serialize (Buffer::Iterator start) const
 {
   Buffer::Iterator i = start;
 
@@ -140,25 +140,25 @@ void MIPv6Header::Serialize (Buffer::Iterator start) const
 }
 
 
-MIPv6OptionField::MIPv6OptionField (uint32_t optionsOffset)
+Mipv6OptionField::Mipv6OptionField (uint32_t optionsOffset)
   : m_optionData (0),
   m_optionsOffset (optionsOffset)
 {
 }
 
-MIPv6OptionField::~MIPv6OptionField ()
+Mipv6OptionField::~Mipv6OptionField ()
 {
 }
 
-uint32_t MIPv6OptionField::GetSerializedSize () const
+uint32_t Mipv6OptionField::GetSerializedSize () const
 {
-  return m_optionData.GetSize () + CalculatePad ((MIPv6OptionHeader::Alignment) {8,0});
+  return m_optionData.GetSize () + CalculatePad ((Mipv6OptionHeader::Alignment) {8,0});
 }
 
-void MIPv6OptionField::Serialize (Buffer::Iterator start) const
+void Mipv6OptionField::Serialize (Buffer::Iterator start) const
 {
   start.Write (m_optionData.Begin (), m_optionData.End ());
-  uint32_t fill = CalculatePad ((MIPv6OptionHeader::Alignment) {8,0});
+  uint32_t fill = CalculatePad ((Mipv6OptionHeader::Alignment) {8,0});
 
   NS_LOG_LOGIC ("fill with " << fill << " bytes padding");
   switch (fill)
@@ -174,7 +174,7 @@ void MIPv6OptionField::Serialize (Buffer::Iterator start) const
     }
 }
 
-uint32_t MIPv6OptionField::Deserialize (Buffer::Iterator start, uint32_t length)
+uint32_t Mipv6OptionField::Deserialize (Buffer::Iterator start, uint32_t length)
 {
   uint8_t buf[length];
   start.Read (buf, length);
@@ -184,9 +184,9 @@ uint32_t MIPv6OptionField::Deserialize (Buffer::Iterator start, uint32_t length)
   return length;
 }
 
-void MIPv6OptionField::AddOption (MIPv6OptionHeader const& option)
+void Mipv6OptionField::AddOption (Mipv6OptionHeader const& option)
 {
-  NS_LOG_FUNCTION_NOARGS ();
+  NS_LOG_FUNCTION (this << option);
 
   uint32_t pad = CalculatePad (option.GetAlignment ());
 
@@ -209,17 +209,17 @@ void MIPv6OptionField::AddOption (MIPv6OptionHeader const& option)
   option.Serialize (it);
 }
 
-uint32_t MIPv6OptionField::CalculatePad (MIPv6OptionHeader::Alignment alignment) const
+uint32_t Mipv6OptionField::CalculatePad (Mipv6OptionHeader::Alignment alignment) const
 {
   return (alignment.offset - (m_optionData.GetSize () + m_optionsOffset)) % alignment.factor;
 }
 
-uint32_t MIPv6OptionField::GetOptionsOffset ()
+uint32_t Mipv6OptionField::GetOptionsOffset ()
 {
   return m_optionsOffset;
 }
 
-Buffer MIPv6OptionField::GetOptionBuffer ()
+Buffer Mipv6OptionField::GetOptionBuffer ()
 {
   return m_optionData;
 }
@@ -230,7 +230,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityBindingUpdateHeader);
 TypeId Ipv6MobilityBindingUpdateHeader::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityBindingUpdateHeader")
-    .SetParent<MIPv6Header> ()
+    .SetParent<Mipv6Header> ()
     .AddConstructor<Ipv6MobilityBindingUpdateHeader> ()
   ;
   return tid;
@@ -242,7 +242,7 @@ TypeId Ipv6MobilityBindingUpdateHeader::GetInstanceTypeId () const
 }
 
 Ipv6MobilityBindingUpdateHeader::Ipv6MobilityBindingUpdateHeader ()
-  : MIPv6OptionField (12)
+  : Mipv6OptionField (12)
 {
   SetHeaderLen (0);
   SetMhType (IPV6_MOBILITY_BINDING_UPDATE);
@@ -434,7 +434,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6MobilityBindingAckHeader);
 TypeId Ipv6MobilityBindingAckHeader::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6MobilityBindingAckHeader")
-    .SetParent<MIPv6Header> ()
+    .SetParent<Mipv6Header> ()
     .AddConstructor<Ipv6MobilityBindingAckHeader> ()
   ;
   return tid;
@@ -446,7 +446,7 @@ TypeId Ipv6MobilityBindingAckHeader::GetInstanceTypeId () const
 }
 
 Ipv6MobilityBindingAckHeader::Ipv6MobilityBindingAckHeader ()
-  : MIPv6OptionField (12)
+  : Mipv6OptionField (12)
 {
   SetHeaderLen (0);
   SetMhType (IPV6_MOBILITY_BINDING_ACKNOWLEDGEMENT);
@@ -585,7 +585,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6HoTIHeader);
 TypeId Ipv6HoTIHeader::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6HoTIHeader")
-    .SetParent<MIPv6Header> ()
+    .SetParent<Mipv6Header> ()
     .AddConstructor<Ipv6HoTIHeader> ()
   ;
   return tid;
@@ -676,7 +676,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6CoTIHeader);
 TypeId Ipv6CoTIHeader::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6CoTIHeader")
-    .SetParent<MIPv6Header> ()
+    .SetParent<Mipv6Header> ()
     .AddConstructor<Ipv6CoTIHeader> ()
   ;
   return tid;
@@ -766,7 +766,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6HoTHeader);
 TypeId Ipv6HoTHeader::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6HoTHeader")
-    .SetParent<MIPv6Header> ()
+    .SetParent<Mipv6Header> ()
     .AddConstructor<Ipv6HoTHeader> ()
   ;
   return tid;
@@ -869,7 +869,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6CoTHeader);
 TypeId Ipv6CoTHeader::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6CoTHeader")
-    .SetParent<MIPv6Header> ()
+    .SetParent<Mipv6Header> ()
     .AddConstructor<Ipv6CoTHeader> ()
   ;
   return tid;
@@ -974,7 +974,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6BindingErrorHeader);
 TypeId Ipv6BindingErrorHeader::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6BindingErrorHeader")
-    .SetParent<MIPv6Header> ()
+    .SetParent<Mipv6Header> ()
     .AddConstructor<Ipv6BindingErrorHeader> ()
   ;
   return tid;
@@ -1085,7 +1085,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv6BindingRefreshRequestHeader);
 TypeId Ipv6BindingRefreshRequestHeader::GetTypeId ()
 {
   static TypeId tid = TypeId ("ns3::Ipv6BindingRefreshRequestHeader")
-    .SetParent<MIPv6Header> ()
+    .SetParent<Mipv6Header> ()
     .AddConstructor<Ipv6BindingRefreshRequestHeader> ()
   ;
   return tid;

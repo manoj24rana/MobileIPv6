@@ -31,7 +31,7 @@ namespace ns3 {
  * \class Ipv6MobilityOptionHeader
  * \brief Ipv6 Mobility option header.
  */
-class MIPv6OptionHeader : public Header
+class Mipv6OptionHeader : public Header
 {
 public:
   /**
@@ -43,8 +43,8 @@ public:
    */
   struct Alignment
   {
-    uint8_t factor;
-    uint8_t offset;
+    uint8_t factor; /**< Factor */
+    uint8_t offset; /**< Offset */
   };
 
   /**
@@ -62,12 +62,12 @@ public:
   /**
    * \brief Constructor.
    */
-  MIPv6OptionHeader ();
+  Mipv6OptionHeader ();
 
   /**
    * \brief Destructor.
    */
-  virtual ~MIPv6OptionHeader ();
+  virtual ~Mipv6OptionHeader ();
 
   /**
    * \brief Get the type of the option.
@@ -139,142 +139,402 @@ private:
   uint8_t m_len;
 };
 
-class Ipv6MobilityOptionPad1Header : public MIPv6OptionHeader
+/**
+ * \class Ipv6MobilityOptionPad1Header
+ * \brief Ipv6 Mobility option pad1 header.
+ */
+class Ipv6MobilityOptionPad1Header : public Mipv6OptionHeader
 {
 public:
+  /**
+   * \brief Get the type identifier.
+   * \return type identifier
+   */
   static TypeId GetTypeId ();
+  /**
+   * \brief Return the instance type identifier.
+   * \return instance type ID
+   */
   virtual TypeId GetInstanceTypeId () const;
 
+  /**
+   * \brief constructor.
+   */
   Ipv6MobilityOptionPad1Header ();
 
+  /**
+   * \brief destructor.
+   */
   virtual ~Ipv6MobilityOptionPad1Header ();
-
+  /**
+   * \brief Print informations.
+   * \param os output stream
+   */
   virtual void Print (std::ostream& os) const;
+  /**
+   * \brief Get the serialized size.
+   * \return serialized size
+   */
   virtual uint32_t GetSerializedSize () const;
+  /**
+   * \brief Serialize the packet.
+   * \param start start offset
+   */
   virtual void Serialize (Buffer::Iterator start) const;
+  /**
+   * \brief Deserialize the packet.
+   * \param start start offset
+   * \return length of packet
+   */
   virtual uint32_t Deserialize (Buffer::Iterator start);
 
 protected:
 private:
 };
 
-class Ipv6MobilityOptionPadnHeader : public MIPv6OptionHeader
+/**
+ * \class Ipv6MobilityOptionPadnHeader
+ * \brief Ipv6 Mobility option padn header.
+ */
+class Ipv6MobilityOptionPadnHeader : public Mipv6OptionHeader
 {
 public:
+  /**
+   * \brief Get the type identifier.
+   * \return type identifier
+   */
   static TypeId GetTypeId ();
+  /**
+   * \brief Return the instance type identifier.
+   * \return instance type ID
+   */
   virtual TypeId GetInstanceTypeId () const;
-
+  /**
+   * \brief constructor.
+   * \param length length
+   */
   Ipv6MobilityOptionPadnHeader ( uint8_t length = 2 );
-
+  /**
+   * \brief destructor.
+   */
   virtual ~Ipv6MobilityOptionPadnHeader ();
-
+  /**
+   * \brief Print informations.
+   * \param os output stream
+   */
   virtual void Print (std::ostream& os) const;
+  /**
+   * \brief Get the serialized size.
+   * \return serialized size
+   */
   virtual uint32_t GetSerializedSize () const;
+  /**
+   * \brief Serialize the packet.
+   * \param start start offset
+   */
   virtual void Serialize (Buffer::Iterator start) const;
+  /**
+   * \brief Deserialize the packet.
+   * \param start start offset
+   * \return length of packet
+   */
   virtual uint32_t Deserialize (Buffer::Iterator start);
 
 protected:
 private:
 };
 
-class Ipv6MobilityOptionBindingRefreshAdviceHeader : public MIPv6OptionHeader
+/**
+ * \class Ipv6MobilityOptionBindingRefreshAdviceHeader
+ * \brief Ipv6Mobility Option Binding Refresh Advice Header.
+ */
+class Ipv6MobilityOptionBindingRefreshAdviceHeader : public Mipv6OptionHeader
 {
 public:
+  /**
+   * \brief Get the type identifier.
+   * \return type identifier
+   */
   static TypeId GetTypeId ();
+  /**
+   * \brief Return the instance type identifier.
+   * \return instance type ID
+   */
   virtual TypeId GetInstanceTypeId () const;
-
+  /**
+   * \brief constructor
+   */
   Ipv6MobilityOptionBindingRefreshAdviceHeader ();
-
+  /**
+   * \brief destructor
+   */
   virtual ~Ipv6MobilityOptionBindingRefreshAdviceHeader ();
 
-
+  /**
+   * \brief get refresh interval.
+   * \return refresh interval
+   */
   uint16_t GetRefreshInterval () const;
+  /**
+   * \brief set refresh interval.
+   * \param intvl refresh interval
+   */
   void SetRefreshInterval (uint16_t intvl);
-
+  /**
+   * \brief Print informations.
+   * \param os output stream
+   */
   virtual void Print (std::ostream& os) const;
+  /**
+   * \brief Get the serialized size.
+   * \return serialized size
+   */
   virtual uint32_t GetSerializedSize () const;
+  /**
+   * \brief Serialize the packet.
+   * \param start start offset
+   */
   virtual void Serialize (Buffer::Iterator start) const;
+  /**
+   * \brief Deserialize the packet.
+   * \param start start offset
+   * \return length of packet
+   */
   virtual uint32_t Deserialize (Buffer::Iterator start);
+  /**
+   * \brief Get the Alignment requirement of this option header
+   * \return the required alignment
+   */
   virtual Alignment GetAlignment () const;
 protected:
 private:
+  /**
+   * \brief refresh interval
+   */
   uint16_t m_refreshinterval;
 };
 
-class Ipv6MobilityOptionAlternateCareofAddressHeader : public MIPv6OptionHeader
+/**
+ * \class Ipv6MobilityOptionAlternateCareofAddressHeader
+ * \brief Ipv6 Mobility Option Alternate CareofAddress Header.
+ */
+class Ipv6MobilityOptionAlternateCareofAddressHeader : public Mipv6OptionHeader
 {
 public:
+  /**
+   * \brief Get the type identifier.
+   * \return type identifier
+   */
   static TypeId GetTypeId ();
+  /**
+   * \brief Return the instance type identifier.
+   * \return instance type ID
+   */
   virtual TypeId GetInstanceTypeId () const;
-
+  /**
+   * \brief constructor
+   */
   Ipv6MobilityOptionAlternateCareofAddressHeader ();
-
+  /**
+   * \brief destructor
+   */
   virtual ~Ipv6MobilityOptionAlternateCareofAddressHeader ();
 
 
-
+  /**
+   * \brief get alternate CoA.
+   * \return alternate CoA
+   */
   Ipv6Address GetAlternateCareofAddress () const;
+  /**
+   * \brief set alternate CoA.
+   * \param coa alternate CoA
+   */
   void SetAlternateCareofAddress (Ipv6Address coa);
-
+  /**
+   * \brief Print informations.
+   * \param os output stream
+   */
   virtual void Print (std::ostream& os) const;
+  /**
+   * \brief Get the serialized size.
+   * \return serialized size
+   */
   virtual uint32_t GetSerializedSize () const;
+  /**
+   * \brief Serialize the packet.
+   * \param start start offset
+   */
   virtual void Serialize (Buffer::Iterator start) const;
+  /**
+   * \brief Deserialize the packet.
+   * \param start start offset
+   * \return length of packet
+   */
   virtual uint32_t Deserialize (Buffer::Iterator start);
+  /**
+   * \brief Get the Alignment requirement of this option header
+   * \return the required alignment
+   */
   virtual Alignment GetAlignment () const;
 
 protected:
 private:
+  /**
+   * \brief the alternate CoA
+   */
   Ipv6Address m_coa;
 };
-
-class Ipv6MobilityOptionNonceIndicesHeader : public MIPv6OptionHeader
+/**
+ * \class Ipv6MobilityOptionNonceIndicesHeader
+ * \brief Ipv6 Mobility Option Nonce Indices Header.
+ */
+class Ipv6MobilityOptionNonceIndicesHeader : public Mipv6OptionHeader
 {
 public:
+  /**
+   * \brief Get the type identifier.
+   * \return type identifier
+   */
   static TypeId GetTypeId ();
+  /**
+   * \brief Return the instance type identifier.
+   * \return instance type ID
+   */
   virtual TypeId GetInstanceTypeId () const;
-
+  /**
+   * \brief constructor
+   */
   Ipv6MobilityOptionNonceIndicesHeader ();
-
+  /**
+   * \brief destructor
+   */
   virtual ~Ipv6MobilityOptionNonceIndicesHeader ();
-
+  /**
+   * \brief get home nonce index
+   * \return home nonce index
+   */
   uint16_t GetHomeNonceIndex () const;
+  /**
+   * \brief set home nonce index
+   * \param hi home nonce index
+   */
   void SetHomeNonceIndex (uint16_t hi);
-
+  /**
+   * \brief get care-of nonce index
+   * \return care-of nonce index
+   */
   uint16_t GetCareOfNonceIndex () const;
+  /**
+   * \brief set care-of nonce index
+   * \param coi care-of nonce index
+   */
   void SetCareOfNonceIndex (uint16_t coi);
-
+  /**
+   * \brief Print informations.
+   * \param os output stream
+   */
   virtual void Print (std::ostream& os) const;
+  /**
+   * \brief Get the serialized size.
+   * \return serialized size
+   */
   virtual uint32_t GetSerializedSize () const;
+  /**
+   * \brief Serialize the packet.
+   * \param start start offset
+   */
   virtual void Serialize (Buffer::Iterator start) const;
+  /**
+   * \brief Deserialize the packet.
+   * \param start start offset
+   * \return length of packet
+   */
   virtual uint32_t Deserialize (Buffer::Iterator start);
+  /**
+   * \brief Get the Alignment requirement of this option header
+   * \return the required alignment
+   */
   virtual Alignment GetAlignment () const;
 protected:
 private:
+  /**
+   * \brief home nonce index
+   */
   uint16_t m_homenonceindex;
+  /**
+   * \brief care-of nonce index
+   */
   uint16_t m_careofnonceindex;
 
 };
-
-class Ipv6MobilityOptionBindingAuthorizationDataHeader : public MIPv6OptionHeader
+/**
+ * \class Ipv6MobilityOptionBindingAuthorizationDataHeader
+ * \brief Ipv6 Mobility Option Binding Authorization Data Header.
+ */
+class Ipv6MobilityOptionBindingAuthorizationDataHeader : public Mipv6OptionHeader
 {
 public:
+  /**
+   * \brief Get the type identifier.
+   * \return type identifier
+   */
   static TypeId GetTypeId ();
+  /**
+   * \brief Return the instance type identifier.
+   * \return instance type ID
+   */
   virtual TypeId GetInstanceTypeId () const;
-
+  /**
+   * \brief constructor
+   */
   Ipv6MobilityOptionBindingAuthorizationDataHeader ();
-
+  /**
+   * \brief destructor
+   */
   virtual ~Ipv6MobilityOptionBindingAuthorizationDataHeader ();
   //Taking 64 bit authenticator instead of 96 bits
+  /**
+   * \brief get authenticator
+   * \return authenticator
+   */
   uint64_t GetAuthenticator () const;
+  /**
+   * \brief set authenticator
+   * \param auth authenticator
+   */
   void SetAuthenticator (uint64_t auth);
-
+  /**
+   * \brief Print informations.
+   * \param os output stream
+   */
   virtual void Print (std::ostream& os) const;
+  /**
+   * \brief Get the serialized size.
+   * \return serialized size
+   */
   virtual uint32_t GetSerializedSize () const;
+  /**
+   * \brief Serialize the packet.
+   * \param start start offset
+   */
   virtual void Serialize (Buffer::Iterator start) const;
+  /**
+   * \brief Deserialize the packet.
+   * \param start start offset
+   * \return length of packet
+   */
   virtual uint32_t Deserialize (Buffer::Iterator start);
+  /**
+   * \brief Get the Alignment requirement of this option header
+   * \return the required alignment
+   */
   virtual Alignment GetAlignment () const;
 protected:
 private:
+  /**
+   * \brief the authenticator
+   */
   uint64_t m_auth;
 };
 

@@ -26,30 +26,30 @@
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (MIPv6Demux);
+NS_OBJECT_ENSURE_REGISTERED (Mipv6Demux);
 
-TypeId MIPv6Demux::GetTypeId ()
+TypeId Mipv6Demux::GetTypeId ()
 {
-  static TypeId tid = TypeId ("ns3::MIPv6Demux")
+  static TypeId tid = TypeId ("ns3::Mipv6Demux")
     .SetParent<Object> ()
-    .AddConstructor<MIPv6Demux> ()
+    .AddConstructor<Mipv6Demux> ()
     .AddAttribute ("Mobilities", "The set of IPv6 Mobilities registered with this demux.",
                    ObjectVectorValue (),
-                   MakeObjectVectorAccessor (&MIPv6Demux::m_mobilities),
-                   MakeObjectVectorChecker<MIPv6Mobility> ())
+                   MakeObjectVectorAccessor (&Mipv6Demux::m_mobilities),
+                   MakeObjectVectorChecker<Mipv6Mobility> ())
   ;
   return tid;
 }
 
-MIPv6Demux::MIPv6Demux ()
+Mipv6Demux::Mipv6Demux ()
 {
 }
 
-MIPv6Demux::~MIPv6Demux ()
+Mipv6Demux::~Mipv6Demux ()
 {
 }
 
-void MIPv6Demux::DoDispose ()
+void Mipv6Demux::DoDispose ()
 {
   for (Ipv6MobilityList_t::iterator it = m_mobilities.begin (); it != m_mobilities.end (); it++)
     {
@@ -61,17 +61,17 @@ void MIPv6Demux::DoDispose ()
   Object::DoDispose ();
 }
 
-void MIPv6Demux::SetNode (Ptr<Node> node)
+void Mipv6Demux::SetNode (Ptr<Node> node)
 {
   m_node = node;
 }
 
-void MIPv6Demux::Insert (Ptr<MIPv6Mobility> mobility)
+void Mipv6Demux::Insert (Ptr<Mipv6Mobility> mobility)
 {
   m_mobilities.push_back (mobility);
 }
 
-Ptr<MIPv6Mobility> MIPv6Demux::GetMobility (int mobilityNumber)
+Ptr<Mipv6Mobility> Mipv6Demux::GetMobility (int mobilityNumber)
 {
   for (Ipv6MobilityList_t::iterator i = m_mobilities.begin (); i != m_mobilities.end (); ++i)
     {
@@ -83,7 +83,7 @@ Ptr<MIPv6Mobility> MIPv6Demux::GetMobility (int mobilityNumber)
   return 0;
 }
 
-void MIPv6Demux::Remove (Ptr<MIPv6Mobility> mobility)
+void Mipv6Demux::Remove (Ptr<Mipv6Mobility> mobility)
 {
   m_mobilities.remove (mobility);
 }
