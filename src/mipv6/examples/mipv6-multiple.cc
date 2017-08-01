@@ -63,11 +63,11 @@ NodeContainer backbone2;
 CommandLine cmd;
 cmd.Parse (argc, argv);
 
-  ars.Create(2);
-  ha.Create(1);
-  sta.Create(4);
-  cn.Create(1);
-  mid.Create(1);
+ars.Create (2);
+ha.Create (1);
+sta.Create (4);
+cn.Create (1);
+mid.Create (1);
 
 
 
@@ -102,39 +102,39 @@ internet.Install (cn);
 internet.Install (sta);
 
 
-backbone1.Add(mid.Get(0));
-backbone1.Add(ars.Get(0));
-backbone1.Add(ars.Get(1));
+backbone1.Add(mid.Get (0));
+backbone1.Add(ars.Get (0));
+backbone1.Add(ars.Get (1));
 
-backbone2.Add(cn.Get(0));
-backbone2.Add(mid.Get(0));
-backbone2.Add(ha.Get(0));
+backbone2.Add(cn.Get (0));
+backbone2.Add(mid.Get (0));
+backbone2.Add(ha.Get (0));
 
 CsmaHelper csma;
 Ipv6AddressHelper ipv6;
 Ipv6InterfaceContainer iifc;
 
-csma.SetChannelAttribute ("DataRate", DataRateValue (DataRate("100Mbps")));
+csma.SetChannelAttribute ("DataRate", DataRateValue (DataRate ("100Mbps")));
 csma.SetChannelAttribute ("Delay", TimeValue (MilliSeconds(1)));
 csma.SetDeviceAttribute ("Mtu", UintegerValue (1400));
-backbone1Devs = csma.Install(backbone1);
-backbone2Devs = csma.Install(backbone2);
+backbone1Devs = csma.Install (backbone1);
+backbone2Devs = csma.Install (backbone2);
 
 
 ipv6.SetBase (Ipv6Address ("2001:db80::"), Ipv6Prefix (64));
 iifc = ipv6.Assign (backbone1Devs);
-backbone1Ifs.Add(iifc);
+backbone1Ifs.Add (iifc);
 ipv6.SetBase (Ipv6Address ("5001:db80::"), Ipv6Prefix (64));
 iifc = ipv6.Assign (backbone2Devs);
-backbone2Ifs.Add(iifc);
+backbone2Ifs.Add (iifc);
 
 
-backbone1Ifs.SetForwarding(0,true);
-backbone1Ifs.SetForwarding(1,true);
-backbone1Ifs.SetForwarding(2,true);
-backbone2Ifs.SetForwarding(0,true);
-backbone2Ifs.SetForwarding(1,true);
-backbone2Ifs.SetForwarding(2,true);
+backbone1Ifs.SetForwarding (0,true);
+backbone1Ifs.SetForwarding (1,true);
+backbone1Ifs.SetForwarding (2,true);
+backbone2Ifs.SetForwarding (0,true);
+backbone2Ifs.SetForwarding (1,true);
+backbone2Ifs.SetForwarding (2,true);
 backbone1Ifs.SetDefaultRouteInAllNodes (0);
 backbone1Ifs.SetDefaultRouteInAllNodes (1);
 backbone1Ifs.SetDefaultRouteInAllNodes (2);
@@ -181,8 +181,8 @@ wifiMac.SetType ("ns3::ApWifiMac",
 		           "BeaconGeneration", BooleanValue (true),
 		           "BeaconInterval", TimeValue (MilliSeconds(100)));
 
-ar1Devs = wifi.Install (wifiPhy, wifiMac, ars.Get(0));
-ar2Devs = wifi.Install (wifiPhy, wifiMac, ars.Get(1));
+ar1Devs = wifi.Install (wifiPhy, wifiMac, ars.Get (0));
+ar2Devs = wifi.Install (wifiPhy, wifiMac, ars.Get (1));
 Ipv6AddressHelper ipv62;
 
 ipv62.SetBase (Ipv6Address ("8888:56ac::"), Ipv6Prefix (64));
@@ -209,14 +209,14 @@ mobility.SetPositionAllocator (positionAlloc);
 mobility.SetMobilityModel ("ns3::ConstantVelocityMobilityModel");  
 mobility.Install(sta);
 
-Ptr<ConstantVelocityMobilityModel> cvm = sta.Get(0)->GetObject<ConstantVelocityMobilityModel>();
+Ptr<ConstantVelocityMobilityModel> cvm = sta.Get(0)->GetObject<ConstantVelocityMobilityModel> ();
 cvm->SetVelocity(Vector (3, 0, 0)); //move left to right
 cvm = sta.Get(1)->GetObject<ConstantVelocityMobilityModel>();
 cvm->SetVelocity(Vector (3, 0, 0)); //move left to right
 
-cvm = sta.Get(2)->GetObject<ConstantVelocityMobilityModel>();
+cvm = sta.Get(2)->GetObject<ConstantVelocityMobilityModel> ();
 cvm->SetVelocity(Vector (-3, 0, 0)); //move right to left
-cvm = sta.Get(3)->GetObject<ConstantVelocityMobilityModel>();
+cvm = sta.Get(3)->GetObject<ConstantVelocityMobilityModel> ();
 cvm->SetVelocity(Vector (-3, 0, 0)); //move right to left
 
 wifiMac.SetType ("ns3::StaWifiMac",
@@ -237,11 +237,11 @@ Ptr<Radvd> radvd=CreateObject<Radvd> ();
 Ptr<RadvdInterface> routerInterface= Create<RadvdInterface> (indexRouter, 1500, 50);
 Ptr<RadvdPrefix> routerPrefix = Create<RadvdPrefix> (prefix, 64, 1.5, 2.0);
 
-routerInterface->AddPrefix(routerPrefix);
+routerInterface->AddPrefix (routerPrefix);
 
-radvd->AddConfiguration(routerInterface);
+radvd->AddConfiguration (routerInterface);
 
-ars.Get(0)->AddApplication(radvd);
+ars.Get(0)->AddApplication (radvd);
 radvd->SetStartTime(Seconds (1.0));
 radvd->SetStopTime(Seconds (100.0));
 
@@ -256,110 +256,110 @@ Ptr<Radvd> radvd2=CreateObject<Radvd> ();
 Ptr<RadvdInterface> routerInterface2 = Create<RadvdInterface> (indexRouter2, 1500, 50);
 Ptr<RadvdPrefix> routerPrefix2 = Create<RadvdPrefix> (prefix2, 64, 1.5, 2.0);
 
-routerInterface2->AddPrefix(routerPrefix2);
+routerInterface2->AddPrefix (routerPrefix2);
 
-radvd2->AddConfiguration(routerInterface2);
+radvd2->AddConfiguration (routerInterface2);
 
-ars.Get(1)->AddApplication(radvd2);
+ars.Get(1)->AddApplication (radvd2);
 radvd2->SetStartTime(Seconds (4.1));
 radvd2->SetStopTime(Seconds (100.0));
 
 
 Ipv6StaticRoutingHelper routingHelper;
 Ptr<Ipv6> ipv692 = mid.Get(0)->GetObject<Ipv6> ();
-Ptr<Ipv6StaticRouting> rttop = routingHelper.GetStaticRouting(ipv692);
-rttop->AddNetworkRouteTo(Ipv6Address("8888:56ac::"),Ipv6Prefix(64),Ipv6Address("2001:db80::200:ff:fe00:2"),1,0);
-rttop->AddNetworkRouteTo(Ipv6Address("9999:db80::"),Ipv6Prefix(64),Ipv6Address("2001:db80::200:ff:fe00:3"),1,0);
-ipv692 = ars.Get(0)->GetObject<Ipv6> ();
-rttop = routingHelper.GetStaticRouting(ipv692);
-rttop->AddNetworkRouteTo(Ipv6Address("5001:db80::"),Ipv6Prefix(64),Ipv6Address("2001:db80::200:ff:fe00:1"),1,0);
-ipv692 = ars.Get(1)->GetObject<Ipv6> ();
-rttop = routingHelper.GetStaticRouting(ipv692);
-rttop->AddNetworkRouteTo(Ipv6Address("5001:db80::"),Ipv6Prefix(64),Ipv6Address("2001:db80::200:ff:fe00:1"),1,0);
+Ptr<Ipv6StaticRouting> rttop = routingHelper.GetStaticRouting (ipv692);
+rttop->AddNetworkRouteTo(Ipv6Address ("8888:56ac::"), Ipv6Prefix (64), Ipv6Address ("2001:db80::200:ff:fe00:2"), 1, 0);
+rttop->AddNetworkRouteTo(Ipv6Address ("9999:db80::"), Ipv6Prefix (64), Ipv6Address ("2001:db80::200:ff:fe00:3"), 1, 0);
+ipv692 = ars.Get (0)->GetObject<Ipv6> ();
+rttop = routingHelper.GetStaticRouting (ipv692);
+rttop->AddNetworkRouteTo(Ipv6Address ("5001:db80::"), Ipv6Prefix (64), Ipv6Address("2001:db80::200:ff:fe00:1"), 1, 0);
+ipv692 = ars.Get (1)->GetObject<Ipv6> ();
+rttop = routingHelper.GetStaticRouting (ipv692);
+rttop->AddNetworkRouteTo (Ipv6Address ("5001:db80::"), Ipv6Prefix (64), Ipv6Address ("2001:db80::200:ff:fe00:1"), 1, 0);
 
 
-mipv6HAHelper hahelper;
-hahelper.Install(ha.Get(0));
-mipv6MNHelper mnhelper(hahelper.GetHomeAgentAddressList(),false); 
-mnhelper.Install(sta.Get(0));
-mnhelper.Install(sta.Get(1));
+Mipv6HaHelper hahelper;
+hahelper.Install (ha.Get (0));
+Mipv6MnHelper mnhelper (hahelper.GetHomeAgentAddressList(),false); 
+mnhelper.Install (sta.Get(0));
+mnhelper.Install (sta.Get(1));
 
-mnhelper.Install(sta.Get(2));
-mnhelper.Install(sta.Get(3));
+mnhelper.Install (sta.Get(2));
+mnhelper.Install (sta.Get(3));
 
-LogComponentEnable("mipv6MN", LOG_LEVEL_ALL);
-LogComponentEnable("mipv6HA", LOG_LEVEL_ALL);
+LogComponentEnable ("Mipv6Mn", LOG_LEVEL_ALL);
+LogComponentEnable ("Mipv6Ha", LOG_LEVEL_ALL);
 
 UdpEchoServerHelper echoServer1 (9);
 UdpEchoServerHelper echoServer2 (10);
 
-  ApplicationContainer serverApps1 = echoServer1.Install (sta.Get (0));
-  ApplicationContainer serverApps2 = echoServer2.Install (sta.Get (1));
-  ApplicationContainer serverApps3 = echoServer1.Install (sta.Get (2));
-  ApplicationContainer serverApps4 = echoServer2.Install (sta.Get (3));
+ApplicationContainer serverApps1 = echoServer1.Install (sta.Get (0));
+ApplicationContainer serverApps2 = echoServer2.Install (sta.Get (1));
+ApplicationContainer serverApps3 = echoServer1.Install (sta.Get (2));
+ApplicationContainer serverApps4 = echoServer2.Install (sta.Get (3));
 
-  serverApps1.Start (Seconds (4.0));
-  serverApps1.Stop (Seconds (700.0));
+serverApps1.Start (Seconds (4.0));
+serverApps1.Stop (Seconds (700.0));
 
-  serverApps2.Start (Seconds (5.0));
-  serverApps2.Stop (Seconds (700.0));
+serverApps2.Start (Seconds (5.0));
+serverApps2.Stop (Seconds (700.0));
 
-  serverApps3.Start (Seconds (5.0));
-  serverApps3.Stop (Seconds (700.0));
+serverApps3.Start (Seconds (5.0));
+serverApps3.Stop (Seconds (700.0));
 
-  serverApps4.Start (Seconds (5.0));
-  serverApps4.Stop (Seconds (700.0));
-
-
-
-
-  UdpEchoClientHelper echoClient1 (Ipv6Address("5001:db80::200:ff:fe00:9"), 9);
-  UdpEchoClientHelper echoClient2 (Ipv6Address("5001:db80::200:ff:fe00:a"), 10);
-  UdpEchoClientHelper echoClient3 (Ipv6Address("5001:db80::200:ff:fe00:b"), 11);
-  UdpEchoClientHelper echoClient4 (Ipv6Address("5001:db80::200:ff:fe00:c"), 12);
-
-  echoClient1.SetAttribute ("MaxPackets", UintegerValue (1000));
-  echoClient1.SetAttribute ("Interval", TimeValue (Seconds (0.1)));
-  echoClient1.SetAttribute ("PacketSize", UintegerValue (1024));
-
-  echoClient2.SetAttribute ("MaxPackets", UintegerValue (1000));
-  echoClient2.SetAttribute ("Interval", TimeValue (Seconds (0.1)));
-  echoClient2.SetAttribute ("PacketSize", UintegerValue (1024));
-
-  echoClient3.SetAttribute ("MaxPackets", UintegerValue (1000));
-  echoClient3.SetAttribute ("Interval", TimeValue (Seconds (0.1)));
-  echoClient3.SetAttribute ("PacketSize", UintegerValue (1024));
-
-  echoClient4.SetAttribute ("MaxPackets", UintegerValue (1000));
-  echoClient4.SetAttribute ("Interval", TimeValue (Seconds (0.1)));
-  echoClient4.SetAttribute ("PacketSize", UintegerValue (1024));
-
-
-  ApplicationContainer clientApps1 = echoClient1.Install (cn.Get (0));
-  ApplicationContainer clientApps2 = echoClient2.Install (cn.Get (0));
-  ApplicationContainer clientApps3 = echoClient3.Install (cn.Get (0));
-  ApplicationContainer clientApps4 = echoClient4.Install (cn.Get (0));
-
-  clientApps1.Start (Seconds (4.1));
-  clientApps1.Stop (Seconds (700.0));  
-
-  clientApps2.Start (Seconds (5.1));
-  clientApps2.Stop (Seconds (700.0));
-
-  clientApps3.Start (Seconds (6.1));
-  clientApps3.Stop (Seconds (700.0));
-
-  clientApps4.Start (Seconds (7.1));
-  clientApps4.Stop (Seconds (700.0));
-
-  LogComponentEnable("UdpEchoClientApplication", LOG_LEVEL_ALL);
-  LogComponentEnable("UdpEchoServerApplication", LOG_LEVEL_ALL);
+serverApps4.Start (Seconds (5.0));
+serverApps4.Stop (Seconds (700.0));
 
 
 
-  Simulator::Stop (Seconds (100.5));
-  Simulator::Run ();
-  Simulator::Destroy ();
 
-  return 0;
+UdpEchoClientHelper echoClient1 (Ipv6Address ("5001:db80::200:ff:fe00:9"), 9);
+UdpEchoClientHelper echoClient2 (Ipv6Address ("5001:db80::200:ff:fe00:a"), 10);
+UdpEchoClientHelper echoClient3 (Ipv6Address ("5001:db80::200:ff:fe00:b"), 11);
+UdpEchoClientHelper echoClient4 (Ipv6Address ("5001:db80::200:ff:fe00:c"), 12);
+
+echoClient1.SetAttribute ("MaxPackets", UintegerValue (1000));
+echoClient1.SetAttribute ("Interval", TimeValue (Seconds (0.1)));
+echoClient1.SetAttribute ("PacketSize", UintegerValue (1024));
+
+echoClient2.SetAttribute ("MaxPackets", UintegerValue (1000));
+echoClient2.SetAttribute ("Interval", TimeValue (Seconds (0.1)));
+echoClient2.SetAttribute ("PacketSize", UintegerValue (1024));
+
+echoClient3.SetAttribute ("MaxPackets", UintegerValue (1000));
+echoClient3.SetAttribute ("Interval", TimeValue (Seconds (0.1)));
+echoClient3.SetAttribute ("PacketSize", UintegerValue (1024));
+
+echoClient4.SetAttribute ("MaxPackets", UintegerValue (1000));
+echoClient4.SetAttribute ("Interval", TimeValue (Seconds (0.1)));
+echoClient4.SetAttribute ("PacketSize", UintegerValue (1024));
+
+
+ApplicationContainer clientApps1 = echoClient1.Install (cn.Get (0));
+ApplicationContainer clientApps2 = echoClient2.Install (cn.Get (0));
+ApplicationContainer clientApps3 = echoClient3.Install (cn.Get (0));
+ApplicationContainer clientApps4 = echoClient4.Install (cn.Get (0));
+
+clientApps1.Start (Seconds (4.1));
+clientApps1.Stop (Seconds (700.0));  
+
+clientApps2.Start (Seconds (5.1));
+clientApps2.Stop (Seconds (700.0));
+
+clientApps3.Start (Seconds (6.1));
+clientApps3.Stop (Seconds (700.0));
+
+clientApps4.Start (Seconds (7.1));
+clientApps4.Stop (Seconds (700.0));
+
+LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_ALL);
+LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_ALL);
+
+
+
+Simulator::Stop (Seconds (100.5));
+Simulator::Run ();
+Simulator::Destroy ();
+
+return 0;
 }
