@@ -29,8 +29,8 @@ def build(bld):
 
     module_test = bld.create_ns3_module_test_library('mipv6')
     module_test.source = [
-        'test/mipv6-test-suite.cc',
-        'test/handoff-test.cc',
+        'test/mip-test.cc',
+        'test/mip-handoff-test.cc',
         ]
 
     headers = bld(features='ns3header')
