@@ -115,7 +115,7 @@ main (int argc, char *argv[])
  for (NetDeviceContainer::Iterator it = ueLteDevs.Begin (); it != ueLteDevs.End (); ++it)
    (*it)->SetAddress (Mac48Address::Allocate ());
 
-  ueIpIface = epcHelper->AssignUeIpv6Address (NetDeviceContainer (ueLteDevs));
+  ueIpIface = epcHelper->AssignUePgwIpv6Address (NetDeviceContainer (ueLteDevs));
   // Assign IP address to UEs, and install applications
   for (uint32_t u = 0; u < ueNodes.GetN (); ++u)
     {

@@ -86,7 +86,7 @@ main (int argc, char *argv[])
 
   Ipv6StaticRoutingHelper ipv6RoutingHelper;
   Ptr<Ipv6StaticRouting> remoteHostStaticRouting = ipv6RoutingHelper.GetStaticRouting (remoteHost->GetObject<Ipv6> ());
-  remoteHostStaticRouting->AddNetworkRouteTo (Ipv6Address("7777:db80::"),Ipv6Prefix(64),Ipv6Address("6001:db80::200:ff:fe00:3"),1,0);
+  remoteHostStaticRouting->AddNetworkRouteTo (Ipv6Address("7777:db80::"),Ipv6Prefix(56),Ipv6Address("6001:db80::200:ff:fe00:3"),1,0);
 
   NodeContainer ueNodes;
   NodeContainer enbNodes;
@@ -117,7 +117,7 @@ main (int argc, char *argv[])
  for (NetDeviceContainer::Iterator it = ueLteDevs.Begin (); it != ueLteDevs.End (); ++it)
    (*it)->SetAddress (Mac48Address::Allocate ());
 
-  ueIpIface = epcHelper->AssignUeIpv6Address (NetDeviceContainer (ueLteDevs));
+  ueIpIface = epcHelper->AssignUePgwIpv6Address (NetDeviceContainer (ueLteDevs));
   // Assign IP address to UEs, and install applications
   for (uint32_t u = 0; u < ueNodes.GetN (); ++u)
     {
@@ -126,6 +126,8 @@ main (int argc, char *argv[])
       Ptr<Ipv6StaticRouting> ueStaticRouting = ipv6RoutingHelper.GetStaticRouting (ueNode->GetObject<Ipv6> ());
       ueStaticRouting->SetDefaultRoute (epcHelper->GetUeDefaultGatewayAddress6 (), 0);
     }
+
+std::cout<<"\n\nGW Address:\n"<<epcHelper->GetUeDefaultGatewayAddress6 ()<<"\n\n";
 
   // Attach one UE per eNodeB
   for (uint16_t i = 0; i < numberOfNodes; i++)
