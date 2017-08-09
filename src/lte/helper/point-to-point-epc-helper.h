@@ -78,7 +78,7 @@ public:
   virtual uint8_t ActivateEpsBearer (Ptr<NetDevice> ueLteDevice, uint64_t imsi, Ptr<EpcTft> tft, EpsBearer bearer);
   virtual Ptr<Node> GetPgwNode ();
   virtual Ipv4InterfaceContainer AssignUeIpv4Address (NetDeviceContainer ueDevices);
-  Ipv6InterfaceContainer AssignUeIpv6Address (NetDeviceContainer ueDevices);
+  Ipv6InterfaceContainer AssignUePgwIpv6Address (NetDeviceContainer ueDevices);
   virtual Ipv4Address GetUeDefaultGatewayAddress ();
   Ipv6Address GetUeDefaultGatewayAddress6 ();
 
@@ -89,7 +89,6 @@ private:
    * helper to assign IPv4 addresses to UE devices as well as to the TUN device of the SGW/PGW
    */
   Ipv4AddressHelper m_ueAddressHelper;
-
   /** 
    * helper to assign IPv6 addresses to UE devices as well as to the TUN device of the SGW/PGW
    */
@@ -109,11 +108,6 @@ private:
    * TUN device implementing tunneling of user data over GTP-U/UDP/IP
    */
   Ptr<VirtualNetDevice> m_tunDevice;
-
-  /**
-   * TUN device containing IPv6 address and implementing tunneling of user data over GTP-U/UDP/IP
-   */
-  Ptr<VirtualNetDevice> m_tunDevice6;
 
   /**
    * MME network element
@@ -177,6 +171,20 @@ private:
    * because of some big X2 messages, you need a big MTU.
    */
   uint16_t m_x2LinkMtu;
+
+  /**
+   * Assign last 8 bit of the 64 bit prefix, used by UE and PGW.
+   * It is incremented by 1 while IPv6 address helper going to assign
+   * an IPv6 address to an UE. Thus, UE and PGW 64 bit prefix remains
+   * always unique 
+   */
+  uint8_t m_ipv6addressincrementor;
+
+  /**
+   * The common 56 bit prefix used for the IPv6 address assignment of
+   * the UE and PGW 
+   */
+  Ipv6Address m_baseipv6prefix;
 
 };
 

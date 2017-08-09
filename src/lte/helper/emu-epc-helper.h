@@ -81,7 +81,7 @@ public:
   virtual uint8_t ActivateEpsBearer (Ptr<NetDevice> ueLteDevice, uint64_t imsi, Ptr<EpcTft> tft, EpsBearer bearer);
   virtual Ptr<Node> GetPgwNode ();
   virtual Ipv4InterfaceContainer AssignUeIpv4Address (NetDeviceContainer ueDevices);
-  Ipv6InterfaceContainer AssignUeIpv6Address (NetDeviceContainer ueDevices);
+  Ipv6InterfaceContainer AssignUePgwIpv6Address (NetDeviceContainer ueDevices);
   virtual Ipv4Address GetUeDefaultGatewayAddress ();
   Ipv6Address GetUeDefaultGatewayAddress6 ();
 
@@ -113,11 +113,6 @@ private:
    * TUN device containg IPv4 address and implementing tunneling of user data over GTP-U/UDP/IP
    */
   Ptr<VirtualNetDevice> m_tunDevice;
-
-  /**
-   * TUN device containing IPv6 address and implementing tunneling of user data over GTP-U/UDP/IP
-   */
-  Ptr<VirtualNetDevice> m_tunDevice6;
 
   /**
    * MME network element
@@ -164,6 +159,20 @@ private:
    * First 5 bytes of the Enb MAC address base
    */
   std::string m_enbMacAddressBase;
+  
+  /**
+   * Assign last 8 bit of the 64 bit prefix, used by UE and PGW.
+   * It is incremented by 1 while IPv6 address helper going to assign
+   * an IPv6 address to an UE. Thus, UE and PGW 64 bit prefix remains
+   * always unique 
+   */
+  uint8_t m_ipv6addressincrementor;
+
+  /**
+   * The common 56 bit prefix used for the IPv6 address assignment of
+   * the UE and PGW 
+   */
+  Ipv6Address m_baseipv6prefix;
 };
 
 

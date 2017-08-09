@@ -63,7 +63,9 @@ PointToPointEpcHelper::PointToPointEpcHelper ()
   // we use a /8 net for all UEs
   m_ueAddressHelper.SetBase ("7.0.0.0", "255.0.0.0");
 
-  m_ueAddressHelper6.SetBase (Ipv6Address ("7777:db80::"), Ipv6Prefix (64));
+
+  m_ipv6addressincrementor = 0;
+  m_baseipv6prefix = Ipv6Address("7777:db80::");
   
   
   // create SgwPgwNode
@@ -79,48 +81,33 @@ PointToPointEpcHelper::PointToPointEpcHelper ()
   // create TUN device implementing tunneling of user data over GTP-U/UDP/IP 
   m_tunDevice = CreateObject<VirtualNetDevice> ();
 
-  // create TUN device containing IPv6 address and implementing tunneling of user data over GTP-U/UDP/IP 
-  m_tunDevice6 = CreateObject<VirtualNetDevice> ();
-
   // allow jumbo packets
   m_tunDevice->SetAttribute ("Mtu", UintegerValue (30000));
 
-  m_tunDevice6->SetAttribute ("Mtu", UintegerValue (30000));
-
   // yes we need this
-  m_tunDevice->SetAddress (Mac48Address::Allocate ()); 
-
-  m_tunDevice6->SetAddress (Mac48Address::Allocate ()); 
+  m_tunDevice->SetAddress (Mac48Address::Allocate ());
 
 
 
   m_sgwPgw->AddDevice (m_tunDevice);
-  m_sgwPgw->AddDevice (m_tunDevice6);
   NetDeviceContainer tunDeviceContainer;
   tunDeviceContainer.Add (m_tunDevice);
-  NetDeviceContainer tunDeviceContainer6;
-  tunDeviceContainer6.Add (m_tunDevice6);
   
   // the TUN device is on the same subnet as the UEs, so when a packet
   // addressed to an UE arrives at the intenet to the WAN interface of
   // the PGW it will be forwarded to the TUN device. 
   Ipv4InterfaceContainer tunDeviceIpv4IfContainer = m_ueAddressHelper.Assign (tunDeviceContainer);  
 
-  // the TUN device is on the same subnet as the UEs, so when a packet
-  // addressed to an UE IPv6 address arrives at the intenet to the WAN interface of
-  // the PGW it will be forwarded to the TUN device. 
-  Ipv6InterfaceContainer tunDeviceIpv4IfContainer6 = m_ueAddressHelper6.Assign (tunDeviceContainer6);
 
-  //the constructor is changed for passing m_tunDevice6
+  Ipv6InterfaceContainer tunDeviceIpv6IfContainer = AssignUePgwIpv6Address (tunDeviceContainer);
+
   // create EpcSgwPgwApplication
-  m_sgwPgwApp = CreateObject<EpcSgwPgwApplication> (m_tunDevice, m_tunDevice6, sgwPgwS1uSocket);
+  m_sgwPgwApp = CreateObject<EpcSgwPgwApplication> (m_tunDevice, sgwPgwS1uSocket);
   m_sgwPgw->AddApplication (m_sgwPgwApp);
   
   // connect SgwPgwApplication and virtual net device for tunneling
   m_tunDevice->SetSendCallback (MakeCallback (&EpcSgwPgwApplication::RecvFromTunDevice, m_sgwPgwApp));
 
-  // connect SgwPgwApplication and virtual net device 6 for tunneling
-  m_tunDevice6->SetSendCallback (MakeCallback (&EpcSgwPgwApplication::RecvFromTunDevice, m_sgwPgwApp));
 
   // Create MME and connect with SGW via S11 interface
   m_mme = CreateObject<EpcMme> ();
@@ -180,8 +167,6 @@ PointToPointEpcHelper::DoDispose ()
   NS_LOG_FUNCTION (this);
   m_tunDevice->SetSendCallback (MakeNullCallback<bool, Ptr<Packet>, const Address&, const Address&, uint16_t> ());
   m_tunDevice = 0;
-  m_tunDevice6->SetSendCallback (MakeNullCallback<bool, Ptr<Packet>, const Address&, const Address&, uint16_t> ());
-  m_tunDevice6 = 0;
   m_sgwPgwApp = 0;  
   m_sgwPgw->Dispose ();
 }
@@ -383,9 +368,25 @@ PointToPointEpcHelper::AssignUeIpv4Address (NetDeviceContainer ueDevices)
 }
 
 Ipv6InterfaceContainer 
-PointToPointEpcHelper::AssignUeIpv6Address (NetDeviceContainer ueDevices)
+PointToPointEpcHelper::AssignUePgwIpv6Address (NetDeviceContainer ueDevices)
 {
-  return m_ueAddressHelper6.Assign (ueDevices);
+  Ipv6InterfaceContainer iifc;
+  Ptr<NetDevice> device;
+  for (uint32_t i = 0; i < ueDevices.GetN (); ++i) 
+    {
+       NetDeviceContainer dc;
+       device = ueDevices.Get (i);
+       dc.Add (device);
+       m_ipv6addressincrementor++;
+       NS_ASSERT_MSG (m_ipv6addressincrementor < 128, "Maximum 128 UEs are supported");
+       uint8_t buf[16];
+       m_baseipv6prefix.GetBytes (buf);
+       buf[7] = m_ipv6addressincrementor;
+       Ipv6Address addr (buf);
+       m_ueAddressHelper6.SetBase (addr, Ipv6Prefix (64));
+       iifc.Add (m_ueAddressHelper6.Assign (dc));
+    }  
+  return iifc;
 }
 
 Ipv4Address
