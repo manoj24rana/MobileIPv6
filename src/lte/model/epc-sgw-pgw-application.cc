@@ -129,15 +129,14 @@ EpcSgwPgwApplication::DoDispose ()
 }
 
   
-EpcSgwPgwApplication::EpcSgwPgwApplication (const Ptr<VirtualNetDevice> tunDevice, const Ptr<VirtualNetDevice> tunDevice6, const Ptr<Socket> s1uSocket)
+EpcSgwPgwApplication::EpcSgwPgwApplication (const Ptr<VirtualNetDevice> tunDevice, const Ptr<Socket> s1uSocket)
   : m_s1uSocket (s1uSocket),
     m_tunDevice (tunDevice),
-    m_tunDevice6 (tunDevice6),
     m_gtpuUdpPort (2152), // fixed by the standard
     m_teidCount (0),
     m_s11SapMme (0)
 {
-  NS_LOG_FUNCTION (this << tunDevice << tunDevice6 << s1uSocket);
+  NS_LOG_FUNCTION (this << tunDevice << s1uSocket);
   m_s1uSocket->SetRecvCallback (MakeCallback (&EpcSgwPgwApplication::RecvFromS1uSocket, this));
   m_s11SapSgw = new MemberEpcS11SapSgw<EpcSgwPgwApplication> (this);
 }
@@ -158,7 +157,7 @@ EpcSgwPgwApplication::RecvFromTunDevice (Ptr<Packet> packet, const Address& sour
   // get IP address of UE
   Ptr<Packet> pCopy = packet->Copy ();
   pCopy->CopyData (&ipType, 1);
-  ipType = (ipType>>4) & 0x0f;
+  ipType=(ipType>>4) & 0x0f;
   if (ipType == 0x04)
     {
       Ipv4Header ipv4Header;
@@ -241,19 +240,18 @@ EpcSgwPgwApplication::SendToTunDevice (Ptr<Packet> packet, uint32_t teid)
 {
   NS_LOG_FUNCTION (this << packet << teid);
   NS_LOG_LOGIC (" packet size: " << packet->GetSize () << " bytes");
-
   uint8_t ipType;
   // get IP address of UE
   Ptr<Packet> pCopy = packet->Copy ();
   pCopy->CopyData (&ipType, 1);
-  ipType = (ipType>>4) & 0x0f;
+  ipType=(ipType>>4) & 0x0f;
   if (ipType == 0x04)
     {
       m_tunDevice->Receive (packet, 0x0800, m_tunDevice->GetAddress (), m_tunDevice->GetAddress (), NetDevice::PACKET_HOST);
     }
   else
     {
-      m_tunDevice6->Receive (packet, 0x86DD, m_tunDevice6->GetAddress (), m_tunDevice6->GetAddress (), NetDevice::PACKET_HOST);
+      m_tunDevice->Receive (packet, 0x86DD, m_tunDevice->GetAddress (), m_tunDevice->GetAddress (), NetDevice::PACKET_HOST);
     }
 }
 

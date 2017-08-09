@@ -63,7 +63,8 @@ public:
    * internet over GTP-U/UDP/IP on the S1-U interface
    * \param s1uSocket socket used to send GTP-U packets to the eNBs
    */
-  EpcSgwPgwApplication (const Ptr<VirtualNetDevice> tunDevice, const Ptr<VirtualNetDevice> tunDevice6, const Ptr<Socket> s1uSocket);
+
+  EpcSgwPgwApplication (const Ptr<VirtualNetDevice> tunDevice, const Ptr<Socket> s1uSocket);
 
   /** 
    * Destructor
@@ -214,24 +215,24 @@ public:
     void SetEnbAddr (Ipv4Address addr);
 
     /** 
-     * \return the IPv4 address of the UE
+     * \return the address of the UE
      */
     Ipv4Address GetUeAddr ();
 
     /** 
-     * set the IPv4 address of the UE
+     * set the address of the UE
      * 
      * \param addr the address of the UE
      */
     void SetUeAddr (Ipv4Address addr);
 
     /** 
-     * \return the IPv6 address of the UE
+     * \return the address of the UE
      */
     Ipv6Address GetUeAddr6 ();
 
     /** 
-     * set the IPv6 address of the UE
+     * set the address of the UE
      * 
      * \param addr the address of the UE
      */
@@ -256,12 +257,6 @@ public:
    * from/to the internet over GTP-U/UDP/IP on the S1 interface 
    */
   Ptr<VirtualNetDevice> m_tunDevice;
-
-  /**
-   * TUN VirtualNetDevice used for tunneling/detunneling IP packets
-   * from/to the internet over GTP-U/UDP/IP on the S1 interface 
-   */
-  Ptr<VirtualNetDevice> m_tunDevice6;
 
   /**
    * Map telling for each UE IPv4 address the corresponding UE info 
