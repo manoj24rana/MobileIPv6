@@ -70,7 +70,7 @@ main (int argc, char *argv[])
 
   Ptr<Node> pgw = epcHelper->GetPgwNode ();
 
-   // Create a single RemoteHost
+  // Create a single RemoteHost
   NodeContainer remoteHostContainer;
   remoteHostContainer.Create (1);
   Ptr<Node> remoteHost = remoteHostContainer.Get (0);
@@ -114,8 +114,8 @@ main (int argc, char *argv[])
 
   Ipv6InterfaceContainer ueIpIface;
 
- for (NetDeviceContainer::Iterator it = ueLteDevs.Begin (); it != ueLteDevs.End (); ++it)
-   (*it)->SetAddress (Mac48Address::Allocate ());
+  for (NetDeviceContainer::Iterator it = ueLteDevs.Begin (); it != ueLteDevs.End (); ++it)
+    (*it)->SetAddress (Mac48Address::Allocate ());
 
   ueIpIface = epcHelper->AssignUePgwIpv6Address (NetDeviceContainer (ueLteDevs));
   // Assign IP address to UEs, and install applications
@@ -124,17 +124,17 @@ main (int argc, char *argv[])
       Ptr<Node> ueNode = ueNodes.Get (u);
       // Set the default gateway for the UE
       Ptr<Ipv6StaticRouting> ueStaticRouting = ipv6RoutingHelper.GetStaticRouting (ueNode->GetObject<Ipv6> ());
-      ueStaticRouting->SetDefaultRoute (epcHelper->GetUeDefaultGatewayAddress6 (), 0);
+      ueStaticRouting->SetDefaultRoute (epcHelper->GetUeDefaultGatewayAddress6 (), 1);
     }
 
-std::cout<<"\n\nGW Address:\n"<<epcHelper->GetUeDefaultGatewayAddress6 ()<<"\n\n";
+  std::cout<<"\n\nGW Address:\n"<<epcHelper->GetUeDefaultGatewayAddress6 ()<<"\n\n";
 
   // Attach one UE per eNodeB
   for (uint16_t i = 0; i < numberOfNodes; i++)
-      {
-        lteHelper->Attach (ueLteDevs.Get(i), enbLteDevs.Get(i));
-        // side effect: the default EPS bearer will be activated
-      }
+    {
+      lteHelper->Attach (ueLteDevs.Get(i), enbLteDevs.Get(i));
+      // side effect: the default EPS bearer will be activated
+    }
 
   Ipv6AddressHelper ipv6h;
   ipv6h.SetBase (Ipv6Address ("6001:db80::"), Ipv6Prefix (64));
@@ -146,49 +146,51 @@ std::cout<<"\n\nGW Address:\n"<<epcHelper->GetUeDefaultGatewayAddress6 ()<<"\n\n
 
   // Install and start applications on UEs and remote host
 
-UdpEchoServerHelper echoServer (9);
+  UdpEchoServerHelper echoServer (9);
 
-ApplicationContainer serverApps = echoServer.Install (remoteHost);
-
-
-serverApps.Start (Seconds (4.0));
-serverApps.Stop (Seconds (50.0));
+  ApplicationContainer serverApps = echoServer.Install (remoteHost);
 
 
-UdpEchoClientHelper echoClient1 (remoteHostAddr, 9);
-UdpEchoClientHelper echoClient2 (remoteHostAddr, 9);
-
-echoClient1.SetAttribute ("MaxPackets", UintegerValue (1000));
-echoClient1.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
-echoClient1.SetAttribute ("PacketSize", UintegerValue (1024));
-
-echoClient2.SetAttribute ("MaxPackets", UintegerValue (1000));
-echoClient2.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
-echoClient2.SetAttribute ("PacketSize", UintegerValue (1024));
-
-ApplicationContainer clientApps1 = echoClient1.Install (ueNodes.Get(0));
-ApplicationContainer clientApps2 = echoClient2.Install (ueNodes.Get(1));
+  serverApps.Start (Seconds (4.0));
+  serverApps.Stop (Seconds (50.0));
 
 
-clientApps1.Start (Seconds (4.0));
-clientApps1.Stop (Seconds (50.0));  
+  UdpEchoClientHelper echoClient1 (remoteHostAddr, 9);
+  UdpEchoClientHelper echoClient2 (remoteHostAddr, 9);
 
-clientApps2.Start (Seconds (4.5));
-clientApps2.Stop (Seconds (50.0));
+  echoClient1.SetAttribute ("MaxPackets", UintegerValue (1000));
+  echoClient1.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
+  echoClient1.SetAttribute ("PacketSize", UintegerValue (1024));
 
-LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_ALL);
-LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_ALL);
+  echoClient2.SetAttribute ("MaxPackets", UintegerValue (1000));
+  echoClient2.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
+  echoClient2.SetAttribute ("PacketSize", UintegerValue (1024));
 
-//LogComponentEnable ("Icmpv6L4Protocol", LOG_LEVEL_ALL);
+  ApplicationContainer clientApps1 = echoClient1.Install (ueNodes.Get(0));
+  ApplicationContainer clientApps2 = echoClient2.Install (ueNodes.Get(1));
 
 
-  LogComponentEnable("EpcSgwPgwApplication", LOG_LEVEL_ALL);
-  LogComponentEnable("EpcEnbApplication", LOG_LEVEL_ALL);
-  LogComponentEnable("LteUeNetDevice", LOG_LEVEL_ALL);
-  LogComponentEnable("LteEnbNetDevice", LOG_LEVEL_ALL);
-  LogComponentEnable("EpcUeNas", LOG_LEVEL_ALL);
-  LogComponentEnable("PointToPointEpcHelper", LOG_LEVEL_ALL);
-LogComponentEnable("EpcTftClassifier", LOG_LEVEL_ALL);
+  clientApps1.Start (Seconds (4.0));
+  clientApps1.Stop (Seconds (50.0));
+
+  clientApps2.Start (Seconds (4.5));
+  clientApps2.Stop (Seconds (50.0));
+
+  LogLevel level = LogLevel (LOG_PREFIX_TIME | LOG_PREFIX_NODE | LOG_LEVEL_ALL);
+
+  LogComponentEnable ("UdpEchoClientApplication", level);
+  LogComponentEnable ("UdpEchoServerApplication", level);
+
+//  LogComponentEnable ("Icmpv6L4Protocol", LOG_LEVEL_ALL);
+//  LogComponentEnable ("Ipv6L3Protocol", level);
+
+//  LogComponentEnable("EpcSgwPgwApplication", LOG_LEVEL_ALL);
+//  LogComponentEnable("EpcEnbApplication", LOG_LEVEL_ALL);
+//  LogComponentEnable("LteUeNetDevice", LOG_LEVEL_ALL);
+//  LogComponentEnable("LteEnbNetDevice", LOG_LEVEL_ALL);
+//  LogComponentEnable("EpcUeNas", LOG_LEVEL_ALL);
+//  LogComponentEnable("PointToPointEpcHelper", LOG_LEVEL_ALL);
+//  LogComponentEnable("EpcTftClassifier", LOG_LEVEL_ALL);
 
   internet.EnablePcapIpv6 ("lena1", ueNodes.Get(0));
   internet.EnablePcapIpv6 ("lena2", ueNodes.Get(1));
