@@ -33,7 +33,8 @@
 #include <ns3/epc-enb-application.h>
 #include <ns3/epc-sgw-pgw-application.h>
 #include <ns3/emu-fd-net-device-helper.h>
-
+#include "ns3/ipv6-static-routing.h"
+#include "ns3/ipv6-static-routing-helper.h"
 #include <ns3/lte-enb-rrc.h>
 #include <ns3/epc-x2.h>
 #include <ns3/lte-enb-net-device.h>
@@ -138,6 +139,15 @@ EmuEpcHelper::DoInitialize ()
   Ipv4InterfaceContainer tunDeviceIpv4IfContainer = m_ueAddressHelper.Assign (tunDeviceContainer); 
 
   Ipv6InterfaceContainer tunDeviceIpv6IfContainer = AssignUePgwIpv6Address (tunDeviceContainer);
+
+  //Set Forwarding
+  tunDeviceIpv6IfContainer.SetForwarding (0,true);
+  tunDeviceIpv6IfContainer.SetDefaultRouteInAllNodes (0);
+
+  //Add route for all UEs at TUN device
+  Ipv6StaticRoutingHelper ipv6RoutingHelper;
+  Ptr<Ipv6StaticRouting> remoteHostStaticRouting = ipv6RoutingHelper.GetStaticRouting (m_sgwPgw->GetObject<Ipv6> ());
+  remoteHostStaticRouting->AddNetworkRouteTo (Ipv6Address("7777:db80::"),Ipv6Prefix(56),Ipv6Address("::"),1,0);
 
   // create EpcSgwPgwApplication
   m_sgwPgwApp = CreateObject<EpcSgwPgwApplication> (m_tunDevice, sgwPgwS1uSocket);
@@ -387,6 +397,7 @@ EmuEpcHelper::AssignUeIpv4Address (NetDeviceContainer ueDevices)
 Ipv6InterfaceContainer 
 EmuEpcHelper::AssignUePgwIpv6Address (NetDeviceContainer ueDevices)
 {
+  // Make Unique 64 bit prefix for pgw and all UEs and then assign address
   Ipv6InterfaceContainer iifc;
   Ptr<NetDevice> device;
   for (uint32_t i = 0; i < ueDevices.GetN (); ++i) 
