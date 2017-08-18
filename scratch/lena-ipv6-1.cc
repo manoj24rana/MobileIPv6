@@ -48,7 +48,6 @@ main (int argc, char *argv[])
   double simTime = 100;
   double distance = 60.0;
 
-  // Command line arguments
   CommandLine cmd;
   cmd.AddValue ("numberOfNodes", "Number of eNodeBs + UE pairs", numberOfNodes);
   cmd.AddValue ("simTime", "Total duration of the simulation [s])", simTime);
@@ -110,8 +109,9 @@ main (int argc, char *argv[])
   for (NetDeviceContainer::Iterator it = ueLteDevs.Begin (); it != ueLteDevs.End (); ++it)
     (*it)->SetAddress (Mac48Address::Allocate ());
 
-  ueIpIface = epcHelper->AssignUePgwIpv6Address (NetDeviceContainer (ueLteDevs));
   // Assign IP address to UEs, and install applications
+  ueIpIface = epcHelper->AssignUeIpv6Address (NetDeviceContainer (ueLteDevs));
+
 
   Ipv6StaticRoutingHelper ipv6RoutingHelper;
 
@@ -138,8 +138,12 @@ main (int argc, char *argv[])
   internetIpIfaces.SetForwarding (0, true);
   internetIpIfaces.SetDefaultRouteInAllNodes (0);
 
+  Ipv6AddressValue ipval;
+  epcHelper->GetAttribute ("BaseIpv6Prefix", ipval);
+  Ipv6Address prefix = ipval.Get ();
+ 
   Ptr<Ipv6StaticRouting> remoteHostStaticRouting = ipv6RoutingHelper.GetStaticRouting (remoteHost->GetObject<Ipv6> ());
-  remoteHostStaticRouting->AddNetworkRouteTo (Ipv6Address ("7777:db80::"), Ipv6Prefix (56), internetIpIfaces.GetAddress (0, 1), 1, 0);
+  remoteHostStaticRouting->AddNetworkRouteTo (prefix, Ipv6Prefix (48), internetIpIfaces.GetAddress (0, 1), 1, 0);
 
 
   // interface 0 is localhost, 1 is the p2p device
@@ -181,17 +185,6 @@ main (int argc, char *argv[])
   LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_ALL);
   LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_ALL);
 
-  //  LogComponentEnable ("Icmpv6L4Protocol", LOG_LEVEL_ALL);
-  //  LogComponentEnable("EpcSgwPgwApplication", LOG_LEVEL_ALL);
-  //  LogComponentEnable("EpcEnbApplication", LOG_LEVEL_ALL);
-  //  LogComponentEnable("LteUeNetDevice", LOG_LEVEL_ALL);
-  //  LogComponentEnable("LteEnbNetDevice", LOG_LEVEL_ALL);
-  //  LogComponentEnable("EpcUeNas", LOG_LEVEL_ALL);
-  //  LogComponentEnable("PointToPointEpcHelper", LOG_LEVEL_ALL);
-  //  LogComponentEnable("EpcTftClassifier", LOG_LEVEL_ALL);
-  //  LogComponentEnable("Ipv6StaticRouting", LOG_LEVEL_ALL);
-  //  LogComponentEnable("Ipv6Interface", LOG_LEVEL_ALL);
-
   internet.EnablePcapIpv6 ("lena1", ueNodes.Get (0));
   internet.EnablePcapIpv6 ("lena2", ueNodes.Get (1));
   internet.EnablePcapIpv6 ("lena3", remoteHostContainer.Get (0));
@@ -201,13 +194,8 @@ main (int argc, char *argv[])
   Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
   routingHelper.PrintRoutingTableAt (Seconds (4.3), pgw, routingStream);
 
-
-
-
   Simulator::Stop (Seconds (simTime));
   Simulator::Run ();
-
-
 
   Simulator::Destroy ();
   return 0;
