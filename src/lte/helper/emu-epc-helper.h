@@ -81,7 +81,7 @@ public:
   virtual uint8_t ActivateEpsBearer (Ptr<NetDevice> ueLteDevice, uint64_t imsi, Ptr<EpcTft> tft, EpsBearer bearer);
   virtual Ptr<Node> GetPgwNode ();
   virtual Ipv4InterfaceContainer AssignUeIpv4Address (NetDeviceContainer ueDevices);
-  Ipv6InterfaceContainer AssignUePgwIpv6Address (NetDeviceContainer ueDevices);
+  Ipv6InterfaceContainer AssignUeIpv6Address (NetDeviceContainer ueDevices);
   virtual Ipv4Address GetUeDefaultGatewayAddress ();
   Ipv6Address GetUeDefaultGatewayAddress6 ();
 
@@ -166,13 +166,24 @@ private:
    * an IPv6 address to an UE. Thus, UE and PGW 64 bit prefix remains
    * always unique 
    */
-  uint8_t m_ipv6addressincrementor;
+  uint32_t m_ipv6addressincrementor;
 
   /**
-   * The common 56 bit prefix used for the IPv6 address assignment of
-   * the UE and PGW 
+   * The common 64 bit prefix used for the IPv6 address assignment of
+   * the PGW 
    */
-  Ipv6Address m_baseipv6prefix;
+  Ipv6Address m_pgwbaseipv6prefix;
+
+  /**
+   * The common 48 bit prefix used for the IPv6 address assignment of
+   * the UE 
+   */
+  Ipv6Address m_uebaseipv6prefix;
+
+  /**
+   * The prefixes used by this epc to assign UE addresses
+   */
+  std::list<Ipv6Address> m_Prefixlist;
 };
 
 

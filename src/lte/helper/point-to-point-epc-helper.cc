@@ -42,6 +42,8 @@
 #include <ns3/epc-mme.h>
 #include <ns3/epc-ue-nas.h>
 
+#include <algorithm>
+
 namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("PointToPointEpcHelper");
@@ -64,9 +66,12 @@ PointToPointEpcHelper::PointToPointEpcHelper ()
   // we use a /8 net for all UEs
   m_ueAddressHelper.SetBase ("7.0.0.0", "255.0.0.0");
 
-
+  //Initialize IPv6address incrementor
   m_ipv6addressincrementor = 0;
-  m_baseipv6prefix = Ipv6Address("7777:db80::");
+
+  // Create /64 bit base prefix for pgw
+  m_pgwbaseipv6prefix = Ipv6Address ("7777:2001:ef00:30bf::");
+  m_ueAddressHelper6.SetBase (m_pgwbaseipv6prefix, Ipv6Prefix (64));
   
   
   // create SgwPgwNode
@@ -100,17 +105,14 @@ PointToPointEpcHelper::PointToPointEpcHelper ()
   Ipv4InterfaceContainer tunDeviceIpv4IfContainer = m_ueAddressHelper.Assign (tunDeviceContainer);  
 
 
-  Ipv6InterfaceContainer tunDeviceIpv6IfContainer = AssignUePgwIpv6Address (tunDeviceContainer);
+  // the TUN device for IPv6 address is on the different subnet as the
+  // UEs, it will forward the UE packets as we have inserted the route
+  // for all UEs at the time of assigning UE addresses
+  Ipv6InterfaceContainer tunDeviceIpv6IfContainer = m_ueAddressHelper6.Assign (tunDeviceContainer);
 
-  //Set Forwarding
+  //Set Forwarding of the IPv6 interface
   tunDeviceIpv6IfContainer.SetForwarding (0,true);
   tunDeviceIpv6IfContainer.SetDefaultRouteInAllNodes (0);
-
-  //Add route for all UEs at TUN device
-  Ipv6StaticRoutingHelper ipv6RoutingHelper;
-  Ptr<Ipv6StaticRouting> remoteHostStaticRouting = ipv6RoutingHelper.GetStaticRouting (m_sgwPgw->GetObject<Ipv6> ());
-  remoteHostStaticRouting->AddNetworkRouteTo (Ipv6Address("7777:db80::"),Ipv6Prefix(56),Ipv6Address("::"),1,0);
-
 
   // create EpcSgwPgwApplication
   m_sgwPgwApp = CreateObject<EpcSgwPgwApplication> (m_tunDevice, sgwPgwS1uSocket);
@@ -168,6 +170,11 @@ PointToPointEpcHelper::GetTypeId (void)
                    UintegerValue (3000),
                    MakeUintegerAccessor (&PointToPointEpcHelper::m_x2LinkMtu),
                    MakeUintegerChecker<uint16_t> ())
+    .AddAttribute ("BaseIpv6Prefix",
+                   "The 48 bit IPv6 prefix to be used for the assignment of IPv6 addresses to pgw and ue.",
+                   Ipv6AddressValue (Ipv6Address ("9999:f00d:cafe::")),
+                   MakeIpv6AddressAccessor (&PointToPointEpcHelper::m_uebaseipv6prefix),
+                   MakeIpv6AddressChecker ())
   ;
   return tid;
 }
@@ -379,25 +386,47 @@ PointToPointEpcHelper::AssignUeIpv4Address (NetDeviceContainer ueDevices)
 }
 
 Ipv6InterfaceContainer 
-PointToPointEpcHelper::AssignUePgwIpv6Address (NetDeviceContainer ueDevices)
+PointToPointEpcHelper::AssignUeIpv6Address (NetDeviceContainer ueDevices)
 {
   // Make Unique 64 bit prefix for pgw and all UEs and then assign address
+  NS_ASSERT_MSG (m_ipv6addressincrementor < 65536, "Maximum 65535 UEs are supported");
   Ipv6InterfaceContainer iifc;
   Ptr<NetDevice> device;
+  uint8_t buf[16];
+  m_uebaseipv6prefix.GetBytes (buf);
+  // Take only first 48 bits
+  buf[6] = 0;
+  buf[7] = 0;
+  Ipv6Address addr (buf);
+  std::list<Ipv6Address>::iterator iter = std::find (m_Prefixlist.begin (), m_Prefixlist.end (), addr);
+
+  if (ueDevices.GetN ())
+    {
+      if (m_Prefixlist.end () == iter)
+        {
+           m_Prefixlist.push_back (addr);
+           m_ipv6addressincrementor = 0;
+           //Add route for a UE at TUN device 6
+           Ipv6StaticRoutingHelper ipv6RoutingHelper;
+           Ptr<Ipv6StaticRouting> PgwStaticRouting = ipv6RoutingHelper.GetStaticRouting (m_sgwPgw->GetObject<Ipv6> ());
+           PgwStaticRouting->AddNetworkRouteTo (m_uebaseipv6prefix, Ipv6Prefix (48), Ipv6Address("::"), 1, 0);
+        } 
+    }
+
   for (uint32_t i = 0; i < ueDevices.GetN (); ++i) 
     {
        NetDeviceContainer dc;
        device = ueDevices.Get (i);
        dc.Add (device);
-       m_ipv6addressincrementor++;
-       NS_ASSERT_MSG (m_ipv6addressincrementor < 128, "Maximum 128 UEs are supported");
-       uint8_t buf[16];
-       m_baseipv6prefix.GetBytes (buf);
-       buf[7] = m_ipv6addressincrementor;
+       buf[6] = (m_ipv6addressincrementor >> 8);
+       buf[7] = m_ipv6addressincrementor & 0xffff;
        Ipv6Address addr (buf);
+       NS_ASSERT_MSG (!addr.IsEqual (m_pgwbaseipv6prefix), "Cannot assign the same 64 bit prefix of pgw to a UE");
        m_ueAddressHelper6.SetBase (addr, Ipv6Prefix (64));
        iifc.Add (m_ueAddressHelper6.Assign (dc));
-    }  
+       m_ipv6addressincrementor++;
+    }
+
   return iifc;
 }
 
