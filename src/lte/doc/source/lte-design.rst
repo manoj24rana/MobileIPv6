@@ -120,7 +120,7 @@ in Figure :ref:`fig-epc-topology`.
 
 The following design choices have been made for the EPC model:
 
- #. The only Packet Data Network (PDN) type supported is IPv4.
+ #. The Packet Data Network (PDN) type supported is both IPv4 and IPv6.
  #. The SGW and PGW functional entities are implemented within a single
     node, which is hence referred to as the SGW/PGW node.
  #. The scenarios with inter-SGW mobility are not of interests. Hence, a
@@ -3097,9 +3097,16 @@ there are two different layers of
 IP networking. The first one is the end-to-end layer, which provides end-to-end 
 connectivity to the users; this layers involves the UEs, the PGW and
 the remote host (including eventual internet routers and hosts in
-between), but does not involve the eNB. By default, UEs are assigned a public IPv4 address in the 7.0.0.0/8
-network, and the PGW gets the address 7.0.0.1, which is used by all
-UEs as the gateway to reach the internet. 
+between), but does not involve the eNB. Every EPC is assigned a 16 bit IPv4 and a
+48 bit IPv6 network address from the pool of 7.0.0.0/8 and 7777:f00d::/32 respectively
+for the purpose of UE and PGW address assignments from these base addresses. As well as,
+the default base address values could also be changed by setting the attribute value of
+them in helper classes. It increases the readability of user defined topology. Each UE
+and the PGW gets a unique 32 bit IPv4 address or, a uinque 64 bit IPv6 prefix derived
+from the corresponding base address, which is aligned with the 3GPP IPv6 address allocation
+process. As the first 16 bit (ipv4 type) or, 48 bit (ipv6 type) prefixes differs from one EPC
+to another, the routing path set up in the internet becomes easy for different UEs, belonging to
+different EPCs. The PGW's address is used by all UEs as the gateway to reach the internet. 
 
 The second layer of IP networking is the EPC local area network. This
 involves all eNB nodes and the SGW/PGW node. This network is
@@ -3125,12 +3132,12 @@ end-to-end flow of data packets.
 
 To begin with, we consider the case of the downlink, which is depicted
 in Figure :ref:`fig-epc-data-flow-dl`.   
-Downlink Ipv4 packets are generated from a generic remote host, and
+Downlink Ipv4/Ipv6 packets are generated from a generic remote host, and
 addressed to one of the UE device. Internet routing will take care of
 forwarding the packet to the generic NetDevice of the SGW/PGW node
 which is connected to the internet (this is the Gi interface according
 to 3GPP terminology). The SGW/PGW has a VirtualNetDevice which is
-assigned the gateway IP address of the UE subnet; hence, static
+assigned the base IPv4/v6 address of the EPC network; hence, static
 routing rules will cause the incoming packet from the internet to be
 routed through this VirtualNetDevice. Such device starts the
 GTP/UDP/IP tunneling procedure, by forwarding the packet to a
