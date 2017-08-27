@@ -70,7 +70,7 @@ main (int argc, char *argv[])
 
   Ptr<Node> pgw = epcHelper->GetPgwNode ();
 
-   // Create a single RemoteHost
+  // Create a single RemoteHost
   NodeContainer remoteHostContainer;
   remoteHostContainer.Create (1);
   Ptr<Node> remoteHost = remoteHostContainer.Get (0);
@@ -89,9 +89,10 @@ main (int argc, char *argv[])
   // interface 0 is localhost, 1 is the p2p device
   Ipv4Address remoteHostAddr = internetIpIfaces.GetAddress (1);
 
+
   Ipv4StaticRoutingHelper ipv4RoutingHelper;
   Ptr<Ipv4StaticRouting> remoteHostStaticRouting = ipv4RoutingHelper.GetStaticRouting (remoteHost->GetObject<Ipv4> ());
-  remoteHostStaticRouting->AddNetworkRouteTo (Ipv4Address ("7.0.0.0"), Ipv4Mask ("255.0.0.0"), 1);
+  remoteHostStaticRouting->AddNetworkRouteTo (epcHelper->GetEpcIpv4NetworkAddress (), Ipv4Mask ("255.255.0.0"), 1);
 
   NodeContainer ueNodes;
   NodeContainer enbNodes;
@@ -170,13 +171,13 @@ clientApps2.Stop (Seconds (50.0));
 LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_ALL);
 LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_ALL);
 
-  LogComponentEnable("EpcSgwPgwApplication", LOG_LEVEL_ALL);
-  LogComponentEnable("EpcEnbApplication", LOG_LEVEL_ALL);
-LogComponentEnable("LteUeNetDevice", LOG_LEVEL_ALL);
-LogComponentEnable("LteEnbNetDevice", LOG_LEVEL_ALL);
-LogComponentEnable("PointToPointEpcHelper", LOG_LEVEL_ALL);
-LogComponentEnable("EpcUeNas", LOG_LEVEL_ALL);
-LogComponentEnable("EpcTftClassifier", LOG_LEVEL_ALL);
+//  LogComponentEnable("EpcSgwPgwApplication", LOG_LEVEL_ALL);
+//  LogComponentEnable("EpcEnbApplication", LOG_LEVEL_ALL);
+//LogComponentEnable("LteUeNetDevice", LOG_LEVEL_ALL);
+//LogComponentEnable("LteEnbNetDevice", LOG_LEVEL_ALL);
+//LogComponentEnable("PointToPointEpcHelper", LOG_LEVEL_ALL);
+//LogComponentEnable("EpcUeNas", LOG_LEVEL_ALL);
+//LogComponentEnable("EpcTftClassifier", LOG_LEVEL_ALL);
 
 
 

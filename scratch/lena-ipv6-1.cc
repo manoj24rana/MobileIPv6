@@ -1,6 +1,6 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2011 Centre Tecnologic de Telecomunicacions de Catalunya (CTTC)
+ * Copyright (c) 2017 Jadavpur University, India
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Jaume Nin <jaume.nin@cttc.cat>
+ * Author: Manoj Kumar Rana <manoj24.rana@gmail.com>
  */
 
 #include "ns3/lte-helper.h"
@@ -43,30 +43,16 @@ NS_LOG_COMPONENT_DEFINE ("EpcFirstExampleForIpv6");
 int
 main (int argc, char *argv[])
 {
-
-  uint16_t numberOfNodes = 2;
-  double simTime = 100;
-  double distance = 60.0;
-
   CommandLine cmd;
-  cmd.AddValue ("numberOfNodes", "Number of eNodeBs + UE pairs", numberOfNodes);
-  cmd.AddValue ("simTime", "Total duration of the simulation [s])", simTime);
-  cmd.AddValue ("distance", "Distance between eNBs [m]", distance);
   cmd.Parse (argc, argv);
 
   Ptr<LteHelper> lteHelper = CreateObject<LteHelper> ();
   Ptr<PointToPointEpcHelper>  epcHelper = CreateObject<PointToPointEpcHelper> ();
   lteHelper->SetEpcHelper (epcHelper);
 
-  ConfigStore inputConfig;
-  inputConfig.ConfigureDefaults ();
-
-  // parse again so you can override default values from the command line
-  cmd.Parse (argc, argv);
-
   Ptr<Node> pgw = epcHelper->GetPgwNode ();
 
-   // Create a single RemoteHost
+  // Create a single RemoteHost
   NodeContainer remoteHostContainer;
   remoteHostContainer.Create (1);
   Ptr<Node> remoteHost = remoteHostContainer.Get (0);
@@ -82,14 +68,14 @@ main (int argc, char *argv[])
 
   NodeContainer ueNodes;
   NodeContainer enbNodes;
-  enbNodes.Create (numberOfNodes);
-  ueNodes.Create (numberOfNodes);
+  enbNodes.Create (2);
+  ueNodes.Create (2);
 
   // Install Mobility Model
   Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
-  for (uint16_t i = 0; i < numberOfNodes; i++)
+  for (uint16_t i = 0; i < 2; i++)
     {
-      positionAlloc->Add (Vector (distance * i, 0, 0));
+      positionAlloc->Add (Vector (60.0 * i, 0, 0));
     }
   MobilityHelper mobility;
   mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
@@ -109,7 +95,7 @@ main (int argc, char *argv[])
   for (NetDeviceContainer::Iterator it = ueLteDevs.Begin (); it != ueLteDevs.End (); ++it)
     (*it)->SetAddress (Mac48Address::Allocate ());
 
-  // Assign IP address to UEs, and install applications
+  // Assign IP address to UEs
   ueIpIface = epcHelper->AssignUeIpv6Address (NetDeviceContainer (ueLteDevs));
 
 
@@ -118,14 +104,14 @@ main (int argc, char *argv[])
   for (uint32_t u = 0; u < ueNodes.GetN (); ++u)
     {
       Ptr<Node> ueNode = ueNodes.Get (u);
-      // Set the default gateway for the UE
+      // Set the default gateway for the UEs
       Ptr<Ipv6StaticRouting> ueStaticRouting = ipv6RoutingHelper.GetStaticRouting (ueNode->GetObject<Ipv6> ());
       ueStaticRouting->SetDefaultRoute (epcHelper->GetUeDefaultGatewayAddress6 (), 1);
     }
 
 
   // Attach one UE per eNodeB
-  for (uint16_t i = 0; i < numberOfNodes; i++)
+  for (uint16_t i = 0; i < 2; i++)
     {
       lteHelper->Attach (ueLteDevs.Get (i), enbLteDevs.Get (i));
       // side effect: the default EPS bearer will be activated
@@ -138,26 +124,22 @@ main (int argc, char *argv[])
   internetIpIfaces.SetForwarding (0, true);
   internetIpIfaces.SetDefaultRouteInAllNodes (0);
 
-  Ipv6AddressValue ipval;
-  epcHelper->GetAttribute ("BaseIpv6Prefix", ipval);
-  Ipv6Address prefix = ipval.Get ();
- 
   Ptr<Ipv6StaticRouting> remoteHostStaticRouting = ipv6RoutingHelper.GetStaticRouting (remoteHost->GetObject<Ipv6> ());
-  remoteHostStaticRouting->AddNetworkRouteTo (prefix, Ipv6Prefix (48), internetIpIfaces.GetAddress (0, 1), 1, 0);
+  remoteHostStaticRouting->AddNetworkRouteTo (epcHelper->GetEpcIpv6NetworkAddress (), Ipv6Prefix (48), internetIpIfaces.GetAddress (0, 1), 1, 0);
 
 
   // interface 0 is localhost, 1 is the p2p device
   Ipv6Address remoteHostAddr = internetIpIfaces.GetAddress (1, 1);
 
 
-  // Install and start applications on UEs and remote host
+  // Start applications on UEs and remote host
 
   UdpEchoServerHelper echoServer (9);
 
   ApplicationContainer serverApps = echoServer.Install (remoteHost);
 
 
-  serverApps.Start (Seconds (4.0));
+  serverApps.Start (Seconds (1.0));
   serverApps.Stop (Seconds (50.0));
 
 
@@ -176,10 +158,10 @@ main (int argc, char *argv[])
   ApplicationContainer clientApps2 = echoClient2.Install (ueNodes.Get(1));
 
 
-  clientApps1.Start (Seconds (4.0));
+  clientApps1.Start (Seconds (1.0));
   clientApps1.Stop (Seconds (50.0));  
 
-  clientApps2.Start (Seconds (4.5));
+  clientApps2.Start (Seconds (1.5));
   clientApps2.Stop (Seconds (50.0));
 
   LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_ALL);
@@ -190,11 +172,7 @@ main (int argc, char *argv[])
   internet.EnablePcapIpv6 ("lena3", remoteHostContainer.Get (0));
   internet.EnablePcapIpv6 ("lena4", pgw);
 
-  Ipv6StaticRoutingHelper routingHelper;
-  Ptr<OutputStreamWrapper> routingStream = Create<OutputStreamWrapper> (&std::cout);
-  routingHelper.PrintRoutingTableAt (Seconds (4.3), pgw, routingStream);
-
-  Simulator::Stop (Seconds (simTime));
+  Simulator::Stop (Seconds (50));
   Simulator::Run ();
 
   Simulator::Destroy ();
