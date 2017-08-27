@@ -69,7 +69,11 @@ public:
    *  \return The object TypeId.
    */
   static TypeId GetTypeId (void);
+  TypeId GetInstanceTypeId () const;
   virtual void DoDispose ();
+
+  Ipv4Address GetEpcIpv4NetworkAddress ();
+  Ipv6Address GetEpcIpv6NetworkAddress ();
 
   // inherited from EpcHelper
   virtual void AddEnb (Ptr<Node> enbNode, Ptr<NetDevice> lteEnbNetDevice, uint16_t cellId);
@@ -88,11 +92,11 @@ private:
   /** 
    * helper to assign IPv4 addresses to UE devices as well as to the TUN device of the SGW/PGW
    */
-  Ipv4AddressHelper m_ueAddressHelper;
+  Ipv4AddressHelper m_UePgwAddressHelper;
   /** 
    * helper to assign IPv6 addresses to UE devices as well as to the TUN device of the SGW/PGW
    */
-  Ipv6AddressHelper m_ueAddressHelper6;
+  Ipv6AddressHelper m_UePgwAddressHelper6;
   
   /**
    * SGW-PGW network element
@@ -173,29 +177,28 @@ private:
   uint16_t m_x2LinkMtu;
 
   /**
-   * Assign last 8 bit of the 64 bit prefix, used by UE and PGW.
-   * It is incremented by 1 while IPv6 address helper going to assign
-   * an IPv6 address to an UE. Thus, UE and PGW 64 bit prefix remains
-   * always unique 
+   * The common 8 bit prefix used for the IPv4 address assignment of
+   * the EPC network
    */
-  uint32_t m_ipv6addressincrementor;
+  Ipv4Address m_UePgwbaseipv4prefix8;
 
   /**
-   * The common 64 bit prefix used for the IPv6 address assignment of
-   * the PGW 
+   * The 16 bit prefix used for the IPv4 address assignment of
+   * the UE and PGW
    */
-  Ipv6Address m_pgwbaseipv6prefix;
+  Ipv4Address m_UePgwbaseipv4prefix16;
+
+  /**
+   * The common 32 bit prefix used for the IPv6 address assignment of
+   * this EPC network
+   */
+  Ipv6Address m_UePgwbaseipv6prefix32;
 
   /**
    * The common 48 bit prefix used for the IPv6 address assignment of
-   * the UE 
+   * the UE and PGW
    */
-  Ipv6Address m_uebaseipv6prefix;
-
-  /**
-   * The prefixes used by this epc to assign UE addresses
-   */
-  std::list<Ipv6Address> m_Prefixlist;
+  Ipv6Address m_UePgwbaseipv6prefix48;
 };
 
 

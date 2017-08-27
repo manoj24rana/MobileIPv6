@@ -41,8 +41,8 @@
 #include <ns3/lte-ue-net-device.h>
 #include <ns3/epc-mme.h>
 #include <ns3/epc-ue-nas.h>
-
-#include <algorithm>
+#include <ns3/ipv4-address-generator.h>
+#include <ns3/ipv6-address-generator.h>
 
 namespace ns3 {
 
@@ -55,6 +55,8 @@ PointToPointEpcHelper::PointToPointEpcHelper ()
   : m_gtpuUdpPort (2152)  // fixed by the standard
 {
   NS_LOG_FUNCTION (this);
+  // To access the attribute value within the constructor
+  ObjectBase::ConstructSelf (AttributeConstructionList ());
 
   // since we use point-to-point links for all S1-U links, 
   // we use a /30 subnet which can hold exactly two addresses 
@@ -63,21 +65,35 @@ PointToPointEpcHelper::PointToPointEpcHelper ()
 
   m_x2Ipv4AddressHelper.SetBase ("12.0.0.0", "255.255.255.252");
 
-  // we use a /8 net for all UEs
-  m_ueAddressHelper.SetBase ("7.0.0.0", "255.0.0.0");
+  // we use a /16 bit IPv4 net for an EPC network
+  m_UePgwbaseipv4prefix16 = m_UePgwbaseipv4prefix8.CombineMask (Ipv4Mask ("255.0.0.0"));  //Initialize
+  Ipv4AddressGenerator::Init (m_UePgwbaseipv4prefix16, Ipv4Mask ("255.255.0.0"));
 
-  //Initialize IPv6address incrementor
-  m_ipv6addressincrementor = 0;
+  Ipv4AddressGenerator::TestMode ();
+  while (!(Ipv4AddressGenerator::AddAllocated (Ipv4AddressGenerator::GetNetwork (Ipv4Mask ("255.255.0.0")))))
+    m_UePgwbaseipv4prefix16 = Ipv4AddressGenerator::NextNetwork (Ipv4Mask ("255.255.0.0"));
+  m_UePgwAddressHelper.SetBase (m_UePgwbaseipv4prefix16, "255.255.0.0"); //The helper will assign IPv4 addresses using this 16 bit prefix
+  //Now we get an unique 16 bit IPv4 prefix for this EPC, which not used by any other EPC
 
-  // Create /64 bit base prefix for pgw
-  m_pgwbaseipv6prefix = Ipv6Address ("7777:2001:ef00:30bf::");
-  m_ueAddressHelper6.SetBase (m_pgwbaseipv6prefix, Ipv6Prefix (64));
-  
-  
+
+  // we use a /48 IPv6 net for an EPC network
+  m_UePgwbaseipv6prefix48 = m_UePgwbaseipv6prefix32.CombinePrefix (Ipv6Prefix (32));//Initialize
+  Ipv6AddressGenerator::Init (m_UePgwbaseipv6prefix48, Ipv6Prefix (48));
+
+  Ipv6AddressGenerator::TestMode ();
+  while (!(Ipv6AddressGenerator::AddAllocated (Ipv6AddressGenerator::GetNetwork (Ipv6Prefix (48)))))
+    m_UePgwbaseipv6prefix48 = Ipv6AddressGenerator::NextNetwork (Ipv6Prefix (48));
+  //Now we get an unique 48 bit IPv6 prefix for this EPC, which not used by any other EPC
+
   // create SgwPgwNode
   m_sgwPgw = CreateObject<Node> ();
   InternetStackHelper internet;
   internet.Install (m_sgwPgw);
+
+  //The Tun device resides in different 64 bit subnet and so, create an unique route to tun device for all the packets destined to all 64 bit IPv6 prefixes of UEs, based by the unique 48 bit network prefix of this EPC network
+  Ipv6StaticRoutingHelper ipv6RoutingHelper;
+  Ptr<Ipv6StaticRouting> pgwStaticRouting = ipv6RoutingHelper.GetStaticRouting (m_sgwPgw->GetObject<Ipv6> ());
+  pgwStaticRouting->AddNetworkRouteTo (m_UePgwbaseipv6prefix48, Ipv6Prefix (48), Ipv6Address ("::"), 1, 0);
   
   // create S1-U socket
   Ptr<Socket> sgwPgwS1uSocket = Socket::CreateSocket (m_sgwPgw, TypeId::LookupByName ("ns3::UdpSocketFactory"));
@@ -102,13 +118,14 @@ PointToPointEpcHelper::PointToPointEpcHelper ()
   // the TUN device is on the same subnet as the UEs, so when a packet
   // addressed to an UE arrives at the intenet to the WAN interface of
   // the PGW it will be forwarded to the TUN device. 
-  Ipv4InterfaceContainer tunDeviceIpv4IfContainer = m_ueAddressHelper.Assign (tunDeviceContainer);  
+  Ipv4InterfaceContainer tunDeviceIpv4IfContainer = AssignUeIpv4Address (tunDeviceContainer);  
 
 
   // the TUN device for IPv6 address is on the different subnet as the
   // UEs, it will forward the UE packets as we have inserted the route
   // for all UEs at the time of assigning UE addresses
-  Ipv6InterfaceContainer tunDeviceIpv6IfContainer = m_ueAddressHelper6.Assign (tunDeviceContainer);
+  Ipv6InterfaceContainer tunDeviceIpv6IfContainer = AssignUeIpv6Address (tunDeviceContainer);
+
 
   //Set Forwarding of the IPv6 interface
   tunDeviceIpv6IfContainer.SetForwarding (0,true);
@@ -170,13 +187,24 @@ PointToPointEpcHelper::GetTypeId (void)
                    UintegerValue (3000),
                    MakeUintegerAccessor (&PointToPointEpcHelper::m_x2LinkMtu),
                    MakeUintegerChecker<uint16_t> ())
+    .AddAttribute ("BaseIpv4Prefix",
+                   "The 8 bit IPv4 prefix to be used for the assignment of IPv4 addresses to pgw and ue.",
+                   Ipv4AddressValue (Ipv4Address ("7.0.0.0")),
+                   MakeIpv4AddressAccessor (&PointToPointEpcHelper::m_UePgwbaseipv4prefix8),
+                   MakeIpv4AddressChecker ())
     .AddAttribute ("BaseIpv6Prefix",
-                   "The 48 bit IPv6 prefix to be used for the assignment of IPv6 addresses to pgw and ue.",
-                   Ipv6AddressValue (Ipv6Address ("9999:f00d:cafe::")),
-                   MakeIpv6AddressAccessor (&PointToPointEpcHelper::m_uebaseipv6prefix),
+                   "The 32 bit IPv6 prefix to be used for the assignment of IPv6 addresses to pgw and ue.",
+                   Ipv6AddressValue (Ipv6Address ("7777:f00d::")),
+                   MakeIpv6AddressAccessor (&PointToPointEpcHelper::m_UePgwbaseipv6prefix32),
                    MakeIpv6AddressChecker ())
   ;
   return tid;
+}
+
+TypeId
+PointToPointEpcHelper::GetInstanceTypeId () const
+{
+  return GetTypeId ();
 }
 
 void
@@ -382,49 +410,27 @@ PointToPointEpcHelper::GetPgwNode ()
 Ipv4InterfaceContainer 
 PointToPointEpcHelper::AssignUeIpv4Address (NetDeviceContainer ueDevices)
 {
-  return m_ueAddressHelper.Assign (ueDevices);
+  return m_UePgwAddressHelper.Assign (ueDevices);
 }
 
 Ipv6InterfaceContainer 
 PointToPointEpcHelper::AssignUeIpv6Address (NetDeviceContainer ueDevices)
 {
-  // Make Unique 64 bit prefix for pgw and all UEs and then assign address
-  NS_ASSERT_MSG (m_ipv6addressincrementor < 65536, "Maximum 65535 UEs are supported");
   Ipv6InterfaceContainer iifc;
   Ptr<NetDevice> device;
-  uint8_t buf[16];
-  m_uebaseipv6prefix.GetBytes (buf);
-  // Take only first 48 bits
-  buf[6] = 0;
-  buf[7] = 0;
-  Ipv6Address addr (buf);
-  std::list<Ipv6Address>::iterator iter = std::find (m_Prefixlist.begin (), m_Prefixlist.end (), addr);
 
-  if (ueDevices.GetN ())
-    {
-      if (m_Prefixlist.end () == iter)
-        {
-           m_Prefixlist.push_back (addr);
-           m_ipv6addressincrementor = 0;
-           //Add route for a UE at TUN device 6
-           Ipv6StaticRoutingHelper ipv6RoutingHelper;
-           Ptr<Ipv6StaticRouting> PgwStaticRouting = ipv6RoutingHelper.GetStaticRouting (m_sgwPgw->GetObject<Ipv6> ());
-           PgwStaticRouting->AddNetworkRouteTo (m_uebaseipv6prefix, Ipv6Prefix (48), Ipv6Address("::"), 1, 0);
-        } 
-    }
+  // Assign unique 64 bit prefixes to each UE
+
+  Ipv6AddressGenerator::Init (m_UePgwbaseipv6prefix48, Ipv6Prefix (64));
 
   for (uint32_t i = 0; i < ueDevices.GetN (); ++i) 
     {
        NetDeviceContainer dc;
        device = ueDevices.Get (i);
        dc.Add (device);
-       buf[6] = (m_ipv6addressincrementor >> 8);
-       buf[7] = m_ipv6addressincrementor & 0xffff;
-       Ipv6Address addr (buf);
-       NS_ASSERT_MSG (!addr.IsEqual (m_pgwbaseipv6prefix), "Cannot assign the same 64 bit prefix of pgw to a UE");
-       m_ueAddressHelper6.SetBase (addr, Ipv6Prefix (64));
-       iifc.Add (m_ueAddressHelper6.Assign (dc));
-       m_ipv6addressincrementor++;
+       while (!(Ipv6AddressGenerator::AddAllocated (Ipv6AddressGenerator::GetNetwork (Ipv6Prefix (64)))))
+         Ipv6AddressGenerator::NextNetwork (Ipv6Prefix (64));
+       iifc.Add (m_UePgwAddressHelper6.Assign (dc));
     }
 
   return iifc;
@@ -444,4 +450,15 @@ PointToPointEpcHelper::GetUeDefaultGatewayAddress6 ()
   return m_sgwPgw->GetObject<Ipv6> ()->GetAddress (1, 1).GetAddress ();
 }
 
+Ipv4Address PointToPointEpcHelper::GetEpcIpv4NetworkAddress ()
+{
+  // return thr network address of this epc
+  return m_UePgwbaseipv4prefix16;
+}
+
+Ipv6Address PointToPointEpcHelper::GetEpcIpv6NetworkAddress ()
+{
+  //return the network address of this epc
+  return m_UePgwbaseipv6prefix48;
+}
 } // namespace ns3
