@@ -24,7 +24,6 @@
 #include "ns3/log.h"
 #include "ns3/mac48-address.h"
 #include "ns3/ipv4.h"
-#include "ns3/ipv6.h"
 #include "ns3/inet-socket-address.h"
 #include "ns3/uinteger.h"
 
@@ -64,7 +63,16 @@ EpcEnbApplication::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::EpcEnbApplication")
     .SetParent<Object> ()
-    .SetGroupName("Lte");
+    .SetGroupName("Lte")
+    .AddTraceSource ("RxfromEnb",
+                     "Receive data packets from LTE Enb Net Device",
+                     MakeTraceSourceAccessor (&EpcEnbApplication::m_rxLteenbPktTrace),
+                     "ns3::EpcEnbApplication::RxTracedCallback")
+    .AddTraceSource ("RxfromS1u",
+                     "Receive data packets from S1-U Net Device",
+                     MakeTraceSourceAccessor (&EpcEnbApplication::m_rxS1uPktTrace),
+                     "ns3::EpcEnbApplication::RxTracedCallback")
+    ;
   return tid;
 }
 
@@ -242,7 +250,6 @@ void
 EpcEnbApplication::RecvFromLteSocket (Ptr<Socket> socket)
 {
   NS_LOG_FUNCTION (this);  
-
   if(m_lteSocket6)
     {
       NS_ASSERT (socket == m_lteSocket || socket == m_lteSocket6);
@@ -274,6 +281,7 @@ EpcEnbApplication::RecvFromLteSocket (Ptr<Socket> socket)
       std::map<uint8_t, uint32_t>::iterator bidIt = rntiIt->second.find (bid);
       NS_ASSERT (bidIt != rntiIt->second.end ());
       uint32_t teid = bidIt->second;
+      m_rxLteenbPktTrace (packet->Copy ());
       SendToS1uSocket (packet, teid);
     }
 }
@@ -294,7 +302,7 @@ EpcEnbApplication::RecvFromS1uSocket (Ptr<Socket> socket)
   /// Workaround for \bugid{231}
   SocketAddressTag tag;
   packet->RemovePacketTag (tag);
-  
+  m_rxS1uPktTrace (packet->Copy ());
   SendToLteSocket (packet, it->second.m_rnti, it->second.m_bid);
 }
 
@@ -307,7 +315,7 @@ EpcEnbApplication::SendToLteSocket (Ptr<Packet> packet, uint16_t rnti, uint8_t b
   uint8_t ipType;
   Ptr<Packet> pCopy = packet->Copy ();
   pCopy->CopyData (&ipType, 1);
-  ipType = (ipType>>4) & 0x0f;
+  ipType=(ipType>>4) & 0x0f;
   int sentBytes;
   if (ipType == 0x04)
     {
@@ -348,13 +356,13 @@ EpcEnbApplication::DoReleaseIndication (uint64_t imsi, uint16_t rnti, uint8_t be
   m_s1apSapMme->ErabReleaseIndication (imsi, rnti, erabToBeReleaseIndication);
 }
 
-void EpcEnbApplication::SetLTESocket6 (Ptr<Socket> lteSocket6)
+void EpcEnbApplication::SetLTESocket6(Ptr<Socket> lteSocket6)
 {
   m_lteSocket6 = lteSocket6;
   m_lteSocket6->SetRecvCallback (MakeCallback (&EpcEnbApplication::RecvFromLteSocket, this));
 }
 
-Ptr<Socket> EpcEnbApplication::GetLTESocket6 ()
+Ptr<Socket> EpcEnbApplication::GetLTESocket6()
 {
   return m_lteSocket6;
 }

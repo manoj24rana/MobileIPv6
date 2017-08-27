@@ -155,9 +155,17 @@ public:
    * set the address of a previously added UE
    * 
    * \param imsi the unique identifier of the UE
-   * \param ueAddr the IPv4 address of the UE
+   * \param ueAddr the IPv6 address of the UE
    */
   void SetUeAddress6 (uint64_t imsi, Ipv6Address ueAddr);
+
+  /**
+   * TracedCallback signature for data Packet reception event.
+   *
+   * \param [in] packet The data packet sent from the internet.
+   */
+  typedef void (* RxTracedCallback)
+    (Ptr<Packet> packet);
 
 private:
 
@@ -299,6 +307,16 @@ public:
   };
 
   std::map<uint16_t, EnbInfo> m_enbInfoByCellId;
+
+  /**
+   * \brief Callback to trace RX (reception) data packets at Tun Net Device from internet.
+   */ 
+  TracedCallback<Ptr<Packet> > m_rxTunPktTrace;
+
+  /**
+   * \brief Callback to trace RX (reception) data packets from S1-U socket.
+   */ 
+  TracedCallback<Ptr<Packet> > m_rxS1uPktTrace;
 };
 
 } //namespace ns3

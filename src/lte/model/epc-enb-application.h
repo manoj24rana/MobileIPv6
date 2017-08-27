@@ -125,6 +125,14 @@ public:
    */
   void RecvFromS1uSocket (Ptr<Socket> socket);
 
+  /**
+   * TracedCallback signature for data Packet reception event.
+   *
+   * \param [in] packet The data packet sent from the internet.
+   */
+  typedef void (* RxTracedCallback)
+    (Ptr<Packet> packet);
+
 
   struct EpsFlowId_t
   {
@@ -260,6 +268,15 @@ private:
 
   uint16_t m_cellId;
 
+  /**
+   * \brief Callback to trace RX (reception) data packets from LTE Enb Net Device.
+   */ 
+  TracedCallback<Ptr<Packet> > m_rxLteenbPktTrace;
+
+  /**
+   * \brief Callback to trace RX (reception) data packets from S1-U Net Device.
+   */ 
+  TracedCallback<Ptr<Packet> > m_rxS1uPktTrace;
 };
 
 } //namespace ns3

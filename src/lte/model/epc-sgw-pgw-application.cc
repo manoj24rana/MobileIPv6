@@ -115,7 +115,16 @@ EpcSgwPgwApplication::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::EpcSgwPgwApplication")
     .SetParent<Object> ()
-    .SetGroupName("Lte");
+    .SetGroupName("Lte")
+    .AddTraceSource ("RxfromTun",
+                     "Receive data packets from internet in Tunnel net device",
+                     MakeTraceSourceAccessor (&EpcSgwPgwApplication::m_rxTunPktTrace),
+                     "ns3::EpcSgwPgwApplication::RxTracedCallback")
+    .AddTraceSource ("RxfromS1u",
+                     "Receive data packets from S1 U Socket",
+                     MakeTraceSourceAccessor (&EpcSgwPgwApplication::m_rxS1uPktTrace),
+                     "ns3::EpcSgwPgwApplication::RxTracedCallback")
+    ;
   return tid;
 }
 
@@ -152,7 +161,7 @@ bool
 EpcSgwPgwApplication::RecvFromTunDevice (Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber)
 {
   NS_LOG_FUNCTION (this << source << dest << packet << packet->GetSize ());
-
+  m_rxTunPktTrace (packet->Copy ());
   uint8_t ipType;
   // get IP address of UE
   Ptr<Packet> pCopy = packet->Copy ();
@@ -210,6 +219,7 @@ EpcSgwPgwApplication::RecvFromTunDevice (Ptr<Packet> packet, const Address& sour
             }
         }
     }
+
   // there is no reason why we should notify the TUN
   // VirtualNetDevice that he failed to send the packet: if we receive
   // any bogus packet, it will just be silently discarded.
@@ -233,6 +243,8 @@ EpcSgwPgwApplication::RecvFromS1uSocket (Ptr<Socket> socket)
   packet->RemovePacketTag (tag);
 
   SendToTunDevice (packet, teid);
+
+  m_rxS1uPktTrace (packet->Copy ());
 }
 
 void 
