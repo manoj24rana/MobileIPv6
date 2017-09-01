@@ -817,9 +817,9 @@ It is to be noted that the ``EpcHelper`` will also automatically
 create the PGW node and configure it so that it can properly handle
 traffic from/to the LTE radio access network.  Still,
 you need to add some explicit code to connect the PGW to other
-IPv4/IPv6 networks (e.g., the internet). Here is a very simple example about
-how to connect a single remote host to the PGW via a point-to-point
-link::
+IPv4/IPv6 networks (e.g., the internet, another EPC). Here is a very
+simple example about how to connect a single remote host (IPv4 type)
+to the PGW via a point-to-point link::
 
   Ptr<Node> pgw = epcHelper->GetPgwNode ();
 

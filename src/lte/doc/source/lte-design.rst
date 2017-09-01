@@ -3097,16 +3097,18 @@ there are two different layers of
 IP networking. The first one is the end-to-end layer, which provides end-to-end 
 connectivity to the users; this layers involves the UEs, the PGW and
 the remote host (including eventual internet routers and hosts in
-between), but does not involve the eNB. Every EPC is assigned a 16 bit IPv4 and a
-48 bit IPv6 network address from the pool of 7.0.0.0/8 and 7777:f00d::/32 respectively
-for the purpose of UE and PGW address assignments from these base addresses. As well as,
-the default base address values could also be changed by setting the attribute value of
-them in helper classes. It increases the readability of user defined topology. Each UE
-and the PGW gets a unique 32 bit IPv4 address or, a uinque 64 bit IPv6 prefix derived
-from the corresponding base address, which is aligned with the 3GPP IPv6 address allocation
-process. As the first 16 bit (ipv4 type) or, 48 bit (ipv6 type) prefixes differs from one EPC
-to another, the routing path set up in the internet becomes easy for different UEs, belonging to
-different EPCs. The PGW's address is used by all UEs as the gateway to reach the internet. 
+between), but does not involve the eNB. In this version of LTE, the EPC
+supports both IPv4 and IPv6 type users. The 3GPP unique 64 bit IPv6 prefix
+allocation process for each UE and PGW is followed here. Each EPC is assigned
+an unique 16 bit IPv4 and a 48 bit IPv6 network address from the pool of
+7.0.0.0/8 and 7777:f00d::/32 respectively. In the end-to-end IP connection
+between UE and PGW, all addresses are configured using these prefixes.
+These default values could also be changed from user script by setting
+the attribute, defined in the helper classes. It increases the readability
+of the user defined topology. As the first 16 bit (ipv4 type) or, 48 bit (ipv6
+type) prefixes differs from one EPC to another, the routing path towards
+different EPC network from internet also becomes unique and easy to set up.
+The PGW's address is used by all UEs as the gateway to reach the internet. 
 
 The second layer of IP networking is the EPC local area network. This
 involves all eNB nodes and the SGW/PGW node. This network is
@@ -3137,12 +3139,14 @@ addressed to one of the UE device. Internet routing will take care of
 forwarding the packet to the generic NetDevice of the SGW/PGW node
 which is connected to the internet (this is the Gi interface according
 to 3GPP terminology). The SGW/PGW has a VirtualNetDevice which is
-assigned the base IPv4/v6 address of the EPC network; hence, static
+assigned the base IPv4 address of the EPC network; hence, static
 routing rules will cause the incoming packet from the internet to be
-routed through this VirtualNetDevice. Such device starts the
-GTP/UDP/IP tunneling procedure, by forwarding the packet to a
-dedicated application in the SGW/PGW  node which is called
-EpcSgwPgwApplication. This application does the following operations:
+routed through this VirtualNetDevice. In case of IPv6 address as destination,
+a manual route towards the VirtualNetDevice is inserted in the routing table,
+containg the 48 bit IPv6 prefix from which all the IPv6 addresses of the UEs
+and PGW are configured. Such device starts the GTP/UDP/IP tunneling procedure,
+by forwarding the packet to a dedicated application in the SGW/PGW  node which
+is called EpcSgwPgwApplication. This application does the following operations:
 
  #. it determines the eNB node to which the UE is attached, by looking
     at the IP destination address (which is the address of the UE);
