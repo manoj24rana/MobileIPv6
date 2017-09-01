@@ -99,12 +99,12 @@ EmuEpcHelper::GetTypeId (void)
     .AddAttribute ("BaseIpv4Prefix",
                    "The 8 bit IPv4 prefix to be used for the assignment of IPv4 addresses to pgw and ue.",
                    Ipv4AddressValue (Ipv4Address ("7.0.0.0")),
-                   MakeIpv4AddressAccessor (&EmuEpcHelper::m_UePgwbaseipv4prefix8),
+                   MakeIpv4AddressAccessor (&EmuEpcHelper::m_uePgwbaseipv4prefix8),
                    MakeIpv4AddressChecker ())
     .AddAttribute ("BaseIpv6Prefix",
                    "The 48 bit IPv6 prefix to be used for the assignment of IPv6 addresses to pgw and ue.",
                    Ipv6AddressValue (Ipv6Address ("7777:f00d:cafe::")),
-                   MakeIpv6AddressAccessor (&EmuEpcHelper::m_UePgwbaseipv6prefix32),
+                   MakeIpv6AddressAccessor (&EmuEpcHelper::m_uePgwbaseipv6prefix32),
                    MakeIpv6AddressChecker ())
     ;
   return tid;
@@ -122,23 +122,23 @@ EmuEpcHelper::DoInitialize ()
   NS_LOG_LOGIC (this);   
 
   // we use a /16 bit IPv4 net for an EPC network
-  m_UePgwbaseipv4prefix16 = m_UePgwbaseipv4prefix8.CombineMask (Ipv4Mask ("255.0.0.0")); //Initialize
-  Ipv4AddressGenerator::Init (m_UePgwbaseipv4prefix16, Ipv4Mask ("255.255.0.0"));
+  m_uePgwbaseipv4prefix16 = m_uePgwbaseipv4prefix8.CombineMask (Ipv4Mask ("255.0.0.0")); //Initialize
+  Ipv4AddressGenerator::Init (m_uePgwbaseipv4prefix16, Ipv4Mask ("255.255.0.0"));
 
   Ipv4AddressGenerator::TestMode ();
   while (!(Ipv4AddressGenerator::AddAllocated (Ipv4AddressGenerator::GetNetwork (Ipv4Mask ("255.255.0.0")))))
-    m_UePgwbaseipv4prefix16 = Ipv4AddressGenerator::NextNetwork (Ipv4Mask ("255.255.0.0"));
-  m_UePgwAddressHelper.SetBase (m_UePgwbaseipv4prefix16, "255.255.0.0");  //The helper will assign IPv4 addresses using this 16 bit prefix
+    m_uePgwbaseipv4prefix16 = Ipv4AddressGenerator::NextNetwork (Ipv4Mask ("255.255.0.0"));
+  m_uePgwAddressHelper.SetBase (m_uePgwbaseipv4prefix16, "255.255.0.0");  //The helper will assign IPv4 addresses using this 16 bit prefix
   //Now we get an unique 16 bit IPv4 prefix for this EPC, which not used by any other EPC
 
 
   // we use a /48 IPv6 net for an EPC network
-  m_UePgwbaseipv6prefix48 = m_UePgwbaseipv6prefix32.CombinePrefix (Ipv6Prefix (32)); //Initialize
-  Ipv6AddressGenerator::Init (m_UePgwbaseipv6prefix48, Ipv6Prefix (48));
+  m_uePgwbaseipv6prefix48 = m_uePgwbaseipv6prefix32.CombinePrefix (Ipv6Prefix (32)); //Initialize
+  Ipv6AddressGenerator::Init (m_uePgwbaseipv6prefix48, Ipv6Prefix (48));
   Ipv6AddressGenerator::TestMode ();
 
   while (!(Ipv6AddressGenerator::AddAllocated (Ipv6AddressGenerator::GetNetwork (Ipv6Prefix (48)))))
-    m_UePgwbaseipv6prefix48 = Ipv6AddressGenerator::NextNetwork (Ipv6Prefix (48));
+    m_uePgwbaseipv6prefix48 = Ipv6AddressGenerator::NextNetwork (Ipv6Prefix (48));
   //Now we get an unique 48 bit IPv6 prefix for this EPC, which not used by any other EPC
 
 
@@ -150,7 +150,7 @@ EmuEpcHelper::DoInitialize ()
   //The Tun device resides in different 64 bit subnet and so, create an unique route to tun device for all the packets destined to all 64 bit IPv6 prefixes of UEs, based by the unique 48 bit network prefix of this EPC network
   Ipv6StaticRoutingHelper ipv6RoutingHelper;
   Ptr<Ipv6StaticRouting> pgwStaticRouting = ipv6RoutingHelper.GetStaticRouting (m_sgwPgw->GetObject<Ipv6> ());
-  pgwStaticRouting->AddNetworkRouteTo (m_UePgwbaseipv6prefix48, Ipv6Prefix (48), Ipv6Address ("::"), 1, 0);
+  pgwStaticRouting->AddNetworkRouteTo (m_uePgwbaseipv6prefix48, Ipv6Prefix (48), Ipv6Address ("::"), 1, 0);
   
   // create S1-U socket
   Ptr<Socket> sgwPgwS1uSocket = Socket::CreateSocket (m_sgwPgw, TypeId::LookupByName ("ns3::UdpSocketFactory"));
@@ -427,7 +427,7 @@ EmuEpcHelper::GetPgwNode ()
 Ipv4InterfaceContainer 
 EmuEpcHelper::AssignUeIpv4Address (NetDeviceContainer ueDevices)
 {
-  return m_UePgwAddressHelper.Assign (ueDevices);
+  return m_uePgwAddressHelper.Assign (ueDevices);
 }
 
 Ipv6InterfaceContainer 
@@ -438,7 +438,7 @@ EmuEpcHelper::AssignUeIpv6Address (NetDeviceContainer ueDevices)
 
   // Assign unique 64 bit prefixes to each UE
 
-  Ipv6AddressGenerator::Init (m_UePgwbaseipv6prefix48, Ipv6Prefix (64));
+  Ipv6AddressGenerator::Init (m_uePgwbaseipv6prefix48, Ipv6Prefix (64));
 
   for (uint32_t i = 0; i < ueDevices.GetN (); ++i) 
     {
@@ -447,7 +447,7 @@ EmuEpcHelper::AssignUeIpv6Address (NetDeviceContainer ueDevices)
        dc.Add (device);
        while (!(Ipv6AddressGenerator::AddAllocated (Ipv6AddressGenerator::GetNetwork (Ipv6Prefix (64)))))
          Ipv6AddressGenerator::NextNetwork (Ipv6Prefix (64));
-       iifc.Add (m_UePgwAddressHelper6.Assign (dc));
+       iifc.Add (m_uePgwAddressHelper6.Assign (dc));
     }
 
   return iifc;
@@ -470,13 +470,13 @@ EmuEpcHelper::GetUeDefaultGatewayAddress6 ()
 Ipv4Address EmuEpcHelper::GetEpcIpv4NetworkAddress ()
 {
   // return the network address of this EPC
-  return m_UePgwbaseipv4prefix16;
+  return m_uePgwbaseipv4prefix16;
 }
 
 Ipv6Address EmuEpcHelper::GetEpcIpv6NetworkAddress ()
 {
   // return the network address of this EPC
-  return m_UePgwbaseipv6prefix48;
+  return m_uePgwbaseipv6prefix48;
 }
 
 } // namespace ns3

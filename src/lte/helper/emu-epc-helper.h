@@ -95,12 +95,12 @@ private:
   /** 
    * helper to assign IPv4 addresses to UE devices as well as to the TUN device of the SGW/PGW
    */
-  Ipv4AddressHelper m_UePgwAddressHelper; 
+  Ipv4AddressHelper m_uePgwAddressHelper; 
 
   /** 
    * helper to assign IPv6 addresses to UE devices as well as to the TUN device of the SGW/PGW
    */
-  Ipv6AddressHelper m_UePgwAddressHelper6; 
+  Ipv6AddressHelper m_uePgwAddressHelper6; 
 
   /**
    * SGW-PGW network element
@@ -167,25 +167,25 @@ private:
    * The common 8 bit prefix used for the IPv4 address assignment of
    * the EPC network
    */
-  Ipv4Address m_UePgwbaseipv4prefix8;
+  Ipv4Address m_uePgwbaseipv4prefix8;
 
   /**
    * The 16 bit prefix used for the IPv4 address assignment of
    * the UE and PGW
    */
-  Ipv4Address m_UePgwbaseipv4prefix16;
+  Ipv4Address m_uePgwbaseipv4prefix16;
 
   /**
    * The common 32 bit prefix used for the IPv6 address assignment of
    * this EPC network
    */
-  Ipv6Address m_UePgwbaseipv6prefix32;
+  Ipv6Address m_uePgwbaseipv6prefix32;
 
   /**
    * The common 48 bit prefix used for the IPv6 address assignment of
    * the UE and PGW
    */
-  Ipv6Address m_UePgwbaseipv6prefix48;
+  Ipv6Address m_uePgwbaseipv6prefix48;
 };
 
 
